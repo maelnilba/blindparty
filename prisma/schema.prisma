@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
+    provider = "postgresql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
@@ -27,12 +27,12 @@ model Account {
     type              String
     provider          String
     providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
     expires_at        Int?
     token_type        String?
     scope             String?
-    id_token          String? // @db.Text
+    id_token          String? @db.Text
     session_state     String?
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -47,20 +47,160 @@ model Session {
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-}
-
 model VerificationToken {
     identifier String
     token      String   @unique
     expires    DateTime
 
     @@unique([identifier, token])
+}
+
+//
+
+model User {
+    id                 String             @id @default(cuid())
+    name               String?
+    email              String?            @unique
+    emailVerified      DateTime?
+    image              String?
+    accounts           Account[]
+    sessions           Session[]
+    playlists          Playlist[]
+    role               Role               @default(USER)
+    friends            Friend[]
+    invitations_sent   FriendInvitation[] @relation("sent")
+    invitations_invite FriendInvitation[] @relation("invite")
+    hosts              Party[]            @relation("host")
+    players            Player[]
+    party              Party[]
+}
+
+enum Role {
+    USER
+    MODERATOR
+    ADMIN
+}
+
+model Friend {
+    id        String   @id @default(cuid())
+    friendId  String
+    name      String?
+    image     String?
+    createdAt DateTime @default(now())
+    User      User?    @relation(fields: [userId], references: [id])
+    userId    String?
+
+    @@unique([friendId])
+}
+
+model FriendInvitation {
+    id           String           @id @default(cuid())
+    user_sent    User             @relation(name: "sent", fields: [userSentId], references: [id])
+    user_invite  User             @relation(name: "invite", fields: [userInviteId], references: [id])
+    userSentId   String
+    userInviteId String
+    createdAt    DateTime         @default(now())
+    updatedAt    DateTime         @updatedAt
+    status       InvitationStatus @default(PENDING)
+
+    @@unique([userSentId, userInviteId])
+}
+
+enum InvitationStatus {
+    PENDING
+    ACCEPTED
+    REFUSED
+    BLOCKED
+}
+
+//
+
+model Playlist {
+    id          String   @id @default(cuid())
+    user        User[]
+    name        String
+    description String?
+    picture     String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    tracks      Track[]
+    public      Boolean
+    Party       Party[]
+}
+
+// Spotify schema
+
+model Track {
+    id          String     @id
+    name        String
+    picture     String?
+    preview_url String?
+    album       Album      @relation(fields: [albumId], references: [id])
+    albumId     String
+    artists     Artist[]
+    Playlist    Playlist[]
+}
+
+model Album {
+    id     String       @id
+    name   String
+    images AlbumImage[]
+    tracks Track[]
+}
+
+model Artist {
+    id     String  @id
+    name   String
+    tracks Track[]
+}
+
+model AlbumImage {
+    url     String  @id
+    width   Int
+    height  Int
+    album   Album?  @relation(fields: [albumId], references: [id])
+    albumId String?
+}
+
+//
+
+model Player {
+    id      String  @unique @default(cuid())
+    user    User    @relation(fields: [userId], references: [id])
+    userId  String  @id
+    Party   Party?  @relation(fields: [partyId], references: [id])
+    partyId String?
+
+    @@unique([userId, partyId])
+}
+
+model Party {
+    id          String      @id @default(cuid())
+    createdAt   DateTime    @default(now())
+    updatedAt   DateTime    @updatedAt
+    playlist    Playlist    @relation(fields: [playlistId], references: [id])
+    playlistId  String
+    inviteds    User[]
+    players     Player[]
+    host        User        @relation(name: "host", fields: [hostId], references: [id])
+    hostId      String
+    status      PartyStatus @default(PENDING)
+    max_round   Int
+    round       Int         @default(1)
+    link        PartyLink   @relation(fields: [partyLinkId], references: [id])
+    partyLinkId String      @unique
+}
+
+enum PartyStatus {
+    PENDING
+    CANCELED
+    RUNNING
+    ENDED
+}
+
+model PartyLink {
+    id       String   @id @default(cuid())
+    url      String   @unique
+    party    Party?
+    expireIn DateTime @default(dbgenerated("NOW() + interval '1 day'"))
 }
