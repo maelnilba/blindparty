@@ -6,6 +6,6 @@ type ExtractSocial<T extends { [key: string]: any }> = {
   [P in keyof T as Lowercase<ExtractProvider<P>>]: P;
 };
 
-type ExtractProvider<T> = T extends `${infer R}_${string}_ID` ? R : never;
+type ExtractProvider<T> = T extends `${infer R}_CLIENT_ID` ? R : never;
 
 export type Socials = keyof ExtractSocial<ENV>;

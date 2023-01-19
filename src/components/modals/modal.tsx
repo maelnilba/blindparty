@@ -6,6 +6,7 @@ type ModalProps = {
   defaultOpen?: boolean;
   children: ReactNode;
   title?: string;
+  className?: string;
 };
 
 export function Modal(props: ModalProps) {
@@ -42,6 +43,7 @@ export function Modal(props: ModalProps) {
           e.stopPropagation();
           openModal();
         }}
+        className={props.className}
       >
         {button}
       </div>

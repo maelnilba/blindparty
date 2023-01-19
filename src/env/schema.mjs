@@ -25,6 +25,10 @@ export const serverSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
   SPOTIFY_CLIENT_ID: z.string(),
   SPOTIFY_CLIENT_SECRET: z.string(),
+  PUSHER_KEY: z.string(),
+  PUSHER_SECRET: z.string(),
+  PUSHER_APP_ID: z.string(),
+  PUSHER_CLUSTER: z.string(),
 });
 
 /**
@@ -34,4 +38,6 @@ export const serverSchema = z.object({
  */
 export const clientSchema = z.object({
   // NEXT_PUBLIC_CLIENTVAR: z.string(),
+  NEXT_PUBLIC_PUSHER_KEY: z.string(),
+  NEXT_PUBLIC_PUSHER_CLUSTER: z.string(),
 });

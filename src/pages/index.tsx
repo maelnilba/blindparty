@@ -1,4 +1,5 @@
 import Navigation from "@components/navigation";
+import { api } from "@utils/api";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { getServerAuthSession } from "../server/auth";
 
@@ -19,14 +20,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     res: context.res,
   });
 
-  if (session) {
-    return {
-      redirect: {
-        destination: "/dashboard",
-        permanent: false,
-      },
-    };
-  }
+  // if (session) {
+  //   return {
+  //     redirect: {
+  //       destination: "/dashboard",
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 
   return {
     props: {},
