@@ -36,6 +36,14 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { Account, Role } from "@prisma/client";
 import { z } from "zod";
+import {
+  createPRPCServer,
+  presenceChannelProcedureSchema,
+  PresenceInput,
+  publicChannelProcedureSchema,
+  PublicInput,
+} from "@utils/pusher/server";
+import { env } from "env/server.mjs";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -207,7 +215,35 @@ const enfoncePartyUser = t.middleware(
 export const partyProcedure = protectedProcedure
   .input(
     z.object({
-      id: z.string().cuid(),
+      id: z.string().cuid().optional(),
     })
   )
   .use(enfoncePartyUser);
+
+const enforcePRPCServer = t.middleware(async ({ ctx, next, input: i }) => {
+  const input = i as PublicInput | PresenceInput;
+  if (!input.prpc) {
+    throw new TRPCError({ code: "PRECONDITION_FAILED" });
+  }
+
+  const prpc = createPRPCServer({
+    appId: env.PUSHER_APP_ID,
+    cluster: env.PUSHER_CLUSTER,
+    key: env.PUSHER_KEY,
+    secret: env.PUSHER_SECRET,
+  });
+
+  return next({
+    ctx: {
+      ...ctx,
+      prpc,
+    },
+  });
+});
+export const presenceChannelProcedure = protectedProcedure
+  .input(presenceChannelProcedureSchema)
+  .use(enforcePRPCServer);
+
+export const publicChannelProcedure = protectedProcedure
+  .input(publicChannelProcedureSchema)
+  .use(enforcePRPCServer);

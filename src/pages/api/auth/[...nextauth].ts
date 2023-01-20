@@ -10,7 +10,7 @@ import { env } from "../../../env/server.mjs";
 import { prisma } from "../../../server/db";
 
 export const authOptions: NextAuthOptions = {
-  debug: true,
+  debug: false, // true,
   pages: {
     signIn: "/sign-in",
     newUser: "/dashboard",

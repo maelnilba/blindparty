@@ -1,11 +1,20 @@
-import { createTRPCRouter, partyProcedure } from "server/api/trpc";
+import {
+  createTRPCRouter,
+  presenceChannelProcedure,
+  publicChannelProcedure,
+} from "server/api/trpc";
 import { z } from "zod";
 
 export const gameRouter = createTRPCRouter({
-  test: partyProcedure
-    .input(z.object({ ba: z.number() }))
+  test: publicChannelProcedure
+    .input(
+      z.object({
+        test: z.number(),
+      })
+    )
     .mutation(async ({ ctx, input }) => {
-      return 123;
+      // console.log(input.prpc.me);
+      return ctx.prpc(input).trigger({ id: "hehe" });
     }),
   // join: partyProcedure.mutation(async ({ ctx, input }) => {
   //   return ctx.prisma.party.update({
