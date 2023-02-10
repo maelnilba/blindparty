@@ -36,13 +36,6 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { Account, Role } from "@prisma/client";
 import { z } from "zod";
-import {
-  createPRPCServer,
-  presenceChannelProcedureSchema,
-  PresenceInput,
-  publicChannelProcedureSchema,
-  PublicInput,
-} from "@utils/pusher/server";
 import { env } from "env/server.mjs";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
@@ -99,7 +92,7 @@ const enforceUserIsAdmin = t.middleware(async ({ ctx, next }) => {
 export const protectedAdminProcedure =
   protectedProcedure.use(enforceUserIsAdmin);
 
-const enfonceSpotifyUserAuthed = t.middleware(async ({ ctx, next }) => {
+export const enfonceSpotifyUserAuthed = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
@@ -166,84 +159,3 @@ const enfonceSpotifyUserAuthed = t.middleware(async ({ ctx, next }) => {
 export const spotifyProcedure = protectedProcedure.use(
   enfonceSpotifyUserAuthed
 );
-
-const enfoncePartyUser = t.middleware(
-  async ({ ctx, input: mid_input, next }) => {
-    if (!ctx.session || !ctx.session.user) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
-
-    const input = mid_input as { id: string };
-
-    const party = await prisma.party.findUnique({
-      where: {
-        id: input.id,
-      },
-      include: {
-        host: true,
-        inviteds: true,
-        players: {
-          include: {
-            user: true,
-          },
-        },
-      },
-    });
-
-    if (
-      !party ||
-      !party.inviteds
-        .map((invited) => invited.id)
-        .includes(ctx.session.user.id) ||
-      (party.status !== "PENDING" &&
-        !party.players
-          .map((player) => player.userId)
-          .includes(ctx.session.user.id))
-    ) {
-      throw new TRPCError({ code: "UNAUTHORIZED" });
-    }
-
-    return next({
-      ctx: {
-        // infers the `session` as non-nullable
-        session: { ...ctx.session, user: ctx.session.user },
-      },
-    });
-  }
-);
-
-export const partyProcedure = protectedProcedure
-  .input(
-    z.object({
-      id: z.string().cuid().optional(),
-    })
-  )
-  .use(enfoncePartyUser);
-
-const enforcePRPCServer = t.middleware(async ({ ctx, next, input: i }) => {
-  const input = i as PublicInput | PresenceInput;
-  if (!input.prpc) {
-    throw new TRPCError({ code: "PRECONDITION_FAILED" });
-  }
-
-  const prpc = createPRPCServer({
-    appId: env.PUSHER_APP_ID,
-    cluster: env.PUSHER_CLUSTER,
-    key: env.PUSHER_KEY,
-    secret: env.PUSHER_SECRET,
-  });
-
-  return next({
-    ctx: {
-      ...ctx,
-      prpc,
-    },
-  });
-});
-export const presenceChannelProcedure = protectedProcedure
-  .input(presenceChannelProcedureSchema)
-  .use(enforcePRPCServer);
-
-export const publicChannelProcedure = protectedProcedure
-  .input(publicChannelProcedureSchema)
-  .use(enforcePRPCServer);
