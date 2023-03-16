@@ -16,7 +16,7 @@ export const spotifyRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const { body } = await ctx.spotify.getPlaylistTracks(input.id);
-      return body.items;
+      return body.items.filter(({ track }) => Boolean(track?.preview_url));
     }),
   search_playlist: spotifyProcedure
     .input(

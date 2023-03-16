@@ -1,21 +1,29 @@
 import { Divider } from "@components/elements/divider";
+import { MicroIcon } from "@components/icons/micro";
 import { Picture } from "@components/images/picture";
 import { Modal } from "@components/modals/modal";
 import Navigation from "@components/navigation";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useMicroPermission } from "@hooks/useMicroPermission";
-import type { PartyStatus } from "@prisma/client";
+import { useVoiceDetector } from "@hooks/useVoiceDetector";
+import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
+import { raw } from "lib/tailwindcolors";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
 } from "next";
 import { userAgentFromString } from "next/server";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { getServerAuthSession } from "server/auth";
 import { prisma } from "server/db";
+import { TRACK_TIMER_MS } from "../#constant";
+import { sleep } from "lib/helpers/sleep";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -109,13 +117,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   };
 }
+export type Player =
+  | InferGetServerSidePropsType<
+      typeof getServerSideProps
+    >["party"]["inviteds"][number];
 
 const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ party }) => {
   const [joineds, setJoineds] = useState<Set<string>>(new Set());
   const [game, setGame] = useState<PartyStatus>(party.status);
-
+  const [view, setView] = useState<PartyViewStatus>(party.view);
+  const [guesses, setGuesses] = useState<string[]>([]);
   const { send, bind, members } = prpc.game.useConnect(
     party.id,
     {
@@ -142,11 +155,91 @@ const Party: NextPage<
         }
       });
 
-      bind("round", ({ track }) => {});
+      bind("round", async () => {
+        setGuesses([]);
+        await sleep(TRACK_TIMER_MS);
+        setView("GUESS");
+      });
+
+      bind("guess", () => {
+        setGuesses([]);
+        setView("SCORE");
+      });
     }
   );
 
+  const guess = (word: string) => {
+    setGuesses((g) => [...g, word]);
+    send("guess", { guess: word.trim().toLocaleLowerCase() });
+  };
+
   const micro = useMicroPermission();
+  const { finalTranscript } = useSpeechRecognition();
+
+  useEffect(() => {
+    if (view === "GUESS") {
+      guess(finalTranscript);
+    }
+  }, [finalTranscript]);
+
+  const listenContinuously = async () => {
+    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+      return null;
+    }
+
+    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+      console.warn(
+        "Your browser does not support speech recognition software! Try Chrome desktop, maybe?"
+      );
+      return;
+    }
+    await SpeechRecognition.startListening({
+      continuous: true,
+      language: "fr-FR",
+    });
+  };
+  const vadMicro = useRef<SVGSVGElement | null>(null);
+  const { vad } = useVoiceDetector();
+  useEffect(() => {
+    if (game === "RUNNING") {
+      listenContinuously();
+
+      const onVoiceStart = () => {
+        if (!vadMicro.current) return;
+        vadMicro.current.style.display = "block";
+      };
+
+      const onVoiceStop = () => {
+        if (!vadMicro.current) return;
+        vadMicro.current.style.display = "none";
+      };
+
+      const onUpdate = (val: number) => {
+        if (!vadMicro.current) return;
+        const percent = val * 100;
+        let variation = Math.round((percent * 10) / 100) * 100;
+        variation = variation === 0 ? 50 : variation > 900 ? 900 : variation;
+        vadMicro.current.style.color = raw("teal", variation as any);
+        vadMicro.current.style.clipPath = `inset(${percent}% 0 0 0)`;
+      };
+
+      vad({
+        onVoiceStart,
+        onVoiceStop,
+        onUpdate,
+      });
+    }
+
+    return () => {
+      SpeechRecognition.stopListening();
+      vad({
+        onVoiceStart: () => {},
+        onVoiceStop: () => {},
+        onUpdate: () => {},
+      });
+    };
+  }, [game]);
+
   const activation = () => {
     if (typeof window === "undefined") {
       return;
@@ -154,6 +247,7 @@ const Party: NextPage<
 
     window.navigator.mediaDevices.getUserMedia({ audio: true });
   };
+
   const players = useMemo<
     { player: Player; joined: boolean; connected: boolean }[]
   >(() => {
@@ -180,9 +274,10 @@ const Party: NextPage<
   };
 
   return (
-    <div className="min-h-screen w-screen">
+    <div className="flex min-h-screen w-screen flex-col">
       <Navigation />
-      <div className="flex items-center justify-center gap-4 p-4">
+
+      <div className="flex flex-1 items-center justify-center gap-4 p-4">
         {game === "PENDING" && (
           <>
             <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
@@ -245,15 +340,70 @@ const Party: NextPage<
             </div>
           </>
         )}
+        {game === "RUNNING" && (
+          <>
+            <div className="flex  flex-1 flex-col items-center justify-center gap-4 pb-20">
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const target = (
+                    e.target as HTMLFormElement
+                  ).elements.namedItem("guess") as HTMLInputElement;
+                  if (target.value) {
+                    guess(target.value);
+                    target.value = "";
+                  }
+                }}
+              >
+                <input
+                  disabled={view === "SCORE"}
+                  type="text"
+                  name="guess"
+                  placeholder="Michael Jackson"
+                  className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
+                />
+              </form>
+
+              <div
+                data-view={view}
+                className="relative rounded-lg border border-gray-800 p-4 data-[view=SCORE]:border-gray-900"
+              >
+                <MicroIcon
+                  ref={vadMicro}
+                  className="absolute  h-48 w-48 transition-all duration-75"
+                  style={{ clipPath: "inset(100% 0 0 0)" }}
+                />
+                <MicroIcon className="h-48 w-48" />
+              </div>
+              <div className="fixed bottom-0 w-full p-2 pb-0">
+                <div className="scrollbar-hide flex h-48 w-full flex-col gap-2 overflow-y-auto rounded border border-gray-800">
+                  <div className="flex-1">
+                    {guesses
+                      .filter((g) => Boolean(g))
+                      .reverse()
+                      .map((guess, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5"
+                        >
+                          <div className="inline-block w-3/4">
+                            <span className="block overflow-hidden truncate text-ellipsis">
+                              {guess}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 };
 
-type Player =
-  | InferGetServerSidePropsType<
-      typeof getServerSideProps
-    >["party"]["inviteds"][number];
 type PlayerCardProps = {
   player: Player;
   connected: boolean;

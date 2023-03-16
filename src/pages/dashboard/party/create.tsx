@@ -69,7 +69,7 @@ const PartyCreate: NextPage = () => {
                   : true
               )
               .map((playlist) => (
-                <div className="cursor-pointer">
+                <div key={playlist.id} className="cursor-pointer">
                   <PlaylistCard
                     key={playlist.id}
                     playlist={playlist}
@@ -99,6 +99,7 @@ const PartyCreate: NextPage = () => {
               )
               .map((friend) => (
                 <div
+                  key={friend.id}
                   className="cursor-pointer"
                   onClick={() => handleFriends(friend)}
                 >
@@ -150,7 +151,9 @@ const PartyCreate: NextPage = () => {
                 {Array(10)
                   .fill(null)
                   .map((_, idx) => (
-                    <option value={(idx + 1) * 10}>{(idx + 1) * 10}</option>
+                    <option key={idx} value={(idx + 1) * 10}>
+                      {(idx + 1) * 10}
+                    </option>
                   ))}
               </select>
             </div>

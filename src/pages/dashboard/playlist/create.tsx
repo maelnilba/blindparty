@@ -120,6 +120,7 @@ const PlaylistCreate: NextPage = () => {
                 if (!track.track) {
                   return null;
                 }
+                console.log(track.track.preview_url);
                 return (
                   <PlaylistTrackCard
                     key={track.track.id}

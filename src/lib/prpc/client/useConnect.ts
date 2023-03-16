@@ -192,10 +192,10 @@ export function useConnect<
 
     if (isPresence) {
       (input.prpc as any)["me"] =
-        me || (channel.current as PresenceChannel).members.me;
+        me || (channel.current as PresenceChannel)?.members.me;
       (input.prpc as any)["members"] = (
         channel.current as PresenceChannel
-      ).members.members;
+      )?.members?.members;
     }
 
     const json = await (await reproduceTRPCMutate(getQueryKey, input)).json();

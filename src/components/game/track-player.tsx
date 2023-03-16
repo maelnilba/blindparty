@@ -1,8 +1,11 @@
 import { useCountdown } from "@hooks/useCountdown";
 import { RouterOutputs } from "@utils/api";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { TrackBluredPicture } from "./track-picture";
 
-export type TrackPlayerProps = RouterOutputs["party"]["game"]["round"];
+export type TrackPlayerProps = RouterOutputs["party"]["game"]["round"] & {
+  tracktimer: number;
+};
 
 export type TrackPlayerRef = {
   start: () => void;
@@ -10,14 +13,13 @@ export type TrackPlayerRef = {
 };
 
 export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
-  ({ track, embed }, ref) => {
+  ({ track, tracktimer }, ref) => {
     const [state, setState] = useState<"PENDING" | "LOADING" | "RUNNING">(
       "PENDING"
     );
     const timer = useRef<NodeJS.Timeout | null>(null);
-    const { count, start, stop } = useCountdown(5000);
+    const { count, start, stop } = useCountdown(tracktimer);
     const audio = useRef<HTMLAudioElement | null>(null);
-    const iframe = useRef<HTMLIFrameElement | null>(null);
     const range = useRef<HTMLDivElement | null>(null);
 
     useImperativeHandle(ref, () => ({
@@ -36,15 +38,6 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
             }
           });
         }
-        if (iframe.current) {
-          const button =
-            iframe.current.contentWindow?.document.querySelector(
-              '[title="Play"]'
-            );
-          if (button) {
-            (button as HTMLButtonElement).click();
-          }
-        }
       },
       stop: () => {
         if (timer.current) {
@@ -52,24 +45,12 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
           if (audio.current) {
             audio.current?.pause();
           }
-          if (iframe.current) {
-            if (iframe.current) {
-              const button =
-                iframe.current.contentWindow?.document.querySelector(
-                  '[title="Play"]'
-                );
-              if (button) {
-                (button as HTMLButtonElement).click();
-              }
-            }
-          }
+
           stop();
           clearTimeout(timer.current);
         }
       },
     }));
-
-    const image = track?.album.images.filter((i) => i.url).at(0);
 
     return (
       <div className="flex flex-col gap-4">
@@ -77,18 +58,14 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
           {state === "LOADING" && (
             <p className="z-10 text-9xl font-extrabold">{count}</p>
           )}
-          {/* <img className="absolute blur-xl" src={image?.url} /> */}
-          {/* {track?.preview_url && (
+          <TrackBluredPicture track={track} />
+          {track?.preview_url && (
             <>
-              <audio ref={audio}>
+              <audio ref={audio} className="invisible opacity-0">
                 <source src={track.preview_url} />
               </audio>
             </>
-          )} */}
-          <iframe
-            ref={iframe}
-            src="https://open.spotify.com/embed/track/5lwWpQ71GKN3sWmk8zZr9g"
-          ></iframe>
+          )}
         </div>
         <div className="relative h-2 w-full rounded-lg border border-gray-800 bg-black ">
           <div

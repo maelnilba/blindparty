@@ -139,6 +139,7 @@ model Track {
     albumId     String
     artists     Artist[]
     Playlist    Playlist[]
+    Party       Party[]
 }
 
 model Album {
@@ -167,28 +168,32 @@ model AlbumImage {
 model Player {
     id      String  @unique @default(cuid())
     user    User    @relation(fields: [userId], references: [id])
-    userId  String  @id
+    userId  String
     Party   Party?  @relation(fields: [partyId], references: [id])
     partyId String?
+    points  Int     @default(0)
 
     @@unique([userId, partyId])
 }
 
 model Party {
-    id          String      @id @default(cuid())
-    createdAt   DateTime    @default(now())
-    updatedAt   DateTime    @updatedAt
-    playlist    Playlist    @relation(fields: [playlistId], references: [id])
+    id          String          @id @default(cuid())
+    createdAt   DateTime        @default(now())
+    updatedAt   DateTime        @updatedAt
+    playlist    Playlist        @relation(fields: [playlistId], references: [id])
     playlistId  String
     inviteds    User[]
     players     Player[]
-    host        User        @relation(name: "host", fields: [hostId], references: [id])
+    host        User            @relation(name: "host", fields: [hostId], references: [id])
     hostId      String
-    status      PartyStatus @default(PENDING)
+    status      PartyStatus     @default(PENDING)
+    view        PartyViewStatus @default(NONE)
     max_round   Int
-    round       Int         @default(1)
-    link        PartyLink   @relation(fields: [partyLinkId], references: [id])
-    partyLinkId String      @unique
+    round       Int             @default(1)
+    track       Track?          @relation(fields: [trackId], references: [id])
+    link        PartyLink       @relation(fields: [partyLinkId], references: [id], onDelete: Cascade)
+    partyLinkId String          @unique
+    trackId     String?
 }
 
 enum PartyStatus {
@@ -196,6 +201,12 @@ enum PartyStatus {
     CANCELED
     RUNNING
     ENDED
+}
+
+enum PartyViewStatus {
+    NONE
+    GUESS
+    SCORE
 }
 
 model PartyLink {

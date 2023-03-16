@@ -6,12 +6,14 @@ import { PhoneIcon } from "@components/icons/phone";
 import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import Navigation from "@components/navigation";
+import { Score, ScoreBoard } from "@components/game/score-board";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useWindowLocation } from "@hooks/useWindowLocation";
-import type { PartyStatus } from "@prisma/client";
+import { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { RouterOutputs } from "@utils/api";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
+import { sleep } from "lib/helpers/sleep";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
@@ -19,9 +21,16 @@ import type {
 } from "next";
 import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { flushSync } from "react-dom";
 import { getServerAuthSession } from "server/auth";
 import { prisma } from "server/db";
+import {
+  GUESS_MS,
+  ONE_SECOND,
+  TRACK_TIMER_MS,
+  VIEW_SCORE_MS,
+} from "../#constant";
+import { TrackPicture } from "@components/game/track-picture";
+import { PlayerCard } from "@components/party/player-card";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -117,16 +126,25 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
+type Player =
+  | InferGetServerSidePropsType<
+      typeof getServerSideProps
+    >["party"]["inviteds"][number];
+
 const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ party, isHost }) => {
   const [joineds, setJoineds] = useState<Set<string>>(new Set());
   const [game, setGame] = useState<PartyStatus>(party.status);
+  const [view, setView] = useState<PartyViewStatus>(party.view);
+  const [scores, setScores] = useState<Score[]>([]);
+  const [itwas, setItwas] = useState<string | null>(null);
   const [track, setTrack] = useState<
     RouterOutputs["party"]["game"]["round"] | null
   >(null);
   const [tracks, setTracks] = useState<string[]>([]);
 
+  const timer = useRef<NodeJS.Timeout | null>(null);
   const audio = useRef<TrackPlayerRef | null>(null);
 
   const { send, bind, members } = prpc.game.useConnect(
@@ -138,6 +156,8 @@ const Party: NextPage<
       },
     },
     () => {
+      let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
+
       bind("join", ({ joined, user }) => {
         setJoineds((joineds) => {
           if (joined) {
@@ -147,6 +167,59 @@ const Party: NextPage<
           }
           return new Set(joineds);
         });
+      });
+
+      let ok = true; // avoid calling round multiple time
+      bind("guess", async (data) => {
+        if (!data) return;
+        if (!ok) return;
+        const { players, name } = data;
+
+        if (timer.current) {
+          clearInterval(timer.current);
+          timer.current = null;
+        }
+
+        setView("SCORE");
+        setScores(players);
+        setItwas(name);
+        ok = false;
+        await sleep(VIEW_SCORE_MS);
+        ok = true;
+        round([..._tracks]);
+      });
+
+      bind("next", async ({ name, track }) => {
+        if (timer.current) {
+          clearInterval(timer.current);
+          timer.current = null;
+        }
+        _tracks.add(track.id);
+
+        setTracks([..._tracks]);
+        setView("SCORE");
+        setItwas(name);
+
+        await sleep(VIEW_SCORE_MS);
+        round([..._tracks]);
+      });
+
+      bind("round", ({ track }) => {
+        if (!track) {
+          return;
+        }
+
+        setView("GUESS");
+        setItwas(null);
+
+        _tracks.add(track.id);
+        setTracks([..._tracks]);
+        setTrack({ track });
+
+        timer.current = setTimeout(
+          () => send("next", {}),
+          GUESS_MS + TRACK_TIMER_MS + ONE_SECOND
+        );
       });
     }
   );
@@ -190,15 +263,8 @@ const Party: NextPage<
     });
   };
 
-  const round = () => {
-    send("round", { tracks: tracks }, ({ result, error }) => {
-      if (error || !result || !result.track) {
-        return;
-      }
-
-      setTracks((tracks) => [...tracks, result.track.id]);
-      setTrack(result);
-    });
+  const round = (_tracks?: string[]) => {
+    send("round", { tracks: _tracks ?? tracks });
   };
 
   useEffect(() => {
@@ -307,6 +373,7 @@ const Party: NextPage<
                       key={player.id}
                       player={player}
                       joined={joined}
+                      connected
                     />
                   ))}
                 </div>
@@ -316,39 +383,36 @@ const Party: NextPage<
         )}
         {game === "RUNNING" && (
           <>
-            {track?.track && (
-              <TrackPlayer
-                key={track.track.id}
-                ref={audio}
-                track={track.track}
-                embed={track.embed}
-              />
+            {view === "GUESS" && (
+              <>
+                {track?.track && (
+                  <TrackPlayer
+                    tracktimer={TRACK_TIMER_MS}
+                    key={track.track.id}
+                    ref={audio}
+                    track={track.track}
+                  />
+                )}
+              </>
+            )}
+            {view === "SCORE" && (
+              <div className="flex flex-col gap-2">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <p className="text-4xl font-extrabold">The song was</p>
+                  <p>{itwas}</p>
+                  {track && track.track && (
+                    <TrackPicture className="h-28 w-28" track={track.track} />
+                  )}
+                </div>
+                <div className="mt-10 mb-20">
+                  <Divider />
+                </div>
+                <ScoreBoard scores={scores} />
+              </div>
             )}
           </>
         )}
       </div>
-    </div>
-  );
-};
-
-type Player =
-  | InferGetServerSidePropsType<
-      typeof getServerSideProps
-    >["party"]["inviteds"][number];
-type PlayerCardProps = {
-  player: Player;
-  joined: boolean;
-};
-const PlayerCard = ({ player, joined }: PlayerCardProps) => {
-  return (
-    <div className={`${!joined && "opacity-80"}`}>
-      <Picture identifier={player.image}>
-        <img
-          alt={`playlist picture of ${player.name}`}
-          src={player.image!}
-          className="h-12 w-12 rounded-sm border-gray-800"
-        />
-      </Picture>
     </div>
   );
 };
