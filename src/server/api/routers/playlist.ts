@@ -1,13 +1,18 @@
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
+const pictureLink = (key: string | undefined) =>
+  key
+    ? `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.APP_AWS_REGION}.amazonaws.com/${key}`
+    : undefined;
+
 export const playlistRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
         name: z.string(),
         description: z.string().optional(),
-        picture: z.string().optional(),
+        s3key: z.string().optional(),
         tracks: z
           .array(
             z.object({
@@ -37,6 +42,8 @@ export const playlistRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const picture = pictureLink(input.s3key);
+
       return await ctx.prisma.playlist.create({
         data: {
           user: {
@@ -46,6 +53,7 @@ export const playlistRouter = createTRPCRouter({
           },
           name: input.name,
           description: input.description,
+          picture: picture,
           public: false,
           tracks: {
             connectOrCreate: input.tracks.map((track) => ({
@@ -103,7 +111,7 @@ export const playlistRouter = createTRPCRouter({
         id: z.string().cuid(),
         name: z.string(),
         description: z.string().optional(),
-        picture: z.string().optional(),
+        s3key: z.string().optional(),
         tracks: z
           .array(
             z.object({
@@ -134,6 +142,8 @@ export const playlistRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const picture = pictureLink(input.s3key);
+
       return await ctx.prisma.playlist.update({
         where: {
           id: input.id,
@@ -141,6 +151,7 @@ export const playlistRouter = createTRPCRouter({
         data: {
           name: input.name,
           description: input.description,
+          picture: picture,
           tracks: {
             disconnect: input.removed_tracks.map((track_id) => ({
               id: track_id,

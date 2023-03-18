@@ -11,6 +11,7 @@ import type { NextPage } from "next/types";
 const Playlists: NextPage = () => {
   const [hasSpotify, isProviderLoading] = useAccessSpotify();
   const { data: playlists, refetch } = api.playlist.get_all.useQuery();
+
   const { mutate: erase } = api.playlist.delete.useMutation({
     onSuccess: () => {
       refetch();
@@ -113,7 +114,10 @@ const PlaylistCard = ({
           <p>{playlist._count.tracks} tracks</p>
         </div>
         <Picture identifier={playlist.picture}>
-          <img className="h-24 w-24 rounded" src={playlist.picture!} />
+          <img
+            className="aspect-square h-24 w-24 rounded border-gray-800 object-cover"
+            src={playlist.picture!}
+          />
         </Picture>
       </div>
       <div className="flex-1 p-2">

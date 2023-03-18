@@ -1,4 +1,4 @@
-import { isValidElement, ReactElement, ReactNode } from "react";
+import { isValidElement, ReactElement, ReactNode, useState } from "react";
 import { Placeholder } from "./placeholder";
 
 type PictureProps = {
@@ -8,12 +8,17 @@ type PictureProps = {
 };
 export const Picture = ({
   children,
-  identifier,
+  identifier: _identifier,
   className: pClassName,
 }: PictureProps) => {
+  const [identifier, setIdentifier] = useState(_identifier);
   const className = isValidElement(children) ? children.props.className : "";
   if (!identifier) {
     return <Placeholder className={className} />;
   }
-  return <picture className={pClassName}>{children}</picture>;
+  return (
+    <picture className={pClassName} onErrorCapture={() => setIdentifier(false)}>
+      {children}
+    </picture>
+  );
 };

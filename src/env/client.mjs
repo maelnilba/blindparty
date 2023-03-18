@@ -26,7 +26,6 @@ export const formatErrors = (
     .filter(Boolean);
 
 if (!_clientEnv.success) {
-  console.log(clientEnv);
   console.error(
     "❌ Invalid environment variables:\n",
     ...formatErrors(_clientEnv.error.format())

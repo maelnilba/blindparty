@@ -4,6 +4,7 @@ import { type Session } from "next-auth";
 import { getServerAuthSession } from "../auth";
 import { prisma } from "../db";
 import { spotify } from "../spotify";
+import { s3 } from "../s3";
 
 type ExtraSession = Session & {
   spotifyUserId?: string;
@@ -18,6 +19,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
     session: opts.session,
     prisma,
     spotify,
+    s3,
   };
 };
 
@@ -35,8 +37,6 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { Account, Role } from "@prisma/client";
-import { z } from "zod";
-import { env } from "env/server.mjs";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

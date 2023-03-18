@@ -1,3 +1,4 @@
+import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { ImageIcon } from "@components/icons/image";
 import Navigation from "@components/navigation";
 import { TrackPlayer, usePlayer } from "@components/playlist/track-player";
@@ -10,6 +11,7 @@ import { getQuery } from "@utils/next-router";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { Track } from "pages/dashboard/playlist/#types";
+import { useRef } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
 
@@ -56,6 +58,7 @@ const PlaylistEdit: NextPage = () => {
     search({ field: field });
   });
 
+  const s3key = useRef<string>();
   const { data: playlist } = api.admin.playlist.get_playlist.useQuery(
     { id: id! },
     {
@@ -74,14 +77,15 @@ const PlaylistEdit: NextPage = () => {
           playlist.name;
         (zo.form.elements.namedItem(zo.fields.description()) as any).value =
           playlist.description;
-
+        s3key.current = playlist.s3key ?? undefined;
         addTracks(playlist.tracks);
       },
     }
   );
 
+  const imageUpload = useRef<ImageUploadRef | null>(null);
   const zo = useZorm("create", editSchema, {
-    onValidSubmit(e) {
+    async onValidSubmit(e) {
       e.preventDefault();
       if (!id || !playlist) {
         return;
@@ -113,11 +117,15 @@ const PlaylistEdit: NextPage = () => {
         return;
       }
 
+      if (imageUpload.current && imageUpload.current.changed) {
+        await imageUpload.current.upload(s3key.current);
+      }
+
       edit({
         id: id,
         name: e.data.name,
         description: e.data.description,
-        picture: "",
+        s3key: imageUpload.current ? imageUpload.current.key : undefined,
         tracks: tracks,
         removed_tracks: removed_tracks,
       });
@@ -213,9 +221,12 @@ const PlaylistEdit: NextPage = () => {
             </button>
           </div>
           <div className="flex flex-grow items-center justify-center gap-4">
-            <div className="group flex h-full flex-1 cursor-pointer items-center justify-center rounded border border-gray-800 text-white">
-              <ImageIcon className="h-12 w-12 group-hover:scale-105" />
-            </div>
+            <ImageUpload
+              src={playlist?.picture}
+              ref={imageUpload}
+              className="flex-1"
+              prefix="playlist"
+            />
             <form
               ref={zo.ref}
               id="create-playlist"

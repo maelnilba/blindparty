@@ -121,6 +121,7 @@ model Playlist {
     name        String
     description String?
     picture     String?
+    s3key       String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     tracks      Track[]

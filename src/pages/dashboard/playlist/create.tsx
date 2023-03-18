@@ -1,3 +1,4 @@
+import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { ImageIcon } from "@components/icons/image";
 import Navigation from "@components/navigation";
 import { TrackPlayer, usePlayer } from "@components/playlist/track-player";
@@ -7,6 +8,7 @@ import { useMap } from "@hooks/useMap";
 import { api } from "@utils/api";
 import { useRouter } from "next/router";
 import type { NextPage } from "next/types";
+import { useRef } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
 import { Track } from "./#types";
@@ -49,8 +51,9 @@ const PlaylistCreate: NextPage = () => {
     mutate({ id });
   };
 
+  const imageUpload = useRef<ImageUploadRef | null>(null);
   const zo = useZorm("create", createSchema, {
-    onValidSubmit(e) {
+    async onValidSubmit(e) {
       e.preventDefault();
 
       const tracks = [...tracksMap].map(([_, track]) => ({
@@ -76,10 +79,14 @@ const PlaylistCreate: NextPage = () => {
         return;
       }
 
+      if (imageUpload.current && imageUpload.current.changed) {
+        await imageUpload.current.upload();
+      }
+
       create({
         name: e.data.name,
         description: e.data.description,
-        picture: "",
+        s3key: imageUpload.current ? imageUpload.current.key : undefined,
         tracks: tracks,
       });
     },
@@ -158,9 +165,11 @@ const PlaylistCreate: NextPage = () => {
             </button>
           </div>
           <div className="flex flex-grow items-center justify-center gap-4">
-            <div className="group flex h-full flex-1 cursor-pointer items-center justify-center rounded border border-gray-800 text-white">
-              <ImageIcon className="h-12 w-12 group-hover:scale-105" />
-            </div>
+            <ImageUpload
+              ref={imageUpload}
+              className="flex-1"
+              prefix="playlist"
+            />
             <form
               ref={zo.ref}
               id="create-playlist"

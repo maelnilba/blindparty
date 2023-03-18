@@ -254,6 +254,7 @@ export const TrackPlayer = ({
                     .fill(null)
                     .map((_, i) => (
                       <span
+                        key={i}
                         onClick={() => goto(i / 2)}
                         className="h-2 flex-1"
                       ></span>

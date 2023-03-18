@@ -32,7 +32,7 @@ export const PlaylistCard = ({
           <img
             alt={`playlist picture of ${playlist.name}`}
             src={playlist.picture!}
-            className="h-12 w-12 rounded-sm border-gray-800"
+            className="aspect-square h-12 w-12 rounded-sm border-gray-800 object-cover"
           />
         </Picture>
         <div className="inline-block w-3/4">

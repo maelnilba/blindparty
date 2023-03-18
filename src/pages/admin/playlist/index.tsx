@@ -57,7 +57,10 @@ const PlaylistCard = ({ playlist, onDelete }: PlaylistCardProps) => {
           <p>{playlist._count.tracks} tracks</p>
         </div>
         <Picture identifier={playlist.picture}>
-          <img className="h-24 w-24 rounded" src={playlist.picture!} />
+          <img
+            className="aspect-square h-24 w-24 rounded border-gray-800 object-cover"
+            src={playlist.picture!}
+          />
         </Picture>
       </div>
       <div className="flex-1 p-2">
