@@ -180,6 +180,7 @@ model Party {
     id          String          @id @default(cuid())
     createdAt   DateTime        @default(now())
     updatedAt   DateTime        @updatedAt
+    endedAt     DateTime?
     playlist    Playlist        @relation(fields: [playlistId], references: [id])
     playlistId  String
     inviteds    User[]

@@ -35,8 +35,9 @@ export const gameRouter = createTRPCRouter({
           },
           data: {
             players: {
-              delete: {
-                id: ctx.session.user.id,
+              deleteMany: {
+                userId: ctx.session.user.id,
+                partyId: input.prpc.channel_id,
               },
             },
           },
@@ -59,10 +60,28 @@ export const gameRouter = createTRPCRouter({
 
     return ctx.pusher.trigger({ running: !!party });
   }),
-  next: prpc.game.trigger(async ({ ctx, input }) => {
-    const track = await ctx.prisma.party.findUnique({
+  over: prpc.game.trigger(async ({ ctx, input }) => {
+    await ctx.prisma.party.updateMany({
       where: {
         id: input.prpc.channel_id,
+        host: {
+          id: ctx.session.user.id,
+        },
+      },
+      data: {
+        view: "NONE",
+        status: "ENDED",
+        endedAt: new Date(),
+      },
+    });
+  }),
+  next: prpc.game.trigger(async ({ ctx, input }) => {
+    const track = await ctx.prisma.party.findFirst({
+      where: {
+        id: input.prpc.channel_id,
+        host: {
+          id: ctx.session.user.id,
+        },
       },
       select: {
         track: {
@@ -157,7 +176,8 @@ export const gameRouter = createTRPCRouter({
       }
 
       if (party.round + 1 > party.max_round) {
-        return ctx.pusher.trigger({ track: null });
+        ctx.pusher.trigger({}, "over");
+        throw new TRPCError({ code: "CONFLICT" });
       }
 
       const tracks = party.playlist.tracks.filter(
@@ -167,8 +187,6 @@ export const gameRouter = createTRPCRouter({
       let track = tracks[Math.floor(Math.random() * tracks.length)];
 
       if (!track) {
-        console.log("OVERITO?");
-        // Means it's over?
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
       }
 

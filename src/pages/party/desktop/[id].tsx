@@ -221,6 +221,11 @@ const Party: NextPage<
           GUESS_MS + TRACK_TIMER_MS + ONE_SECOND
         );
       });
+
+      bind("over", () => {
+        setView("NONE");
+        setGame("ENDED");
+      });
     }
   );
 
@@ -398,7 +403,7 @@ const Party: NextPage<
             {view === "SCORE" && (
               <div className="flex flex-col gap-2">
                 <div className="flex flex-col items-center justify-center gap-2">
-                  <p className="text-4xl font-extrabold">The song was</p>
+                  <p className="text-4xl font-extrabold">Le son était</p>
                   <p>{itwas}</p>
                   {track && track.track && (
                     <TrackPicture className="h-28 w-28" track={track.track} />

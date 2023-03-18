@@ -33,13 +33,19 @@ export class PRPCPusher<
     return this;
   }
 
-  async trigger<T>(data: T): Promise<T> {
+  async trigger<T>(data: T): Promise<T>;
+  async trigger<T>(data: T, eventName: string): Promise<void>;
+  async trigger<T>(data: T, eventName?: string): Promise<T | void> {
     const channel = setChannelName(
       this.channel_type,
       this.channel_name,
       this.channel_id
     );
 
+    if (eventName) {
+      this.pusher.trigger(channel, eventName, data);
+      return;
+    }
     this.pusher.trigger(channel, this.channel_event!, data);
     return {
       result: data,

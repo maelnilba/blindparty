@@ -5,10 +5,10 @@ type PlaceholderProps = {
 };
 export const Placeholder = (props: PlaceholderProps) => {
   return (
-    <div
+    <picture
       className={`${props.className} flex items-center justify-center rounded border border-gray-800 text-white`}
     >
       <ImageIcon className="h-6 w-6" />
-    </div>
+    </picture>
   );
 };
