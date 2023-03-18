@@ -8,16 +8,16 @@ type PictureProps = {
 };
 export const Picture = ({
   children,
-  identifier: _identifier,
+  identifier,
   className: pClassName,
 }: PictureProps) => {
-  const [identifier, setIdentifier] = useState(_identifier);
+  const [error, setError] = useState(false);
   const className = isValidElement(children) ? children.props.className : "";
-  if (!identifier) {
+  if (!identifier || error) {
     return <Placeholder className={className} />;
   }
   return (
-    <picture className={pClassName} onErrorCapture={() => setIdentifier(false)}>
+    <picture className={pClassName} onErrorCapture={() => setError(true)}>
       {children}
     </picture>
   );

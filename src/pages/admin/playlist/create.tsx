@@ -101,7 +101,7 @@ const PlaylistCreate: NextPage = () => {
 
   return (
     <div className="flex flex-row gap-2">
-      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto px-4">
+      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto px-4 pb-20">
         <div className="sticky top-0 flex flex-col gap-2 bg-black/10 py-2 backdrop-blur-sm">
           <label htmlFor="playlist-name" className="font-semibold">
             Rechercher une playlist
@@ -122,7 +122,7 @@ const PlaylistCreate: NextPage = () => {
           ))}
         </div>
       </div>
-      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto">
+      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pb-20">
         {tracks && (
           <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 backdrop-blur-sm">
             <button
@@ -172,7 +172,7 @@ const PlaylistCreate: NextPage = () => {
             })}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto">
+      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pb-20">
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 backdrop-blur-sm">
           <div className="px-4 pb-2">
             <button

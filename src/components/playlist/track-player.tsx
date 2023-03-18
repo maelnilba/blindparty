@@ -125,10 +125,10 @@ export const TrackPlayer = ({
     audio.current.muted = false;
   };
   const speaker = (spk: number) => {
+    setVolume(spk);
     if (!audio.current) return;
     if (spk === 0 && !muted) mute();
     if (spk !== 0 && muted) unmute();
-    setVolume(spk);
     audio.current.volume = spk / 100;
   };
   const toggle = () => {
@@ -188,19 +188,19 @@ export const TrackPlayer = ({
       >
         <div className="grid w-full grid-cols-12 border-t-2 border-gray-800 p-2">
           <div className="col-span-3 flex items-center justify-center gap-4 px-[1.75rem]">
-            {track && (
-              <>
-                <Picture
-                  className="group/image relative"
-                  identifier={track?.album.images[0]?.url}
-                >
-                  <img
-                    alt={`track picture of ${track.name}`}
-                    src={track?.album.images[0]?.url}
-                    className="h-12 w-12 rounded-sm border-gray-800 transition-all duration-75 group-hover/item:scale-105 group-hover/image:opacity-75"
-                  />
-                </Picture>
-                <div className="inline-block w-3/4">
+            <Picture
+              className="group/image relative"
+              identifier={track?.album.images[0]?.url}
+            >
+              <img
+                alt={`track picture of ${track?.name}`}
+                src={track?.album.images[0]?.url}
+                className="h-12 w-12 rounded-sm border-gray-800 transition-all duration-75 group-hover/item:scale-105 group-hover/image:opacity-75"
+              />
+            </Picture>
+            <div className="inline-block w-3/4">
+              {track && (
+                <>
                   <span
                     title={track.name}
                     className="block overflow-hidden truncate text-ellipsis font-extrabold"
@@ -213,9 +213,9 @@ export const TrackPlayer = ({
                   >
                     {track.artists.map((a) => a.name).join(", ")}
                   </span>
-                </div>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
           <div className="col-span-6 flex flex-col items-center justify-center gap-2">
             {track?.preview_url && (
