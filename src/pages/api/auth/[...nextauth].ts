@@ -7,7 +7,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { env } from "../../../env/server.mjs";
-import { prisma } from "../../../server/db";
+import { prisma } from "@server/db";
 
 export const authOptions: NextAuthOptions = {
   debug: env.NODE_ENV !== "production",

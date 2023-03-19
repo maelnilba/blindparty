@@ -1,6 +1,6 @@
 import Navigation from "@components/navigation";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { getServerAuthSession } from "server/auth";
+import { getServerAuthSession } from "@server/auth";
 
 const Home: NextPage = () => {
   return (

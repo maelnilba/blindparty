@@ -1,8 +1,8 @@
 import { getQuery, getUA } from "@utils/next-router";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { userAgentFromString } from "next/server";
-import { getServerAuthSession } from "server/auth";
-import { prisma } from "server/db";
+import { getServerAuthSession } from "@server/auth";
+import { prisma } from "@server/db";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);

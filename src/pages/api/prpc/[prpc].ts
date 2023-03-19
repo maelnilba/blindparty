@@ -1,5 +1,5 @@
 import { env } from "../../../env/server.mjs";
-import { prpc } from "../../../server/api/prpc";
+import { prpc } from "@server/api/prpc";
 import { createNextApiHandler } from "@prpc/server";
 
 export default createNextApiHandler({

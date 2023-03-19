@@ -1,4 +1,4 @@
-import { protectedAdminProcedure } from "server/api/trpc";
+import { protectedAdminProcedure } from "@server/api/trpc";
 import { z } from "zod";
 import { createTRPCRouter } from "../../trpc";
 

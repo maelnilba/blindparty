@@ -2,7 +2,7 @@ import type { GetServerSidePropsContext, NextPage } from "next";
 import type { BuiltInProviderType } from "next-auth/providers";
 import type { ClientSafeProvider, LiteralUnion } from "next-auth/react";
 import { signIn, getProviders } from "next-auth/react";
-import { getServerAuthSession } from "server/auth";
+import { getServerAuthSession } from "@server/auth";
 
 const Index: NextPage<{
   providers: Record<

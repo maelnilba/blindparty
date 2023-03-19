@@ -28,7 +28,7 @@ const Navigation: React.FC = () => {
           <Link href="/help" className="font-bold hover:opacity-75">
             Help
           </Link>
-          <Menu as="div" className="relative z-10 inline-block text-left">
+          <Menu as="div" className="relative z-50 inline-block">
             <Menu.Button>
               <Transition
                 show
@@ -49,13 +49,13 @@ const Navigation: React.FC = () => {
                 </picture>
               </Transition>
             </Menu.Button>
-            <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-black ring-4 ring-white ring-opacity-5 focus:outline-none">
+            <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-black/80 ring-4 ring-white ring-opacity-5 backdrop-blur-sm focus:outline-none">
               <Menu.Item>
                 {({ active }) => (
                   <Link
                     className={`${
                       active ? "opacity-75" : ""
-                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    } group flex w-full items-center rounded-md p-4 text-sm ring-2 ring-white ring-opacity-5`}
                     href="/settings/account"
                   >
                     Settings
@@ -67,7 +67,7 @@ const Navigation: React.FC = () => {
                   <button
                     className={`${
                       active ? "opacity-75" : ""
-                    } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                    } group flex w-full items-center rounded-md p-4 text-sm ring-2 ring-white ring-opacity-5`}
                     onClick={() =>
                       void signOut({
                         callbackUrl: "/",

@@ -1,4 +1,4 @@
-import { Socials } from "server/types";
+import { Socials } from "@server/types";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const userRouter = createTRPCRouter({

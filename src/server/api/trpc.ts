@@ -1,10 +1,10 @@
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 
-import { getServerAuthSession } from "../auth";
-import { prisma } from "../db";
-import { spotify } from "../spotify";
-import { s3 } from "../s3";
+import { getServerAuthSession } from "@server/auth";
+import { prisma } from "@server/db";
+import { spotify } from "@server/spotify";
+import { s3 } from "@server/s3";
 
 type ExtraSession = Session & {
   spotifyUserId?: string;

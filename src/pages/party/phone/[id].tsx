@@ -20,8 +20,8 @@ import type {
 } from "next";
 import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getServerAuthSession } from "server/auth";
-import { prisma } from "server/db";
+import { getServerAuthSession } from "@server/auth";
+import { prisma } from "@server/db";
 import { TRACK_TIMER_MS } from "../#constant";
 import { sleep } from "lib/helpers/sleep";
 

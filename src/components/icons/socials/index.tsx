@@ -1,5 +1,5 @@
 import type { ClientSafeProvider } from "next-auth/react";
-import type { Socials } from "server/types";
+import type { Socials } from "@server/types";
 import { Icon } from "../icon";
 import { DiscordIcon } from "./discord";
 import { GoogleIcon } from "./google";

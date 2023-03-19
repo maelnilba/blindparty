@@ -1,6 +1,6 @@
 import { getQuery } from "@utils/next-router";
 import type { GetServerSidePropsContext, NextPage } from "next";
-import { prisma } from "server/db";
+import { prisma } from "@server/db";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const url = getQuery(context.query.url);
