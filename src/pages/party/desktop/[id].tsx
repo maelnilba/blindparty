@@ -27,6 +27,9 @@ import { GUESS_MS, TRACK_TIMER_MS, VIEW_SCORE_MS } from "../#constant";
 import { TrackPicture } from "@components/game/track-picture";
 import { PlayerCard } from "@components/party/player-card";
 import { ONE_SECOND_IN_MS } from "lib/helpers/date";
+import { useMessagesBus } from "@hooks/useMessagesBus";
+import { z } from "zod";
+import { useRouter } from "next/router";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -130,6 +133,7 @@ type Player =
 const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ party, isHost }) => {
+  const router = useRouter();
   const [joineds, setJoineds] = useState<Set<string>>(new Set());
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
@@ -142,6 +146,20 @@ const Party: NextPage<
 
   const timer = useRef<NodeJS.Timeout | null>(null);
   const audio = useRef<TrackPlayerRef | null>(null);
+
+  const { subscribe, message, unsubscribe } = useMessagesBus({
+    start: z.boolean(),
+  });
+
+  useEffect(() => {
+    subscribe("start", (started) => {
+      if (!started) return;
+      router.push("/party/error");
+    });
+    return () => {
+      unsubscribe("start");
+    };
+  }, []);
 
   const { send, bind, members } = prpc.game.useConnect(
     party.id,
@@ -259,6 +277,7 @@ const Party: NextPage<
     send("start", undefined, ({ error, result }) => {
       if (!error && result?.running) {
         setGame("RUNNING");
+        message("start", true);
         round();
       }
     });
