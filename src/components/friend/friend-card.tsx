@@ -14,7 +14,7 @@ export const FriendCard = ({ friend, onRemove }: FriendCardProps) => {
         <img
           alt={`user picture of ${friend.name}`}
           src={friend.image!}
-          className="h-12 w-12 rounded-sm border-gray-800 group-hover:scale-105"
+          className="h-12 w-12 rounded-sm border-gray-800 object-cover group-hover:scale-105"
         />
       </Picture>
       <div className="inline-block w-3/4">

@@ -7,7 +7,7 @@ export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
 
   return (
     <img
-      className="absolute"
+      className="absolute object-cover"
       width={600}
       src={"/api/og/blur?src=" + image?.url.split("").reverse().join("")}
     />

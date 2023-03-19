@@ -138,7 +138,7 @@ const UserCard = ({ user, onAdd }: UserCardProps) => {
         <img
           alt={`user picture of ${user.name}`}
           src={user.image!}
-          className="h-12 w-12 rounded-sm border-gray-800 group-hover:scale-105"
+          className="h-12 w-12 rounded-sm border-gray-800 object-cover group-hover:scale-105"
         />
       </Picture>
       <div className="inline-block w-3/4">
@@ -179,7 +179,7 @@ const InvitationCard = ({
         <img
           alt={`user picture of ${friendUser.name}`}
           src={friendUser.image!}
-          className={`h-12 w-12 rounded-sm border-gray-800 ${
+          className={`h-12 w-12 rounded-sm border-gray-800 object-cover ${
             invited && "group-hover:scale-105"
           }`}
         />
