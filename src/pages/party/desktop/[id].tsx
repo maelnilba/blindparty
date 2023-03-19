@@ -92,12 +92,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   });
 
-  if (
-    !party ||
-    !party.inviteds.map((invited) => invited.id).includes(session.user.id) ||
-    (party.status !== "PENDING" &&
-      !party.players.map((player) => player.userId).includes(session.user.id))
-  ) {
+  if (!party || !(party.host.id === session.user.id)) {
     return {
       redirect: {
         destination: "/dashboard",
@@ -154,7 +149,7 @@ const Party: NextPage<
   useEffect(() => {
     subscribe("start", (started) => {
       if (!started) return;
-      router.push("/party/error");
+      router.push("/party/desktop/error");
     });
     return () => {
       unsubscribe("start");
