@@ -1,19 +1,81 @@
+import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { PlusIcon } from "@components/icons/plus";
 import { ensureProvider, SocialIcon } from "@components/icons/socials";
 import { Modal } from "@components/modals/modal";
 import Navigation from "@components/navigation";
-import { useAccessSpotify } from "@hooks/useAccessSpotify";
+import { getServerAuthSession } from "@server/auth";
 import { useQuery } from "@tanstack/react-query";
 import { api, RouterOutputs } from "@utils/api";
-import type { NextPage } from "next";
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+  NextPage,
+} from "next";
 import { getProviders, signIn } from "next-auth/react";
+import { useRef } from "react";
+import { useZorm } from "react-zorm";
+import { z } from "zod";
 
-const Settings: NextPage = () => {
-  const [hasSpotify, isProviderLoading] = useAccessSpotify();
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getServerAuthSession({
+    req: context.req,
+    res: context.res,
+  });
+
+  if (!session || !session.user) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { user: session.user },
+  };
+}
+
+const editSchema = z.object({
+  name: z.string().min(1),
+});
+
+const Settings: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ user: _user }) => {
   const { data: providers } = api.user.provider.useQuery();
   const { data: allProviders } = useQuery(["next-auth-providers"], () =>
     getProviders()
   );
+  const { data: __user, refetch } = api.user.me.useQuery();
+  const { mutate: edit } = api.user.edit.useMutation({
+    onSuccess: () => {
+      refetch();
+
+      // Hack for reload the next-auth session
+      const event = new Event("visibilitychange");
+      document.dispatchEvent(event);
+    },
+  });
+
+  const imageUpload = useRef<ImageUploadRef | null>(null);
+  const zo = useZorm("edit", editSchema, {
+    async onValidSubmit(e) {
+      e.preventDefault();
+
+      let s3key = __user?.s3key ?? getS3key(_user.image);
+      if (imageUpload.current && imageUpload.current.changed) {
+        await imageUpload.current.upload(s3key);
+      }
+
+      edit({
+        name: e.data.name,
+        s3key: imageUpload.current ? imageUpload.current.key : undefined,
+      });
+    },
+  });
+
+  const user = __user ? __user : _user;
 
   return (
     <div className="min-h-screen w-screen">
@@ -21,7 +83,7 @@ const Settings: NextPage = () => {
       <div className="flex flex-wrap gap-4 p-4 px-28">
         <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
           <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-            <Modal>
+            <Modal className="w-full">
               <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                 Lié un compte
               </button>
@@ -66,6 +128,44 @@ const Settings: NextPage = () => {
             ))}
           </div>
         </div>
+        <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
+          <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+            <button
+              type="submit"
+              form="edit-user"
+              className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            >
+              Sauvegarder
+            </button>
+          </div>
+          <div className="flex flex-1 flex-col gap-2 p-2">
+            <div className="flex justify-center gap-4">
+              <ImageUpload
+                src={user.image}
+                ref={imageUpload}
+                className="flex-1"
+                prefix="user"
+              />
+              <form
+                ref={zo.ref}
+                id="edit-user"
+                className="flex h-full flex-[2] flex-col gap-2"
+              >
+                <div>
+                  <label htmlFor={zo.fields.name()} className="font-semibold">
+                    Nom
+                  </label>
+                  <input
+                    defaultValue={user.name ?? ""}
+                    name={zo.fields.name()}
+                    id={zo.fields.name()}
+                    className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                  />
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -93,3 +193,15 @@ const ProviderCard = ({ provider, onClick }: ProviderCardProps) => {
 };
 
 export default Settings;
+
+const getS3key = (url: string | null | undefined) => {
+  if (!url) return undefined;
+
+  const _url = new URL(url);
+  if (
+    _url.hostname ===
+    `${process.env.NEXT_PUBLIC_AWS_S3_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_APP_AWS_REGION}.amazonaws.com`
+  )
+    return _url.pathname.substring(1);
+  else return undefined;
+};

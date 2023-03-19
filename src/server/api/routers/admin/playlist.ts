@@ -1,11 +1,7 @@
 import { protectedAdminProcedure } from "@server/api/trpc";
+import { pictureLink } from "@server/s3";
 import { z } from "zod";
 import { createTRPCRouter } from "../../trpc";
-
-const pictureLink = (key: string | undefined) =>
-  key
-    ? `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.APP_AWS_REGION}.amazonaws.com/${key}`
-    : undefined;
 
 export const playlistRouter = createTRPCRouter({
   create: protectedAdminProcedure
@@ -50,6 +46,7 @@ export const playlistRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           picture: picture,
+          s3key: input.s3key,
           public: true,
           tracks: {
             connectOrCreate: input.tracks.map((track) => ({
@@ -148,6 +145,7 @@ export const playlistRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           picture: picture,
+          s3key: input.s3key,
           tracks: {
             disconnect: input.removed_tracks.map((track_id) => ({
               id: track_id,

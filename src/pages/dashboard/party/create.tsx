@@ -7,6 +7,7 @@ import { api } from "@utils/api";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
+import { ExclamationIcon } from "@components/icons/exclamation";
 
 const PartyCreate: NextPage = () => {
   const router = useRouter();
@@ -26,7 +27,8 @@ const PartyCreate: NextPage = () => {
 
   const [playlistField, setPlaylistField] = useState<string | undefined>();
   const [friendField, setFriendField] = useState<string | undefined>();
-  const roundRef = useRef<HTMLSelectElement | null>(null);
+
+  const [rounds, setRounds] = useState(20);
 
   const { mutate: create } = api.party.create.useMutation({
     onSuccess: (data) => {
@@ -34,12 +36,12 @@ const PartyCreate: NextPage = () => {
     },
   });
   const createParty = () => {
-    if (!roundRef.current || !playlist || !friends.size) {
+    if (!playlist || !friends.size) {
       return;
     }
 
     create({
-      max_round: parseInt(roundRef.current.value, 10) ?? 20,
+      max_round: Math.min(playlist._count.tracks, rounds),
       playlist_id: playlist.id,
       inviteds: [...friends]
         .map(([_, friend]) => friend.friendId!)
@@ -138,24 +140,37 @@ const PartyCreate: NextPage = () => {
                 ))}
               </div>
             </div>
-            <div className="flex min-h-[5rem] flex-col gap-2">
-              <label htmlFor="rounds" className="font-semibold">
-                Nombre de round
-              </label>
-              <select
-                ref={roundRef}
-                id="rounds"
-                defaultValue={20}
-                className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white outline-none"
-              >
-                {Array(10)
-                  .fill(null)
-                  .map((_, idx) => (
-                    <option key={idx} value={(idx + 1) * 10}>
-                      {(idx + 1) * 10}
-                    </option>
-                  ))}
-              </select>
+            <div className="flex flex-1 flex-col gap-2">
+              <div className="flex-1">
+                <label htmlFor="rounds" className="font-semibold">
+                  Nombre de round
+                </label>
+                <select
+                  id="rounds"
+                  value={rounds}
+                  onChange={(e) => setRounds(Number(e.target.value))}
+                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white outline-none"
+                >
+                  {Array(10)
+                    .fill(null)
+                    .map((_, idx) => (
+                      <option key={idx} value={(idx + 1) * 10}>
+                        {(idx + 1) * 10}
+                      </option>
+                    ))}
+                </select>
+              </div>
+              {playlist && playlist._count.tracks < rounds && (
+                <div>
+                  <div className="float-left px-2">
+                    <ExclamationIcon className="mt-4 h-6 w-6" />
+                  </div>
+                  <p>
+                    La playlist sélectionnée contient moins de tracks que de
+                    round. Le nombre de round sera de {playlist._count.tracks}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>

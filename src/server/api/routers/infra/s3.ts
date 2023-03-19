@@ -57,7 +57,14 @@ export const s3Router = createTRPCRouter({
         });
         if (!playlist) throw new TRPCError({ code: "PRECONDITION_FAILED" });
       } else if (_prefix === "user") {
-        throw new TRPCError({ code: "PRECONDITION_FAILED" });
+        const user = await ctx.prisma.user.findFirst({
+          where: {
+            id: ctx.session.user.id,
+            s3key: input.key,
+          },
+        });
+
+        if (!user) throw new TRPCError({ code: "PRECONDITION_FAILED" });
       }
 
       ctx.s3.deleteObject(

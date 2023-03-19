@@ -45,4 +45,6 @@ export const clientSchema = z.object({
   // NEXT_PUBLIC_CLIENTVAR: z.string(),
   NEXT_PUBLIC_PUSHER_KEY: z.string(),
   NEXT_PUBLIC_PUSHER_CLUSTER: z.string(),
+  NEXT_PUBLIC_AWS_REGION: z.string(),
+  NEXT_PUBLIC_AWS_S3_BUCKET_NAME: z.string(),
 });

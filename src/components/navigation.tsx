@@ -44,7 +44,7 @@ const Navigation: React.FC = () => {
                   <img
                     alt={`profile picture of ${session.user.name || "unknown"}`}
                     src={session.user.image || ""}
-                    className="h-12 w-12 rounded-sm border-gray-800"
+                    className="aspect-square h-12 w-12 rounded-sm border-gray-800 object-cover"
                   />
                 </picture>
               </Transition>

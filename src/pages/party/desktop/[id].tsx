@@ -317,7 +317,7 @@ const Party: NextPage<
                   <p>
                     Accèder à la page
                     {location && (
-                      <Url>{`${location?.host}/p/${party.link.url}`}</Url>
+                      <Url>{`${location?.host}/p/${party.link?.url}`}</Url>
                     )}
                     sur vos télèphones pour rejoindre la partie
                   </p>

@@ -210,21 +210,24 @@ const PlaylistEdit: NextPage = () => {
               className="flex flex-[2] flex-col gap-2"
             >
               <div>
-                <label htmlFor="playlist-name" className="font-semibold">
+                <label htmlFor={zo.fields.name()} className="font-semibold">
                   Nom
                 </label>
                 <input
-                  id="playlist-name"
+                  id={zo.fields.name()}
                   name={zo.fields.name()}
                   className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               <div>
-                <label htmlFor="playlist-description" className="font-semibold">
+                <label
+                  htmlFor={zo.fields.description()}
+                  className="font-semibold"
+                >
                   Description
                 </label>
                 <input
-                  id="playlist-description"
+                  id={zo.fields.description()}
                   name={zo.fields.description()}
                   className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
