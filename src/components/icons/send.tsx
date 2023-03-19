@@ -1,8 +1,8 @@
 import { Icon } from "./icon";
 
 export const SendIcon = (props: Icon) => {
-  const { iconType = "outline" } = props;
-  if (iconType === "outline") {
+  const { category = "outline" } = props;
+  if (category === "outline") {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -21,7 +21,7 @@ export const SendIcon = (props: Icon) => {
     );
   }
 
-  if (iconType === "solid") {
+  if (category === "solid") {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"
@@ -34,7 +34,7 @@ export const SendIcon = (props: Icon) => {
     );
   }
 
-  if (iconType === "mini") {
+  if (category === "mini") {
     return (
       <svg
         xmlns="http://www.w3.org/2000/svg"

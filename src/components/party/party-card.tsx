@@ -30,7 +30,7 @@ export const PartyCard = ({ party }: PartyCardProps) => {
         </div>
       </div>
       <Link href={`/party/${party.id}`}>
-        <SendIcon iconType="solid" className="h-6 w-6 hover:scale-125" />
+        <SendIcon category="solid" className="h-6 w-6 hover:scale-125" />
       </Link>
     </div>
   );
