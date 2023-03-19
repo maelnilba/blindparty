@@ -24,6 +24,7 @@ import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { TRACK_TIMER_MS } from "../#constant";
 import { sleep } from "lib/helpers/sleep";
+import { exclude } from "..";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -86,15 +87,30 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   });
 
+  if (!party) {
+    return {
+      redirect: {
+        destination: exclude("PARTY_NOT_EXISTS", "/party"),
+        permanent: false,
+      },
+    };
+  }
+
+  if (!party.inviteds.map((invited) => invited.id).includes(session.user.id)) {
+    return {
+      redirect: {
+        destination: exclude("NOT_INVITED", "/party"),
+        permanent: false,
+      },
+    };
+  }
   if (
-    !party ||
-    !party.inviteds.map((invited) => invited.id).includes(session.user.id) ||
-    (party.status !== "PENDING" &&
-      !party.players.map((player) => player.userId).includes(session.user.id))
+    party.status !== "PENDING" &&
+    !party.players.map((player) => player.userId).includes(session.user.id)
   ) {
     return {
       redirect: {
-        destination: "/dashboard",
+        destination: exclude("NOT_JOINED", "/party"),
         permanent: false,
       },
     };
@@ -342,7 +358,7 @@ const Party: NextPage<
         )}
         {game === "RUNNING" && (
           <>
-            <div className="flex  flex-1 flex-col items-center justify-center gap-4 pb-20">
+            <div className="flex flex-1 flex-col items-center justify-center gap-4 pb-20">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
@@ -416,7 +432,7 @@ const PlayerCard = ({ player, joined, connected }: PlayerCardProps) => {
         <img
           alt={`playlist picture of ${player.name}`}
           src={player.image!}
-          className="h-12 w-12 rounded-sm border-gray-800"
+          className="h-12 w-12 rounded-sm border-gray-800 object-cover"
         />
       </Picture>
     </div>

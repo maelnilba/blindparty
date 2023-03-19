@@ -30,6 +30,7 @@ import { ONE_SECOND_IN_MS } from "lib/helpers/date";
 import { useMessagesBus } from "@hooks/useMessagesBus";
 import { z } from "zod";
 import { useRouter } from "next/router";
+import { exclude } from "..";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -92,10 +93,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   });
 
-  if (!party || !(party.host.id === session.user.id)) {
+  if (!party) {
     return {
       redirect: {
-        destination: "/dashboard",
+        destination: exclude("PARTY_NOT_EXISTS", "/party"),
+
+        permanent: false,
+      },
+    };
+  }
+  if (!(party.host.id === session.user.id)) {
+    return {
+      redirect: {
+        destination: exclude("NOT_HOST", "/party"),
+
         permanent: false,
       },
     };
@@ -150,7 +161,12 @@ const Party: NextPage<
   useEffect(() => {
     subscribe("start", (started) => {
       if (!started) return;
-      router.push("/party/desktop/error");
+      router.push({
+        pathname: "/party",
+        query: {
+          reason: exclude("MULTIPLE_TAB_OPEN"),
+        },
+      });
     });
     return () => {
       unsubscribe("start");
@@ -163,7 +179,13 @@ const Party: NextPage<
     message("join", "new");
     subscribe("join", (join) => {
       if (join === "new") message("join", "already");
-      if (join === "already") router.push("/party/desktop/error");
+      if (join === "already")
+        router.push({
+          pathname: "/party",
+          query: {
+            reason: exclude("DESKTOP_ALREADY_EXIST"),
+          },
+        });
     });
 
     return () => {
