@@ -22,6 +22,7 @@ export function useMessagesBus<
       (data: z.infer<TMessages[keyof TMessages]>) => void | Promise<void>
     >
   >(new Map());
+  const [ready, setready] = useState(false);
 
   function message<TMessage extends keyof TMessages>(
     event: TMessage,
@@ -47,6 +48,7 @@ export function useMessagesBus<
   }
 
   useEffect(() => {
+    setready(true);
     bc.current = new BroadcastChannel(opts?.bc ?? "across");
     const listener = (
       e: MessageEvent<{ event: keyof TMessages; data: unknown }>
@@ -66,5 +68,5 @@ export function useMessagesBus<
     };
   }, [subscription]);
 
-  return { message, subscribe, unsubscribe };
+  return { message, subscribe, unsubscribe, ready };
 }

@@ -142,8 +142,9 @@ const Party: NextPage<
   const timer = useRef<NodeJS.Timeout | null>(null);
   const audio = useRef<TrackPlayerRef | null>(null);
 
-  const { subscribe, message, unsubscribe } = useMessagesBus({
+  const { subscribe, message, unsubscribe, ready } = useMessagesBus({
     start: z.boolean(),
+    join: z.enum(["new", "already"]),
   });
 
   useEffect(() => {
@@ -155,6 +156,20 @@ const Party: NextPage<
       unsubscribe("start");
     };
   }, []);
+
+  useEffect(() => {
+    if (!ready) return;
+    if (game !== "RUNNING") return;
+    message("join", "new");
+    subscribe("join", (join) => {
+      if (join === "new") message("join", "already");
+      if (join === "already") router.push("/party/desktop/error");
+    });
+
+    return () => {
+      unsubscribe("join");
+    };
+  }, [ready, game]);
 
   const { send, bind, members } = prpc.game.useConnect(
     party.id,
