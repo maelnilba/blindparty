@@ -23,14 +23,10 @@ import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
-import {
-  GUESS_MS,
-  ONE_SECOND,
-  TRACK_TIMER_MS,
-  VIEW_SCORE_MS,
-} from "../#constant";
+import { GUESS_MS, TRACK_TIMER_MS, VIEW_SCORE_MS } from "../#constant";
 import { TrackPicture } from "@components/game/track-picture";
 import { PlayerCard } from "@components/party/player-card";
+import { ONE_SECOND_IN_MS } from "lib/helpers/date";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -218,7 +214,7 @@ const Party: NextPage<
 
         timer.current = setTimeout(
           () => send("next", {}),
-          GUESS_MS + TRACK_TIMER_MS + ONE_SECOND
+          GUESS_MS + TRACK_TIMER_MS + ONE_SECOND_IN_MS
         );
       });
 

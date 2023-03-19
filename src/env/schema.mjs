@@ -29,10 +29,11 @@ export const serverSchema = z.object({
   PUSHER_SECRET: z.string(),
   PUSHER_APP_ID: z.string(),
   PUSHER_CLUSTER: z.string(),
-  APP_AWS_ACCESS_KEY: z.string(),
-  APP_AWS_SECRET_KEY: z.string(),
-  APP_AWS_REGION: z.string(),
+  AWS_ACCESS_KEY: z.string(),
+  AWS_SECRET_KEY: z.string(),
+  AWS_REGION: z.string(),
   AWS_S3_BUCKET_NAME: z.string(),
+  GH_API_KEY: z.string(),
 });
 
 /**

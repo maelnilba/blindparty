@@ -178,24 +178,23 @@ model Player {
 }
 
 model Party {
-    id          String          @id @default(cuid())
-    createdAt   DateTime        @default(now())
-    updatedAt   DateTime        @updatedAt
-    endedAt     DateTime?
-    playlist    Playlist        @relation(fields: [playlistId], references: [id])
-    playlistId  String
-    inviteds    User[]
-    players     Player[]
-    host        User            @relation(name: "host", fields: [hostId], references: [id])
-    hostId      String
-    status      PartyStatus     @default(PENDING)
-    view        PartyViewStatus @default(NONE)
-    max_round   Int
-    round       Int             @default(1)
-    track       Track?          @relation(fields: [trackId], references: [id])
-    link        PartyLink       @relation(fields: [partyLinkId], references: [id], onDelete: Cascade)
-    partyLinkId String          @unique
-    trackId     String?
+    id         String          @id @default(cuid())
+    createdAt  DateTime        @default(now())
+    updatedAt  DateTime        @updatedAt
+    endedAt    DateTime?
+    playlist   Playlist        @relation(fields: [playlistId], references: [id])
+    playlistId String
+    inviteds   User[]
+    players    Player[]
+    host       User            @relation(name: "host", fields: [hostId], references: [id])
+    hostId     String
+    status     PartyStatus     @default(PENDING)
+    view       PartyViewStatus @default(NONE)
+    max_round  Int
+    round      Int             @default(1)
+    track      Track?          @relation(fields: [trackId], references: [id])
+    trackId    String?
+    link       PartyLink?
 }
 
 enum PartyStatus {
@@ -214,6 +213,7 @@ enum PartyViewStatus {
 model PartyLink {
     id       String   @id @default(cuid())
     url      String   @unique
-    party    Party?
+    party    Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
+    partyId  String   @unique
     expireIn DateTime @default(dbgenerated("NOW() + interval '1 day'"))
 }

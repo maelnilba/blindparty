@@ -8,7 +8,8 @@
     "postinstall": "prisma generate",
     "lint": "next lint",
     "start": "next start",
-    "db:push": "prisma db push"
+    "db:push": "prisma db push",
+    "cron:start": "ts-node cron/index.ts"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.7",

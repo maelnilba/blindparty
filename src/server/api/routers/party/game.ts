@@ -71,7 +71,7 @@ export const gameRouter = createTRPCRouter({
       data: {
         view: "NONE",
         status: "ENDED",
-        endedAt: new Date(),
+        endedAt: new Date().toISOString(),
       },
     });
   }),

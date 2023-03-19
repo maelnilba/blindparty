@@ -1,4 +1,3 @@
-import { TRPCError } from "@trpc/server";
 import { customAlphabet } from "nanoid";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -15,30 +14,45 @@ export const partyRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.party.create({
-        data: {
-          max_round: input.max_round,
-          playlist: {
-            connect: {
-              id: input.playlist_id,
+      return ctx.prisma.$transaction(async (prisma) => {
+        const party = await prisma.party.create({
+          data: {
+            max_round: input.max_round,
+            playlist: {
+              connect: {
+                id: input.playlist_id,
+              },
+            },
+            host: {
+              connect: {
+                id: ctx.session.user.id,
+              },
+            },
+            inviteds: {
+              connect: [...input.inviteds, ctx.session.user.id].map(
+                (userId) => ({
+                  id: userId,
+                })
+              ),
             },
           },
-          host: {
-            connect: {
-              id: ctx.session.user.id,
+          include: {
+            link: true,
+          },
+        });
+
+        const link = await prisma.partyLink.create({
+          data: {
+            party: {
+              connect: {
+                id: party.id,
+              },
             },
+            url: nanoid(),
           },
-          inviteds: {
-            connect: [...input.inviteds, ctx.session.user.id].map((userId) => ({
-              id: userId,
-            })),
-          },
-          link: {
-            create: {
-              url: nanoid(),
-            },
-          },
-        },
+        });
+
+        return { ...party, link: link };
       });
     }),
 

@@ -1,0 +1,13 @@
+name: Clean party cron
+on:
+  schedule:
+    - cron: "*/60 * * * *"
+jobs:
+  cron:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clean party cron
+        run: |
+          curl --request POST \
+          --url 'https://example.com/api/cron/party' \
+          --header 'Authorization: Bearer ${{ secrets.ACTION_KEY }}'
