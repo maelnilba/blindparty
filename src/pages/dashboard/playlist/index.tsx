@@ -29,7 +29,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  const { accounts } = await prisma.user.findUniqueOrThrow({
+  const accounts = await prisma.user.findUnique({
     where: {
       id: session.user.id,
     },
@@ -38,7 +38,18 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   });
 
-  const providers = accounts.map((account) => account.provider as Socials);
+  if (!accounts) {
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+  }
+
+  const providers = accounts.accounts.map(
+    (account) => account.provider as Socials
+  );
   const hasSpotify = providers?.includes("spotify");
 
   return {

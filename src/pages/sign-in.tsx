@@ -4,6 +4,27 @@ import type { ClientSafeProvider, LiteralUnion } from "next-auth/react";
 import { signIn, getProviders } from "next-auth/react";
 import { getServerAuthSession } from "@server/auth";
 
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const providers = await getProviders();
+  const session = await getServerAuthSession({
+    req: context.req,
+    res: context.res,
+  });
+
+  if (session) {
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: { providers },
+  };
+}
+
 const Index: NextPage<{
   providers: Record<
     LiteralUnion<BuiltInProviderType, string>,
@@ -39,26 +60,5 @@ const Index: NextPage<{
     </>
   );
 };
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const providers = await getProviders();
-  const session = await getServerAuthSession({
-    req: context.req,
-    res: context.res,
-  });
-
-  if (session) {
-    return {
-      redirect: {
-        destination: "/dashboard",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { providers },
-  };
-}
 
 export default Index;
