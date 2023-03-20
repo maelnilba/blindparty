@@ -97,18 +97,18 @@ const PlaylistCard = ({ playlist, onAdd }: PlaylistCardProps) => {
         ))}
       </div>
       <div className="sticky bottom-0 flex flex-row items-center justify-center gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">
-        <button
-          onClick={() => onAdd(playlist)}
-          className="flex-1 rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-        >
-          Ajouter
-        </button>
         <Link
           href={`/dashboard/playlist/discover/${playlist.id}`}
           className="flex-1 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
         >
           Découvrir
         </Link>
+        <button
+          onClick={() => onAdd(playlist)}
+          className="flex-1 rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+        >
+          Ajouter
+        </button>
       </div>
     </div>
   );

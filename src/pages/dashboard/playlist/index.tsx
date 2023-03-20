@@ -169,6 +169,12 @@ const PlaylistCard = ({
       <div className="sticky bottom-0 flex flex-row items-center justify-center gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">
         {playlist.public ? (
           <>
+            <Link
+              href={`/dashboard/playlist/discover/${playlist.id}`}
+              className="flex-1 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            >
+              Découvrir
+            </Link>
             <ConfirmationModal
               title={`Retirer la playlist`}
               message={`Êtes vous certain de vouloir retirer la playlist ${playlist.name} de vos playlist ?`}
@@ -182,12 +188,6 @@ const PlaylistCard = ({
                 Retirer
               </button>
             </ConfirmationModal>
-            <Link
-              href={`/dashboard/playlist/discover/${playlist.id}`}
-              className="flex-1 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-            >
-              Découvrir
-            </Link>
           </>
         ) : (
           <>
