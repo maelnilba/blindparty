@@ -1,7 +1,6 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
-import { ImageIcon } from "@components/icons/image";
 import Navigation from "@components/navigation";
-import { TrackPlayer, usePlayer } from "@components/playlist/track-player";
+import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { useMap } from "@hooks/useMap";

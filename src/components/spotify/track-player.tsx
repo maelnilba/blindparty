@@ -10,6 +10,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useRef,
   useState,
 } from "react";
@@ -135,6 +136,17 @@ export const TrackPlayer = ({
     if (playing) pause();
     else unpause();
   };
+
+  useEffect(() => {
+    const prevent = (e: KeyboardEvent) => {
+      if (e.key === " ") e.preventDefault();
+    };
+    document.body.addEventListener("keydown", prevent);
+    return () => {
+      document.body.removeEventListener("keydown", prevent);
+    };
+  }, []);
+
   useHotkeys("space", () => toggle(), [playing]);
 
   const goto = (seconds: number) => {

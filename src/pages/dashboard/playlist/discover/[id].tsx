@@ -1,6 +1,6 @@
 import { Picture } from "@components/images/picture";
 import Navigation from "@components/navigation";
-import { TrackPlayer, usePlayer } from "@components/playlist/track-player";
+import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
 import { getServerAuthSession } from "@server/auth";
 import { api } from "@utils/api";
