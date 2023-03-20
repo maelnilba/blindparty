@@ -15,7 +15,7 @@ export const PlaylistCard = ({ playlist, onClick }: PlaylistCardProps) => {
         <img
           alt={`playlist picture of ${playlist.name}`}
           src={image?.url}
-          className="h-12 w-12 rounded-sm border-gray-800 object-cover transition-transform group-hover:scale-105"
+          className="h-12 w-12 rounded border-gray-800 object-cover transition-transform group-hover:scale-105"
         />
       </picture>
       <div className="inline-block w-3/4">

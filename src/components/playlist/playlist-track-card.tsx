@@ -15,7 +15,7 @@ export const TrackCard = ({ track }: TrackCardProps) => {
         <img
           alt={`track picture of ${track.name}`}
           src={image?.url}
-          className="h-12 w-12 rounded-sm border-gray-800 object-cover transition-transform"
+          className="h-12 w-12 rounded border-gray-800 object-cover transition-transform"
         />
       </picture>
       <div className="inline-block w-3/4">

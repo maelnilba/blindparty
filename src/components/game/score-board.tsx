@@ -70,7 +70,7 @@ const ScoreCard = ({
         <img
           alt={`image of ${user.name}`}
           src={user.image!}
-          className={`${className} rounded-sm border-gray-800 object-cover`}
+          className={`${className} rounded border-gray-800 object-cover`}
         />
       </Picture>
       <p className="">{user.name}</p>

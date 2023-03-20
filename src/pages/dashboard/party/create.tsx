@@ -134,7 +134,7 @@ const PartyCreate: NextPage = () => {
                     <img
                       alt={`playlist picture of ${friend.name}`}
                       src={friend.image!}
-                      className="h-12 w-12 rounded-sm border-gray-800 object-cover"
+                      className="h-12 w-12 rounded border-gray-800 object-cover"
                     />
                   </Picture>
                 ))}

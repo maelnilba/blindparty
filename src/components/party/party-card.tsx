@@ -16,7 +16,7 @@ export const PartyCard = ({ party }: PartyCardProps) => {
         <img
           alt={`host picture of ${party.host.name}`}
           src={party.host.image!}
-          className="h-12 w-12 rounded-sm border-gray-800 object-cover"
+          className="h-12 w-12 rounded border-gray-800 object-cover"
         />
       </Picture>
       <div className="flex w-3/4 flex-col">

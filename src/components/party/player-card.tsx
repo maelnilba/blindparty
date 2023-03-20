@@ -13,7 +13,7 @@ export const PlayerCard = ({ player, joined, connected }: PlayerCardProps) => {
         <img
           alt={`playlist picture of ${player.name}`}
           src={player.image!}
-          className="aspect-square h-12 w-12 rounded-sm border-gray-800 object-cover"
+          className="aspect-square h-12 w-12 rounded border-gray-800 object-cover"
         />
       </Picture>
     </div>

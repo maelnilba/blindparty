@@ -23,7 +23,7 @@ export const PlaylistTrackCard = ({
     <div className="group/item flex items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <picture
         aria-label={`track picture of ${track.name}`}
-        className="group/image flex h-12 w-12 select-none items-center justify-center rounded-sm border-gray-800 transition-all duration-75 group-hover/item:scale-105"
+        className="group/image flex h-12 w-12 select-none items-center justify-center rounded border-gray-800 transition-all duration-75 group-hover/item:scale-105"
         style={{
           cursor: onPlay && "pointer",
           backgroundImage: image?.url && `url('${image.url}')`,
@@ -87,7 +87,7 @@ export const PlaylistTrackInfoCard = ({
         <Picture identifier={image?.url}>
           <picture
             aria-label={`track picture of ${track.name}`}
-            className="flex h-12 w-12 select-none items-center justify-center rounded-sm border-gray-800 transition-all duration-75 group-hover/item:scale-105"
+            className="flex h-12 w-12 select-none items-center justify-center rounded border-gray-800 transition-all duration-75 group-hover/item:scale-105"
             style={{
               cursor: onPlay && "pointer",
               backgroundImage: image?.url && `url('${image.url}')`,
@@ -129,7 +129,7 @@ export const PlaylistTrackInfoCard = ({
         <Picture identifier={track.album.images?.[0]?.url}>
           <picture
             aria-label={`track picture of ${track.album.name}`}
-            className="flex h-12 w-12 select-none items-center justify-center rounded-sm border-gray-800 transition-all duration-75 group-hover/item:scale-105"
+            className="flex h-12 w-12 select-none items-center justify-center rounded border-gray-800 transition-all duration-75 group-hover/item:scale-105"
             style={{
               cursor: onPlay && "pointer",
               backgroundImage:
