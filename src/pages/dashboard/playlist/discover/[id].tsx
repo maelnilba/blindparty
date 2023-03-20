@@ -1,5 +1,5 @@
 import { Picture } from "@components/images/picture";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
 import { getServerAuthSession } from "@server/auth";
@@ -8,11 +8,14 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
+  NextPageWithLayout,
 } from "next";
 import { Track } from "../#types";
 import { prisma } from "@server/db";
 import { ClockIcon } from "@components/icons/clock";
 import { useRelativeTime } from "@hooks/useRelativeTime";
+import { ReactElement } from "react";
+import { LayoutThrough } from "@components/layout/layout";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -114,7 +117,7 @@ const PlaylistDiscover = ({
 
   return (
     <div className="flex flex-row gap-2">
-      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pb-20">
+      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pt-20">
         <div className="sticky top-0 z-10 flex flex-col items-start justify-center gap-2 bg-black/10 py-2 backdrop-blur-sm">
           <div className="flex items-center justify-center gap-4 px-6">
             <Picture identifier={playlist?.picture}>
@@ -159,17 +162,18 @@ const PlaylistDiscover = ({
   );
 };
 
-const PlaylistDiscoverWrapper: NextPage<
+const PlaylistDiscoverWrapper: NextPageWithLayout<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ playlist }) => {
   return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <TrackPlayer>
-        <PlaylistDiscover playlist={playlist} />
-      </TrackPlayer>
-    </div>
+    <TrackPlayer>
+      <PlaylistDiscover playlist={playlist} />
+    </TrackPlayer>
   );
 };
 
 export default PlaylistDiscoverWrapper;
+
+PlaylistDiscoverWrapper.getLayout = (page: ReactElement) => {
+  return <LayoutThrough>{page}</LayoutThrough>;
+};

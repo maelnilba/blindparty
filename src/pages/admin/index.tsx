@@ -1,13 +1,8 @@
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import type { NextPage } from "next";
 
 const AdminHome: NextPage = () => {
-  return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <div></div>
-    </div>
-  );
+  return <div></div>;
 };
 
 export default AdminHome;

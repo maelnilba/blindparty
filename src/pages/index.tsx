@@ -1,4 +1,4 @@
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import { getServerAuthSession } from "@server/auth";
 
@@ -22,11 +22,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 const Home: NextPage = () => {
-  return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-    </div>
-  );
+  return <div></div>;
 };
 
 export default Home;

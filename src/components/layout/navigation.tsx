@@ -2,7 +2,7 @@ import { Menu, Transition } from "@headlessui/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
-const Navigation: React.FC = () => {
+const Navigation = ({ through = false }: { through?: boolean }) => {
   const { data: session, status } = useSession();
 
   if (status === "loading") {
@@ -85,7 +85,7 @@ const Navigation: React.FC = () => {
             </Menu>
           </div>
         </div>
-        <div className="flex h-20 w-full"></div>
+        {!through && <div className="flex h-20 w-full"></div>}
       </>
     );
   }
@@ -104,7 +104,7 @@ const Navigation: React.FC = () => {
           </button>
         </div>
       </div>
-      <div className="flex h-20 w-full"></div>
+      {!through && <div className="flex h-20 w-full"></div>}
     </>
   );
 };

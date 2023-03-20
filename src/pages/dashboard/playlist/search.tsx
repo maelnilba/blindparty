@@ -1,5 +1,5 @@
 import { Picture } from "@components/images/picture";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { TrackCard } from "@components/playlist/playlist-track-card";
 import { useDebounce } from "@hooks/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
@@ -40,30 +40,27 @@ const PlaylistSearch: NextPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <div className="flex flex-row gap-2">
-        <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto px-4">
-          <div className="sticky top-0 z-[2] flex flex-col gap-2 bg-black/10 py-2 backdrop-blur-sm">
-            <label htmlFor="playlist-name" className="font-semibold">
-              Rechercher une playlist
-            </label>
-            <input
-              ref={searchRef}
-              onChange={(e) => onSearch(e.target.value)}
-              id="playlist-name"
-              className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+    <div className="flex flex-row gap-2">
+      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto px-4">
+        <div className="sticky top-0 z-[2] flex flex-col gap-2 bg-black/10 py-2 backdrop-blur-sm">
+          <label htmlFor="playlist-name" className="font-semibold">
+            Rechercher une playlist
+          </label>
+          <input
+            ref={searchRef}
+            onChange={(e) => onSearch(e.target.value)}
+            id="playlist-name"
+            className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+          />
+        </div>
+        <div className="flex flex-wrap gap-4 px-28">
+          {playlists?.map((playlist) => (
+            <PlaylistCard
+              key={playlist.id}
+              playlist={playlist}
+              onAdd={addPlaylist}
             />
-          </div>
-          <div className="flex flex-wrap gap-4 px-28">
-            {playlists?.map((playlist) => (
-              <PlaylistCard
-                key={playlist.id}
-                playlist={playlist}
-                onAdd={addPlaylist}
-              />
-            ))}
-          </div>
+          ))}
         </div>
       </div>
     </div>

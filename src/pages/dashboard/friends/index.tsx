@@ -7,7 +7,7 @@ import { XMarkIcon } from "@components/icons/x-mark";
 import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { useDebounce } from "@hooks/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import { useSession } from "next-auth/react";
@@ -42,85 +42,78 @@ const Friends: NextPage = () => {
   });
 
   return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <div className="flex flex-wrap gap-4 p-4 px-28">
-        <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
-          <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-            <Modal>
-              <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
-                Rechercher des amis
-              </button>
-              <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
-                <div className="sticky top-0 flex flex-col gap-2 bg-black/10 font-semibold backdrop-blur-sm">
-                  <label htmlFor="search" className="font-semibold">
-                    Rechercher un utilisateur
-                  </label>
-                  <input
-                    onChange={(e) => onSearch(e.target.value)}
-                    id="search"
-                    className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
-                  />
-                </div>
-                <div className="flex-1">
-                  {users?.map((user) => (
-                    <UserCard
-                      key={user.id}
-                      user={user}
-                      onAdd={sendInvitation}
-                    />
-                  ))}
-                </div>
+    <div className="flex flex-wrap gap-4 p-4 px-28">
+      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
+        <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+          <Modal>
+            <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+              Rechercher des amis
+            </button>
+            <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
+              <div className="sticky top-0 flex flex-col gap-2 bg-black/10 font-semibold backdrop-blur-sm">
+                <label htmlFor="search" className="font-semibold">
+                  Rechercher un utilisateur
+                </label>
+                <input
+                  onChange={(e) => onSearch(e.target.value)}
+                  id="search"
+                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                />
               </div>
-            </Modal>
-          </div>
-          <div className="flex-1 p-2">
-            {friends?.map((friend) => (
-              <FriendCard
-                key={friend.id}
-                friend={friend}
-                onRemove={() => remove({ id: friend.id })}
-              />
-            ))}
+              <div className="flex-1">
+                {users?.map((user) => (
+                  <UserCard key={user.id} user={user} onAdd={sendInvitation} />
+                ))}
+              </div>
+            </div>
+          </Modal>
+        </div>
+        <div className="flex-1 p-2">
+          {friends?.map((friend) => (
+            <FriendCard
+              key={friend.id}
+              friend={friend}
+              onRemove={() => remove({ id: friend.id })}
+            />
+          ))}
+        </div>
+      </div>
+      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
+        <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+          <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
+            Mes invitations
           </div>
         </div>
-        <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
-          <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-            <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
-              Mes invitations
-            </div>
-          </div>
-          <div className="flex-1 p-2">
-            {session?.user && session.user.id && (
-              <>
-                {invitations?.map((invitation) => (
-                  <InvitationCard
-                    key={invitation.id}
-                    invitation={invitation}
-                    sessionUserId={session.user!.id}
-                    onAccept={(invitation) => {
-                      {
-                        invitationActions({
-                          type: "ACCEPT",
-                          id: invitation.id,
-                          cb: () => refetch_friends(),
-                        });
-                      }
-                    }}
-                    onRefresh={(invitation) =>
-                      invitationActions({ type: "REFRESH", id: invitation.id })
+        <div className="flex-1 p-2">
+          {session?.user && session.user.id && (
+            <>
+              {invitations?.map((invitation) => (
+                <InvitationCard
+                  key={invitation.id}
+                  invitation={invitation}
+                  sessionUserId={session.user!.id}
+                  onAccept={(invitation) => {
+                    {
+                      invitationActions({
+                        type: "ACCEPT",
+                        id: invitation.id,
+                        cb: () => refetch_friends(),
+                      });
                     }
-                    onReject={(invitation) =>
-                      invitationActions({ type: "REJECT", id: invitation.id })
-                    }
-                    onBlock={(invitation) =>
-                      invitationActions({ type: "BLOCK", id: invitation.id })
-                    }
-                  />
-                ))}
-              </>
-            )}
-          </div>
+                  }}
+                  onRefresh={(invitation) =>
+                    invitationActions({ type: "REFRESH", id: invitation.id })
+                  }
+                  onReject={(invitation) =>
+                    invitationActions({ type: "REJECT", id: invitation.id })
+                  }
+                  onBlock={(invitation) =>
+                    invitationActions({ type: "BLOCK", id: invitation.id })
+                  }
+                />
+              ))}
+            </>
+          )}
         </div>
       </div>
     </div>

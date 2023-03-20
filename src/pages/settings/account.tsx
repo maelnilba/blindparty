@@ -2,7 +2,7 @@ import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { PlusIcon } from "@components/icons/plus";
 import { ensureProvider, SocialIcon } from "@components/icons/socials";
 import { Modal } from "@components/modals/modal";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { getServerAuthSession } from "@server/auth";
 import { useQuery } from "@tanstack/react-query";
 import { api, RouterOutputs } from "@utils/api";
@@ -78,93 +78,90 @@ const Settings: NextPage<
   const user = __user ? __user : _user;
 
   return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <div className="flex flex-wrap gap-4 p-4 px-28">
-        <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
-          <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-            <Modal className="w-full">
-              <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
-                Lié un compte
-              </button>
-              <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
-                <div className="sticky top-0 flex flex-col gap-2 bg-black/10 font-semibold backdrop-blur-sm">
-                  <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
-                    Liste des providers
-                  </div>
-                </div>
-                <div className="flex-1 p-2">
-                  {allProviders && providers && (
-                    <div className="flex flex-col gap-2">
-                      {Object.values(allProviders)
-                        .filter(
-                          (provider) =>
-                            !providers.includes(
-                              ensureProvider(provider.name.toLocaleLowerCase())
-                            )
-                        )
-                        .map((provider) => (
-                          <ProviderCard
-                            key={provider.id}
-                            provider={ensureProvider(
-                              provider.name.toLocaleLowerCase()
-                            )}
-                            onClick={() => {
-                              signIn(provider.id, {
-                                // callbackUrl: "http://localhost:3000/dashboard",
-                              });
-                            }}
-                          />
-                        ))}
-                    </div>
-                  )}
+    <div className="flex flex-wrap gap-4 p-4 px-28">
+      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
+        <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+          <Modal className="w-full">
+            <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+              Lié un compte
+            </button>
+            <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
+              <div className="sticky top-0 flex flex-col gap-2 bg-black/10 font-semibold backdrop-blur-sm">
+                <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
+                  Liste des providers
                 </div>
               </div>
-            </Modal>
-          </div>
-          <div className="flex flex-1 flex-col gap-2 p-2">
-            {providers?.map((provider, idx) => (
-              <ProviderCard key={idx} provider={provider} />
-            ))}
-          </div>
-        </div>
-        <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
-          <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-            <button
-              type="submit"
-              form="edit-user"
-              className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-            >
-              Sauvegarder
-            </button>
-          </div>
-          <div className="flex flex-1 flex-col gap-2 p-2">
-            <div className="flex justify-center gap-4">
-              <ImageUpload
-                src={user.image}
-                ref={imageUpload}
-                className="flex-1"
-                prefix="user"
-                presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
-              />
-              <form
-                ref={zo.ref}
-                id="edit-user"
-                className="flex h-full flex-[2] flex-col gap-2"
-              >
-                <div>
-                  <label htmlFor={zo.fields.name()} className="font-semibold">
-                    Nom
-                  </label>
-                  <input
-                    defaultValue={user.name ?? ""}
-                    name={zo.fields.name()}
-                    id={zo.fields.name()}
-                    className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
-                  />
-                </div>
-              </form>
+              <div className="flex-1 p-2">
+                {allProviders && providers && (
+                  <div className="flex flex-col gap-2">
+                    {Object.values(allProviders)
+                      .filter(
+                        (provider) =>
+                          !providers.includes(
+                            ensureProvider(provider.name.toLocaleLowerCase())
+                          )
+                      )
+                      .map((provider) => (
+                        <ProviderCard
+                          key={provider.id}
+                          provider={ensureProvider(
+                            provider.name.toLocaleLowerCase()
+                          )}
+                          onClick={() => {
+                            signIn(provider.id, {
+                              // callbackUrl: "http://localhost:3000/dashboard",
+                            });
+                          }}
+                        />
+                      ))}
+                  </div>
+                )}
+              </div>
             </div>
+          </Modal>
+        </div>
+        <div className="flex flex-1 flex-col gap-2 p-2">
+          {providers?.map((provider, idx) => (
+            <ProviderCard key={idx} provider={provider} />
+          ))}
+        </div>
+      </div>
+      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
+        <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+          <button
+            type="submit"
+            form="edit-user"
+            className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+          >
+            Sauvegarder
+          </button>
+        </div>
+        <div className="flex flex-1 flex-col gap-2 p-2">
+          <div className="flex justify-center gap-4">
+            <ImageUpload
+              src={user.image}
+              ref={imageUpload}
+              className="flex-1"
+              prefix="user"
+              presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
+            />
+            <form
+              ref={zo.ref}
+              id="edit-user"
+              className="flex h-full flex-[2] flex-col gap-2"
+            >
+              <div>
+                <label htmlFor={zo.fields.name()} className="font-semibold">
+                  Nom
+                </label>
+                <input
+                  defaultValue={user.name ?? ""}
+                  name={zo.fields.name()}
+                  id={zo.fields.name()}
+                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                />
+              </div>
+            </form>
           </div>
         </div>
       </div>

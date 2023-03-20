@@ -5,7 +5,7 @@ import { DesktopIcon } from "@components/icons/desktop";
 import { PhoneIcon } from "@components/icons/phone";
 import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { Score, ScoreBoard } from "@components/game/score-board";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useWindowLocation } from "@hooks/useWindowLocation";
@@ -345,143 +345,140 @@ const Party: NextPage<
   }, [track]);
 
   return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <div className="flex items-center justify-center gap-4 p-4">
-        {game === "PENDING" && (
-          <>
-            <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
-              <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-                <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
-                  Déroulement d'une partie
-                </div>
-              </div>
-              <div className="flex flex-1 flex-col gap-6 p-4">
-                <p>
-                  Lors du déroulement d'une partie, votre écran joue le rôle
-                  d'émetteur et votre télèphone joue le rôle de recepteur
-                </p>
-                <div>
-                  <div className="float-left px-2">
-                    <DesktopIcon className="mt-4 h-6 w-6" />
-                  </div>
-                  <p>
-                    L'écran jouera la rôle du blindtest. Si la connection avec
-                    l'écran est interrompue, la partie sera terminée
-                  </p>
-                </div>
-                <div>
-                  <div className="float-left px-2">
-                    <PhoneIcon className="mt-4 h-6 w-6" />
-                  </div>
-                  <p>
-                    Les télèphones joueront le rôle de microphone. Il faut dire
-                    à haute voix le nom de la musique, l'album ou de l'artiste
-                    (selon les règles de la partie) afin de remporter le round
-                  </p>
-                </div>
-                <Divider />
-                <div>
-                  <p>
-                    Accèder à la page
-                    {location && (
-                      <Url>{`${location?.host}/p/${party.link?.url}`}</Url>
-                    )}
-                    sur vos télèphones pour rejoindre la partie
-                  </p>
-                </div>
+    <div className="flex items-center justify-center gap-4 p-4">
+      {game === "PENDING" && (
+        <>
+          <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+            <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+              <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
+                Déroulement d'une partie
               </div>
             </div>
+            <div className="flex flex-1 flex-col gap-6 p-4">
+              <p>
+                Lors du déroulement d'une partie, votre écran joue le rôle
+                d'émetteur et votre télèphone joue le rôle de recepteur
+              </p>
+              <div>
+                <div className="float-left px-2">
+                  <DesktopIcon className="mt-4 h-6 w-6" />
+                </div>
+                <p>
+                  L'écran jouera la rôle du blindtest. Si la connection avec
+                  l'écran est interrompue, la partie sera terminée
+                </p>
+              </div>
+              <div>
+                <div className="float-left px-2">
+                  <PhoneIcon className="mt-4 h-6 w-6" />
+                </div>
+                <p>
+                  Les télèphones joueront le rôle de microphone. Il faut dire à
+                  haute voix le nom de la musique, l'album ou de l'artiste
+                  (selon les règles de la partie) afin de remporter le round
+                </p>
+              </div>
+              <Divider />
+              <div>
+                <p>
+                  Accèder à la page
+                  {location && (
+                    <Url>{`${location?.host}/p/${party.link?.url}`}</Url>
+                  )}
+                  sur vos télèphones pour rejoindre la partie
+                </p>
+              </div>
+            </div>
+          </div>
 
-            <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
-              <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-                {isHost ? (
-                  <>
-                    {missed ? (
-                      <ConfirmationModal
-                        title="Commencer la partie"
-                        message="Certains amis invités n'ont pas encore rejoint la partie, êtes vous sur de vouloir commencer la partie ? Une fois une partie lancée, il n'est plus possible de la rejoindre."
-                        action="Commencer"
-                        className="w-full"
-                        onSuccess={() => {
-                          start();
-                        }}
-                      >
-                        <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
-                          Commencer la partie
-                        </button>
-                      </ConfirmationModal>
-                    ) : (
-                      <button
-                        onClick={() => start()}
-                        className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-                      >
+          <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+            <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+              {isHost ? (
+                <>
+                  {missed ? (
+                    <ConfirmationModal
+                      title="Commencer la partie"
+                      message="Certains amis invités n'ont pas encore rejoint la partie, êtes vous sur de vouloir commencer la partie ? Une fois une partie lancée, il n'est plus possible de la rejoindre."
+                      action="Commencer"
+                      className="w-full"
+                      onSuccess={() => {
+                        start();
+                      }}
+                    >
+                      <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                         Commencer la partie
                       </button>
-                    )}
-                  </>
-                ) : (
-                  <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
-                    Rejoindre la partie
-                  </button>
-                )}
+                    </ConfirmationModal>
+                  ) : (
+                    <button
+                      onClick={() => start()}
+                      className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                    >
+                      Commencer la partie
+                    </button>
+                  )}
+                </>
+              ) : (
+                <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+                  Rejoindre la partie
+                </button>
+              )}
+            </div>
+            <div className="flex flex-1 flex-col gap-6 p-2">
+              <Divider />
+              <div>
+                <PlaylistCard playlist={party.playlist} />
               </div>
-              <div className="flex flex-1 flex-col gap-6 p-2">
-                <Divider />
-                <div>
-                  <PlaylistCard playlist={party.playlist} />
-                </div>
-                <Divider />
-                <div className="text-center text-lg font-semibold">
-                  <p>{party.max_round} rounds</p>
-                </div>
-                <Divider />
-                <div className="flex flex-wrap gap-2">
-                  {players.map(({ player, joined }) => (
-                    <PlayerCard
-                      key={player.id}
-                      player={player}
-                      joined={joined}
-                      connected
-                    />
-                  ))}
-                </div>
+              <Divider />
+              <div className="text-center text-lg font-semibold">
+                <p>{party.max_round} rounds</p>
+              </div>
+              <Divider />
+              <div className="flex flex-wrap gap-2">
+                {players.map(({ player, joined }) => (
+                  <PlayerCard
+                    key={player.id}
+                    player={player}
+                    joined={joined}
+                    connected
+                  />
+                ))}
               </div>
             </div>
-          </>
-        )}
-        {game === "RUNNING" && (
-          <>
-            {view === "GUESS" && (
-              <>
-                {track?.track && (
-                  <TrackPlayer
-                    tracktimer={TRACK_TIMER_MS}
-                    key={track.track.id}
-                    ref={audio}
-                    track={track.track}
-                  />
+          </div>
+        </>
+      )}
+      {game === "RUNNING" && (
+        <>
+          {view === "GUESS" && (
+            <>
+              {track?.track && (
+                <TrackPlayer
+                  tracktimer={TRACK_TIMER_MS}
+                  key={track.track.id}
+                  ref={audio}
+                  track={track.track}
+                />
+              )}
+            </>
+          )}
+          {view === "SCORE" && (
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col items-center justify-center gap-2">
+                <p className="text-4xl font-extrabold">Le son était</p>
+                <p>{itwas}</p>
+                {track && track.track && (
+                  <TrackPicture className="h-28 w-28" track={track.track} />
                 )}
-              </>
-            )}
-            {view === "SCORE" && (
-              <div className="flex flex-col gap-2">
-                <div className="flex flex-col items-center justify-center gap-2">
-                  <p className="text-4xl font-extrabold">Le son était</p>
-                  <p>{itwas}</p>
-                  {track && track.track && (
-                    <TrackPicture className="h-28 w-28" track={track.track} />
-                  )}
-                </div>
-                <div className="mt-10 mb-20">
-                  <Divider />
-                </div>
-                <ScoreBoard scores={scores} />
               </div>
-            )}
-          </>
-        )}
-      </div>
+              <div className="mt-10 mb-20">
+                <Divider />
+              </div>
+              <ScoreBoard scores={scores} />
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 };

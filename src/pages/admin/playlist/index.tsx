@@ -1,6 +1,6 @@
 import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { api, RouterOutputs } from "@utils/api";
 import Link from "next/link";
 import type { NextPage } from "next/types";
@@ -18,25 +18,22 @@ const Playlists: NextPage = () => {
     erase({ id: playlist.id });
   };
   return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <div className="flex flex-wrap gap-4 p-4 px-28">
-        <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">
-          <Link
-            href="/admin/playlist/create"
-            className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-          >
-            Créer une playlist
-          </Link>
-        </div>
-        {playlists?.map((playlist) => (
-          <PlaylistCard
-            key={playlist.id}
-            playlist={playlist}
-            onDelete={deletePlaylist}
-          />
-        ))}
+    <div className="flex flex-wrap gap-4 p-4 px-28">
+      <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">
+        <Link
+          href="/admin/playlist/create"
+          className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+        >
+          Créer une playlist
+        </Link>
       </div>
+      {playlists?.map((playlist) => (
+        <PlaylistCard
+          key={playlist.id}
+          playlist={playlist}
+          onDelete={deletePlaylist}
+        />
+      ))}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import { Divider } from "@components/elements/divider";
 import { MicroIcon } from "@components/icons/micro";
 import { Picture } from "@components/images/picture";
 import { Modal } from "@components/modals/modal";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useMicroPermission } from "@hooks/useMicroPermission";
 import { useVoiceDetector } from "@hooks/useVoiceDetector";
@@ -326,132 +326,128 @@ const Party: NextPage<
   };
 
   return (
-    <div className="relative flex min-h-screen w-screen flex-col">
-      <Navigation />
-
-      <div className="flex flex-1 items-center justify-center gap-4 p-4">
-        {game === "PENDING" && (
-          <>
-            <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
-              <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-                {!micro || micro !== "granted" ? (
-                  <Modal title="Activer votre micro" className="w-full">
-                    <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
-                      Rejoindre la partie
-                    </button>
-                    <div className="flex flex-col gap-2">
-                      <p>
-                        Pour que votre télèphone joue le rôle de recepteur, la
-                        permission d'accèder à votre microphone est requis
-                      </p>
-                      <p>
-                        Si l'activation ne fonctionne pas, verifier les
-                        paramètrages de votre télèphone
-                      </p>
-                      <button
-                        onClick={() => activation()}
-                        className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-                      >
-                        Activer
-                      </button>
-                    </div>
-                  </Modal>
-                ) : (
-                  <button
-                    onClick={() => join()}
-                    disabled={isJoined}
-                    className={`${
-                      isJoined && "opacity-50"
-                    } w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105`}
-                  >
-                    {isJoined ? "En attente" : "Rejoindre la partie"}
+    <div className="flex flex-1 items-center justify-center gap-4 p-4">
+      {game === "PENDING" && (
+        <>
+          <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+            <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+              {!micro || micro !== "granted" ? (
+                <Modal title="Activer votre micro" className="w-full">
+                  <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+                    Rejoindre la partie
                   </button>
-                )}
-              </div>
-              <div className="flex flex-1 flex-col gap-6 p-2">
-                <Divider />
-                <div>
-                  <PlaylistCard playlist={party.playlist} />
-                </div>
-                <Divider />
-                <div className="text-center text-lg font-semibold">
-                  <p>{party.max_round} rounds</p>
-                </div>
-                <Divider />
-                <div className="flex flex-wrap gap-2">
-                  {players.map(({ player, joined, connected }) => (
-                    <PlayerCard
-                      key={player.id}
-                      connected={connected}
-                      player={player}
-                      joined={joined}
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-          </>
-        )}
-        {game === "RUNNING" && (
-          <>
-            <div className="flex flex-1 flex-col items-center justify-center gap-4 pb-20">
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  const target = (
-                    e.target as HTMLFormElement
-                  ).elements.namedItem("guess") as HTMLInputElement;
-                  if (target.value) {
-                    guess(target.value);
-                    target.value = "";
-                  }
-                }}
-              >
-                <input
-                  disabled={view === "SCORE"}
-                  type="text"
-                  name="guess"
-                  placeholder="Michael Jackson"
-                  className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
-                />
-              </form>
-
-              <div
-                data-view={view}
-                className="relative rounded-lg border border-gray-800 p-4 data-[view=SCORE]:border-gray-900"
-              >
-                <MicroIcon
-                  ref={vadMicro}
-                  className="absolute  h-48 w-48 transition-all duration-75"
-                  style={{ clipPath: "inset(100% 0 0 0)" }}
-                />
-                <MicroIcon className="h-48 w-48" />
-              </div>
-              <div className="fixed bottom-0 w-full p-2 pb-0">
-                <div className="scrollbar-hide flex h-48 w-full flex-col gap-2 overflow-y-auto rounded border border-gray-800">
-                  <div className="flex-1">
-                    {guesses
-                      .filter((g) => Boolean(g))
-                      .reverse()
-                      .map((guess, idx) => (
-                        <div
-                          key={idx}
-                          className="flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5"
-                        >
-                          <div className="inline-block w-3/4">
-                            <span className="block overflow-hidden truncate text-ellipsis">
-                              {guess}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                  <div className="flex flex-col gap-2">
+                    <p>
+                      Pour que votre télèphone joue le rôle de recepteur, la
+                      permission d'accèder à votre microphone est requis
+                    </p>
+                    <p>
+                      Si l'activation ne fonctionne pas, verifier les
+                      paramètrages de votre télèphone
+                    </p>
+                    <button
+                      onClick={() => activation()}
+                      className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                    >
+                      Activer
+                    </button>
                   </div>
+                </Modal>
+              ) : (
+                <button
+                  onClick={() => join()}
+                  disabled={isJoined}
+                  className={`${
+                    isJoined && "opacity-50"
+                  } w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105`}
+                >
+                  {isJoined ? "En attente" : "Rejoindre la partie"}
+                </button>
+              )}
+            </div>
+            <div className="flex flex-1 flex-col gap-6 p-2">
+              <Divider />
+              <div>
+                <PlaylistCard playlist={party.playlist} />
+              </div>
+              <Divider />
+              <div className="text-center text-lg font-semibold">
+                <p>{party.max_round} rounds</p>
+              </div>
+              <Divider />
+              <div className="flex flex-wrap gap-2">
+                {players.map(({ player, joined, connected }) => (
+                  <PlayerCard
+                    key={player.id}
+                    connected={connected}
+                    player={player}
+                    joined={joined}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
+      {game === "RUNNING" && (
+        <>
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 pb-20">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const target = (e.target as HTMLFormElement).elements.namedItem(
+                  "guess"
+                ) as HTMLInputElement;
+                if (target.value) {
+                  guess(target.value);
+                  target.value = "";
+                }
+              }}
+            >
+              <input
+                disabled={view === "SCORE"}
+                type="text"
+                name="guess"
+                placeholder="Michael Jackson"
+                className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
+              />
+            </form>
+
+            <div
+              data-view={view}
+              className="relative rounded-lg border border-gray-800 p-4 data-[view=SCORE]:border-gray-900"
+            >
+              <MicroIcon
+                ref={vadMicro}
+                className="absolute  h-48 w-48 transition-all duration-75"
+                style={{ clipPath: "inset(100% 0 0 0)" }}
+              />
+              <MicroIcon className="h-48 w-48" />
+            </div>
+            <div className="fixed bottom-0 w-full p-2 pb-0">
+              <div className="scrollbar-hide flex h-48 w-full flex-col gap-2 overflow-y-auto rounded border border-gray-800">
+                <div className="flex-1">
+                  {guesses
+                    .filter((g) => Boolean(g))
+                    .reverse()
+                    .map((guess, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5"
+                      >
+                        <div className="inline-block w-3/4">
+                          <span className="block overflow-hidden truncate text-ellipsis">
+                            {guess}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };

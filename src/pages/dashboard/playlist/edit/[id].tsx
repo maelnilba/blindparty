@@ -1,24 +1,25 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { useMap } from "@hooks/useMap";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
-import type { NextPage } from "next";
+import type { NextPage, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { ReactElement, useRef } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
 import { Track } from "../#types";
+import { LayoutThrough } from "@components/layout/layout";
 
 const editSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
 });
 
-const PlaylistEdit: NextPage = () => {
+const PlaylistEdit: NextPageWithLayout = () => {
   const { query, push } = useRouter();
   const id = getQuery(query.id);
 
@@ -127,7 +128,7 @@ const PlaylistEdit: NextPage = () => {
 
   return (
     <div className="flex flex-row gap-2">
-      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto p-4 pb-20">
+      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto p-4 pt-20">
         {data?.map((playlist) => (
           <PlaylistCard
             key={playlist.id}
@@ -136,9 +137,9 @@ const PlaylistEdit: NextPage = () => {
           />
         ))}
       </div>
-      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pb-20">
+      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto">
         {tracks && (
-          <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 backdrop-blur-sm">
+          <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">
             <button
               onClick={() =>
                 addTracks(tracks.filter((t) => t.track).map((t) => t.track!))
@@ -186,8 +187,8 @@ const PlaylistEdit: NextPage = () => {
             })}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pb-20">
-        <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 backdrop-blur-sm">
+      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto">
+        <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <div className="px-4 pb-2">
             <button
               type="submit"
@@ -258,13 +259,14 @@ const PlaylistEdit: NextPage = () => {
 
 const PlaylistEditWrapper = () => {
   return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <TrackPlayer>
-        <PlaylistEdit />
-      </TrackPlayer>
-    </div>
+    <TrackPlayer>
+      <PlaylistEdit />
+    </TrackPlayer>
   );
 };
 
 export default PlaylistEditWrapper;
+
+PlaylistEditWrapper.getLayout = (page: ReactElement) => {
+  return <LayoutThrough>{page}</LayoutThrough>;
+};

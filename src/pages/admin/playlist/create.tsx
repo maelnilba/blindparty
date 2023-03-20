@@ -1,20 +1,21 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
-import Navigation from "@components/navigation";
+import Navigation from "@components/layout/navigation";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
 import { api } from "@utils/api";
-import type { NextPage } from "next";
+import type { NextPage, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
 import { Track } from "pages/dashboard/playlist/#types";
-import { useRef, useState } from "react";
+import { ReactElement, useRef, useState } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
 import { useAsyncEffect } from "@hooks/useAsyncEffect";
 import { create } from "zustand";
 import { AlbumsPicture } from "@components/playlist/albums-picture";
+import { LayoutThrough } from "@components/layout/layout";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -39,7 +40,7 @@ const useAlbumsPictureStore = create<{
   },
 }));
 
-const PlaylistCreate: NextPage = () => {
+const PlaylistCreate: NextPageWithLayout = () => {
   const router = useRouter();
   const {
     map: tracksMap,
@@ -168,8 +169,8 @@ const PlaylistCreate: NextPage = () => {
 
   return (
     <div className="flex flex-row gap-2">
-      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto px-4 pb-20">
-        <div className="sticky top-0 flex flex-col gap-2 bg-black/10 py-2 backdrop-blur-sm">
+      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto px-4">
+        <div className="sticky top-0 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <label htmlFor="playlist-name" className="font-semibold">
             Rechercher une playlist
           </label>
@@ -189,9 +190,9 @@ const PlaylistCreate: NextPage = () => {
           ))}
         </div>
       </div>
-      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pb-20">
+      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto">
         {tracks && (
-          <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 backdrop-blur-sm">
+          <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">
             <button
               onClick={() =>
                 addTracks(tracks.filter((t) => t.track).map((t) => t.track!))
@@ -239,8 +240,8 @@ const PlaylistCreate: NextPage = () => {
             })}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pb-20">
-        <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 backdrop-blur-sm">
+      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto ">
+        <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm ">
           <div className="px-4 pb-2">
             <button
               type="submit"
@@ -318,13 +319,14 @@ const PlaylistCreate: NextPage = () => {
 
 const PlaylistCreateWrapper = () => {
   return (
-    <div className="relative min-h-screen w-screen">
-      <Navigation />
-      <TrackPlayer>
-        <PlaylistCreate />
-      </TrackPlayer>
-    </div>
+    <TrackPlayer>
+      <PlaylistCreate />
+    </TrackPlayer>
   );
 };
 
 export default PlaylistCreateWrapper;
+
+PlaylistCreateWrapper.getLayout = (page: ReactElement) => {
+  return <LayoutThrough>{page}</LayoutThrough>;
+};
