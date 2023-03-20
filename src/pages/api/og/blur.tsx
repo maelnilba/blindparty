@@ -1,34 +1,23 @@
 import { ImageResponse } from "@vercel/og";
 import type { NextRequest } from "next/server";
+import { z } from "zod";
+import { createQueryValidator } from "./#";
 
 export const config = {
   runtime: "experimental-edge",
 };
 
+const validator = createQueryValidator(
+  z.object({
+    src: z.string(),
+  })
+);
+
 export default async function (req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const reversed_src = searchParams.get("src");
-  if (!reversed_src) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            display: "flex",
-            height: "100%",
-            width: "100%",
-            flexDirection: "column",
-            alignItems: "center",
-            backgroundColor: "black",
-          }}
-        ></div>
-      ),
-      {
-        width: 630,
-      }
-    );
-  }
+  const { src } = validator.validate(searchParams);
 
-  const src = reversed_src?.split("").reverse().join("");
+  const _src = src.split("").reverse().join("");
 
   return new ImageResponse(
     (
@@ -42,7 +31,7 @@ export default async function (req: NextRequest) {
           filter: "blur(36px)",
         }}
       >
-        <img placeholder="blur" src={src!} />
+        <img placeholder="blur" src={_src} />
       </div>
     ),
     {

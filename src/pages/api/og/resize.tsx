@@ -1,21 +1,22 @@
 import { ImageResponse } from "@vercel/og";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
+import { createQueryValidator } from "./#";
 
 export const config = {
   runtime: "experimental-edge",
 };
 
-const number = z.number();
+const validator = createQueryValidator(
+  z.object({
+    width: z.number(),
+    src: z.string().url(),
+  })
+);
+
 export default async function (req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  let width;
-  let width_params = number.safeParse(searchParams.get("width"));
-  const src = searchParams.get("src");
-
-  if (width_params.success) {
-    width = width_params.data;
-  }
+  const { width, src } = validator.validate(searchParams);
 
   return new ImageResponse(
     (

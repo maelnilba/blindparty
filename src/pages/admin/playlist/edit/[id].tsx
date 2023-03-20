@@ -226,6 +226,7 @@ const PlaylistEdit: NextPage = () => {
               ref={imageUpload}
               className="flex-1"
               prefix="playlist"
+              presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
             />
             <form
               ref={zo.ref}

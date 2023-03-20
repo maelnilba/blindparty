@@ -11,11 +11,32 @@ import { useRef } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
 import { Track } from "./#types";
+import { useAsyncEffect } from "@hooks/useAsyncEffect";
+import { useDebounce } from "@hooks/useDebounce";
+import { create } from "zustand";
 
 const createSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
 });
+
+const useAlbumsPictureStore = create<{
+  cache: Map<string, Blob>;
+  fetch: (sources: string[]) => Promise<Blob>;
+}>((set, get) => ({
+  cache: new Map(),
+  fetch: async (sources) => {
+    const hash = sources.join("|");
+    const _cache = get().cache;
+    if (_cache.has(hash)) return _cache.get(hash)!;
+    const res = await fetch(
+      "/api/og/merge?" + sources.map((source) => `sources=${source}`).join("&")
+    );
+    const img = await res.blob();
+    set({ cache: new Map(_cache.set(hash, img)) });
+    return img;
+  },
+}));
 
 const PlaylistCreate: NextPage = () => {
   const router = useRouter();
@@ -34,6 +55,51 @@ const PlaylistCreate: NextPage = () => {
       router.push("/dashboard/playlist");
     },
   });
+
+  const fetchMergeAlbum = useAlbumsPictureStore((state) => state.fetch);
+  const setMergeAlbum = useDebounce(async (sources: string[]) => {
+    if (!imageUpload.current) return;
+    const img = await fetchMergeAlbum(sources);
+    imageUpload.current.set(img);
+  }, 100);
+
+  useAsyncEffect(async () => {
+    if (
+      tracksMap.size > 3 &&
+      imageUpload.current &&
+      !imageUpload.current.local
+    ) {
+      const images = [
+        ...[...tracksMap]
+          .map(([_, v]) => v.album.images)
+          .reduce((map, images) => {
+            const image = images[0];
+            if (image) map.set(image.url, (map.get(image.url) ?? 0) + 1);
+            return map;
+          }, new Map<string, number>()),
+      ]
+        .map(([k, v]) => ({
+          count: v,
+          image: k,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 4);
+
+      if (images.length !== 4) return;
+      const sources = images.map((img) => img.image).sort();
+      await setMergeAlbum(sources);
+    }
+
+    if (
+      tracksMap.size < 4 &&
+      imageUpload.current &&
+      imageUpload.current.changed &&
+      !imageUpload.current.local
+    ) {
+      imageUpload.current.remove();
+    }
+  }, [tracksMap]);
+
   const { load, start, pause, unpause, currentTrack, playing } = usePlayer();
   const playTrack = async (track: Track) => {
     if (currentTrack?.id === track.id && playing) {
@@ -168,6 +234,7 @@ const PlaylistCreate: NextPage = () => {
               ref={imageUpload}
               className="flex-1"
               prefix="playlist"
+              presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
             />
             <form
               ref={zo.ref}

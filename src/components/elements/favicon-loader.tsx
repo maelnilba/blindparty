@@ -63,7 +63,6 @@ function useFaviconLoader(
       favicons instanceof Function ? favicons(frame) : favicons[frame];
     frame++;
     frame = frame % (options?.FPS ?? fps);
-    console.log("hhhhelo");
     loadingsTimeout.current.push(
       setTimeout(() => {
         frameId.current = window.requestAnimationFrame(() => loading(frame));
