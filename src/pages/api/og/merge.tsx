@@ -27,26 +27,14 @@ export default async function (req: NextRequest) {
           width: "100%",
         }}
       >
-        <picture tw="flex">
+        <picture>
           {row1.map((source, id) => (
-            <img
-              className="col-span-1"
-              width={300}
-              height={300}
-              key={id}
-              src={source}
-            />
+            <img width={300} height={300} key={id} src={source} />
           ))}
         </picture>
-        <picture tw="flex">
+        <picture>
           {row2.map((source, id) => (
-            <img
-              className="col-span-1"
-              width={300}
-              height={300}
-              key={id}
-              src={source}
-            />
+            <img width={300} height={300} key={id} src={source} />
           ))}
         </picture>
       </div>

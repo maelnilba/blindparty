@@ -9,11 +9,12 @@ import { api } from "@utils/api";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { Track } from "pages/dashboard/playlist/#types";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
 import { useAsyncEffect } from "@hooks/useAsyncEffect";
 import { create } from "zustand";
+import { AlbumsPicture } from "@components/playlist/albums-picture";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -58,11 +59,13 @@ const PlaylistCreate: NextPage = () => {
     },
   });
 
+  const [mockAlbumsPicture, setMockAlbumsPicture] = useState<
+    string[] | undefined
+  >();
   const fetchMergeAlbum = useAlbumsPictureStore((state) => state.fetch);
   const setMergeAlbum = useDebounce(async (sources: string[]) => {
     if (!imageUpload.current) return;
-    const img = await fetchMergeAlbum(sources);
-    imageUpload.current.set(img);
+    setMockAlbumsPicture(sources);
   }, 100);
 
   useAsyncEffect(async () => {
@@ -92,13 +95,8 @@ const PlaylistCreate: NextPage = () => {
       await setMergeAlbum(sources);
     }
 
-    if (
-      tracksMap.size < 4 &&
-      imageUpload.current &&
-      imageUpload.current.changed &&
-      !imageUpload.current.local
-    ) {
-      imageUpload.current.remove();
+    if (tracksMap.size < 4) {
+      setMockAlbumsPicture(undefined);
     }
   }, [tracksMap]);
 
@@ -148,6 +146,11 @@ const PlaylistCreate: NextPage = () => {
 
       if (tracks.length < 1) {
         return;
+      }
+
+      if (imageUpload.current && mockAlbumsPicture) {
+        const img = await fetchMergeAlbum(mockAlbumsPicture);
+        imageUpload.current.set(img);
       }
 
       if (imageUpload.current && imageUpload.current.changed) {
@@ -247,13 +250,21 @@ const PlaylistCreate: NextPage = () => {
               Créer
             </button>
           </div>
-          <div className="flex flex-grow items-center justify-center gap-4">
+          <div className="relative flex flex-grow items-center justify-center gap-4">
             <ImageUpload
               ref={imageUpload}
               className="flex-1"
               prefix="playlist"
               presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
-            />
+            >
+              {mockAlbumsPicture && (
+                <AlbumsPicture
+                  className="flex-1"
+                  row1={mockAlbumsPicture.slice(0, 2)}
+                  row2={mockAlbumsPicture.slice(2, 4)}
+                />
+              )}
+            </ImageUpload>
             <form
               ref={zo.ref}
               id="create-playlist"

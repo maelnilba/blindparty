@@ -4,7 +4,9 @@ import { useS3 } from "@hooks/useS3";
 import { api } from "@utils/api";
 import { PresignedPost } from "aws-sdk/clients/s3";
 import {
+  cloneElement,
   forwardRef,
+  ReactNode,
   useDeferredValue,
   useImperativeHandle,
   useRef,
@@ -21,6 +23,7 @@ export type ImageUploadRef = {
 };
 
 type ImageUploadProps = {
+  children?: ReactNode;
   className?: string;
   src?: string | null;
   prefix: S3Prefix;
@@ -34,7 +37,7 @@ type ImageUploadProps = {
   };
 };
 export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
-  ({ className, src: _src, prefix, presignedOptions }, ref) => {
+  ({ className, src: _src, prefix, presignedOptions, children }, ref) => {
     const { mutateAsync } = api.s3.presigned.useMutation();
     const { post } = useS3({ prefix });
     const [__src, set__Src] = useState<string | null | undefined>(_src);
@@ -134,6 +137,9 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
           </Picture>
         ) : (
           <ImageIcon className="pointer-events-none h-12 w-12 group-hover:scale-105" />
+        )}
+        {children && !src && (
+          <div className="pointer-events-none absolute">{children}</div>
         )}
       </div>
     );
