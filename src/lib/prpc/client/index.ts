@@ -23,8 +23,8 @@ export function createPRPCNext<
         }
 
         return {
-          useConnect: (id: any, options: any, binding: any) =>
-            useConnect(id, options, binding, { channel_name: p }),
+          useConnect: (id: any, options: any, binding: any, deps: any = []) =>
+            useConnect(id, options, binding, deps, { channel_name: p }),
         };
       },
     }

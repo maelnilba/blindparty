@@ -65,7 +65,10 @@ export type PRPCRoute<
     >[1],
     binding: Parameters<
       typeof useConnect<TPresence, TRPCRouter, TRPCRoute, TRoute, TChannel>
-    >[2]
+    >[2],
+    deps?: Parameters<
+      typeof useConnect<TPresence, TRPCRouter, TRPCRoute, TRoute, TChannel>
+    >[3]
   ) => ReturnType<
     typeof useConnect<TPresence, TRPCRouter, TRPCRoute, TRoute, TChannel>
   >;

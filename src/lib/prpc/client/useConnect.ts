@@ -33,6 +33,7 @@ export function useConnect<
   id: string,
   options: ConnectOptions<TPresence, InferRouteUser<TRoute>>,
   binding: () => void,
+  deps: any[],
   internal: InternalConnect<TRPCRoute>
 ) {
   const { pusher, setAuth, api } = usePRPC();
@@ -151,11 +152,15 @@ export function useConnect<
         }
       }
     };
-  }, [isSubscribe]);
+  }, [isSubscribe, ...deps]);
 
   function bind<T extends string & (TRPCRouterEvent<TRPCRoute> | PusherEvent)>(
     event: T,
-    callback: (data: InferEventOutput<TRPCRouter, TChannel, T>) => void
+    callback: (
+      data: T extends PusherEvent
+        ? PusherUser<z.infer<InferRouteUser<TRoute>>>
+        : InferEventOutput<TRPCRouter, TChannel, T>
+    ) => void
   ) {
     channel.current?.bind(event, callback);
   }
@@ -219,6 +224,10 @@ export function useConnect<
     channel.current?.unsubscribe();
   }
 
+  function unbind_all() {
+    channel.current && channel.current.unbind_all();
+  }
+
   return {
     me,
     members,
@@ -229,5 +238,6 @@ export function useConnect<
     send,
     subscribe,
     unsubscribe,
+    unbind_all,
   };
 }

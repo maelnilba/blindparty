@@ -25,6 +25,7 @@ import { prisma } from "@server/db";
 import { TRACK_TIMER_MS } from "../#constant";
 import { sleep } from "lib/helpers/sleep";
 import { exclude } from "..";
+import { useRouter } from "next/router";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -141,10 +142,13 @@ export type Player =
 const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ party }) => {
+  const router = useRouter();
   const [joineds, setJoineds] = useState<Set<string>>(new Set());
+  const [isJoined, setIsJoined] = useState(false);
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
   const [guesses, setGuesses] = useState<string[]>([]);
+
   const { send, bind, members } = prpc.game.useConnect(
     party.id,
     {
@@ -154,6 +158,31 @@ const Party: NextPage<
       },
     },
     () => {
+      bind("pusher:member_removed", (member) => {
+        if (game === "RUNNING" && member.info.isHost) {
+          send("host-leave");
+        }
+      });
+
+      bind("host-leave", () => {
+        if (game !== "RUNNING") return;
+        router.push({
+          pathname: "/party",
+          query: {
+            reason: exclude("HOST_LEAVE"),
+          },
+        });
+      });
+
+      bind("leave", ({ id }) => {
+        setJoineds((joineds) => {
+          if (joineds.has(id)) {
+            joineds.delete(id);
+          }
+          return new Set(joineds);
+        });
+      });
+
       bind("join", ({ joined, user }) => {
         setJoineds((joineds) => {
           if (joined) {
@@ -166,6 +195,13 @@ const Party: NextPage<
       });
 
       bind("start", ({ running }) => {
+        if (!isJoined)
+          router.push({
+            pathname: "/party",
+            query: {
+              reason: exclude("NOT_JOINED"),
+            },
+          });
         if (running) {
           setGame("RUNNING");
         }
@@ -181,7 +217,8 @@ const Party: NextPage<
         setGuesses([]);
         setView("SCORE");
       });
-    }
+    },
+    [game, isJoined]
   );
 
   const guess = (word: string) => {
@@ -283,7 +320,6 @@ const Party: NextPage<
     }));
   }, [party, members, joineds]);
 
-  const [isJoined, setIsJoined] = useState(false);
   const join = () => {
     send("join", { joined: !isJoined });
     setIsJoined((j) => !j);

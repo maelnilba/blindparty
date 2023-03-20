@@ -45,6 +45,32 @@ export const gameRouter = createTRPCRouter({
       }
       return ctx.pusher.trigger({ joined: input.joined, user: input.prpc.me });
     }),
+  "host-leave": prpc.game.trigger(({ ctx, input }) => {
+    return ctx.pusher.trigger({});
+  }),
+  leave: prpc.game
+    .data(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .trigger(async ({ ctx, input }) => {
+      await ctx.prisma.party.update({
+        where: {
+          id: input.prpc.channel_id,
+        },
+        data: {
+          players: {
+            deleteMany: {
+              userId: input.id,
+              partyId: input.prpc.channel_id,
+            },
+          },
+        },
+      });
+
+      return ctx.pusher.trigger({ id: input.id });
+    }),
   start: prpc.game.trigger(async ({ ctx, input }) => {
     const party = await ctx.prisma.party.updateMany({
       where: {

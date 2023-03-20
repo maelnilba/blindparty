@@ -193,7 +193,7 @@ const Party: NextPage<
     };
   }, [ready, game]);
 
-  const { send, bind, members } = prpc.game.useConnect(
+  const { send, bind, members, unbind_all } = prpc.game.useConnect(
     party.id,
     {
       subscribeOnMount: true,
@@ -203,6 +203,18 @@ const Party: NextPage<
     },
     () => {
       let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
+
+      bind("pusher:member_removed", (member) => {
+        if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
+          setJoineds((joineds) => {
+            if (joineds.has(member.info.id)) {
+              joineds.delete(member.info.id);
+            }
+            return new Set(joineds);
+          });
+          send("leave", { id: member.info.id });
+        }
+      });
 
       bind("join", ({ joined, user }) => {
         setJoineds((joineds) => {
@@ -263,7 +275,7 @@ const Party: NextPage<
         setTrack({ track });
 
         timer.current = setTimeout(
-          () => send("next", {}),
+          () => send("next"),
           GUESS_MS + TRACK_TIMER_MS + ONE_SECOND_IN_MS
         );
       });
@@ -272,7 +284,12 @@ const Party: NextPage<
         setView("NONE");
         setGame("ENDED");
       });
-    }
+
+      return () => {
+        unbind_all();
+      };
+    },
+    [game]
   );
 
   const location = useWindowLocation();
