@@ -3,7 +3,6 @@ import {
   useRef,
   useState,
   useEffect,
-  LegacyRef,
   Children,
   ReactNode,
   isValidElement,
@@ -11,6 +10,7 @@ import {
   ReactFragment,
   ReactPortal,
   JSXElementConstructor,
+  ComponentProps,
 } from "react";
 import { Popover, Transition } from "@headlessui/react";
 
@@ -34,11 +34,10 @@ export const Tooltip = (props: TooltipProps) => {
 
   const toggleMenu = (open: boolean) => {
     setOpenState((openState) => !openState);
-    (buttonRef?.current as any as HTMLButtonElement).click();
+    (buttonRef?.current as any as HTMLButtonElement)?.click();
   };
 
-  // Open the menu after a delay of timeoutDuration
-  const onHover = (open: boolean, action: string) => {
+  const onHover = (open: boolean, action: "onMouseEnter" | "onMouseLeave") => {
     if (
       (!open && !openState && action === "onMouseEnter") ||
       (open && openState && action === "onMouseLeave")
@@ -72,13 +71,15 @@ export const Tooltip = (props: TooltipProps) => {
     };
   }, []);
 
-  const [button, content] = Children.toArray(props.children).reduce<
-    [Element | null | undefined, Element[]]
+  const [bProps, content] = Children.toArray(props.children).reduce<
+    [ComponentProps<"button"> | null | undefined, Element[]]
   >(
     (prev, child) => {
       if (isValidElement(child)) {
         if (child.type === "button") {
-          prev[0] = child;
+          const { ref, onClick, ...childProps } =
+            child.props as ComponentProps<"button">;
+          prev[0] = childProps;
         } else {
           prev[1].push(child);
         }
@@ -95,9 +96,12 @@ export const Tooltip = (props: TooltipProps) => {
           onMouseEnter={() => onHover(open, "onMouseEnter")}
           onMouseLeave={() => onHover(open, "onMouseLeave")}
         >
-          <Popover.Button ref={buttonRef} className="outline-none">
-            <div onClick={() => handleClick(open)}>{button}</div>
-          </Popover.Button>
+          <Popover.Button
+            ref={buttonRef}
+            onClick={() => handleClick(open)}
+            style={{ ...bProps?.style, outline: "none" }}
+            {...bProps}
+          />
 
           <Transition
             show={open}

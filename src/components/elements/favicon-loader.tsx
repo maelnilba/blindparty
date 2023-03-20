@@ -82,7 +82,6 @@ function useFaviconLoader(
   };
 
   useEffect(() => {
-    console.log(isFetching, isMutating);
     if (!isFetching && !isMutating) {
       loadingsTimeout.current &&
         loadingsTimeout.current.forEach((t) => clearTimeout(t));
