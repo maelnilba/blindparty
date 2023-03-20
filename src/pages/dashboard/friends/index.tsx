@@ -42,7 +42,7 @@ const Friends: NextPage = () => {
   });
 
   return (
-    <div className="min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen">
       <Navigation />
       <div className="flex flex-wrap gap-4 p-4 px-28">
         <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">

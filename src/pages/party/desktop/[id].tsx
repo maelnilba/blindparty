@@ -345,7 +345,7 @@ const Party: NextPage<
   }, [track]);
 
   return (
-    <div className="min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen">
       <Navigation />
       <div className="flex items-center justify-center gap-4 p-4">
         {game === "PENDING" && (

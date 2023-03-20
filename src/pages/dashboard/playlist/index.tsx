@@ -80,7 +80,7 @@ const Playlists: NextPage<
   console.log(hasSpotify);
 
   return (
-    <div className="min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen">
       <Navigation />
       <div className="flex flex-wrap gap-4 p-4 px-28">
         <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">

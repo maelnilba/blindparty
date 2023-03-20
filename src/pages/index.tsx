@@ -4,7 +4,7 @@ import { getServerAuthSession } from "@server/auth";
 
 const Home: NextPage = () => {
   return (
-    <div className="min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen">
       <Navigation />
     </div>
   );

@@ -50,7 +50,7 @@ const PartyCreate: NextPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen">
       <Navigation />
       <div className="flex flex-row gap-2 p-4">
         <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">

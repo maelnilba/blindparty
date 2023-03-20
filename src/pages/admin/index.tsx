@@ -3,7 +3,7 @@ import type { NextPage } from "next";
 
 const AdminHome: NextPage = () => {
   return (
-    <div className="min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen">
       <Navigation />
       <div></div>
     </div>

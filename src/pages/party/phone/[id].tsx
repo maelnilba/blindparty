@@ -326,7 +326,7 @@ const Party: NextPage<
   };
 
   return (
-    <div className="flex min-h-screen w-screen flex-col">
+    <div className="relative flex min-h-screen w-screen flex-col">
       <Navigation />
 
       <div className="flex flex-1 items-center justify-center gap-4 p-4">

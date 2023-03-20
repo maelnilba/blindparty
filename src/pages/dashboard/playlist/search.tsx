@@ -40,7 +40,7 @@ const PlaylistSearch: NextPage = () => {
   };
 
   return (
-    <div className="min-h-screen w-screen">
+    <div className="relative min-h-screen w-screen">
       <Navigation />
       <div className="flex flex-row gap-2">
         <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto px-4">
