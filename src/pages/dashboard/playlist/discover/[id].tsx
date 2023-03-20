@@ -3,16 +3,16 @@ import Navigation from "@components/navigation";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
 import { getServerAuthSession } from "@server/auth";
-import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
 } from "next";
-import { useRouter } from "next/router";
 import { Track } from "../#types";
 import { prisma } from "@server/db";
+import { ClockIcon } from "@components/icons/clock";
+import { useRelativeTime } from "@hooks/useRelativeTime";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -62,6 +62,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       ],
     },
     include: {
+      _count: {
+        select: {
+          user: true,
+          Party: true,
+        },
+      },
       tracks: {
         include: {
           album: {
@@ -75,6 +81,14 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   });
 
+  if (!playlist)
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+
   return {
     props: {
       playlist,
@@ -85,8 +99,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 const PlaylistDiscover = ({
   playlist,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const { query } = useRouter();
-
+  const relativeUpdate = useRelativeTime(playlist.updatedAt);
   const { load, start, pause, unpause, currentTrack, playing } = usePlayer();
   const playTrack = async (track: Track) => {
     if (currentTrack?.id === track.id && playing) {
@@ -102,7 +115,7 @@ const PlaylistDiscover = ({
   return (
     <div className="flex flex-row gap-2">
       <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pb-20">
-        <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 backdrop-blur-sm">
+        <div className="sticky top-0 z-10 flex flex-col items-start justify-center gap-2 bg-black/10 py-2 backdrop-blur-sm">
           <div className="flex items-center justify-center gap-4 px-6">
             <Picture identifier={playlist?.picture}>
               <img
@@ -110,13 +123,25 @@ const PlaylistDiscover = ({
                 className="aspect-square h-24 w-24 object-cover"
               />
             </Picture>
-            <div className="flex flex-[2] flex-col gap-2">
-              <label className="font-semibold">{playlist?.name}</label>
+            <div className="flex flex-col gap-2">
+              <p className="text-4xl font-extrabold">{playlist.name}</p>
+              <div className="flex flex-col gap-1">
+                <div className="flex flex-row gap-2">
+                  <ClockIcon className="h-4 w-4" />
+                  <p className="text-xs font-normal">{relativeUpdate}</p>
+                </div>
+                <p className="text-xs font-normal">
+                  Ajoutée par {playlist._count.user} utilisateurs
+                </p>
+                <p className="text-xs font-normal">
+                  Jouée {playlist._count.Party} fois
+                </p>
+              </div>
             </div>
           </div>
         </div>
         <div className="p-4">
-          {playlist?.tracks.map((track) => (
+          {playlist.tracks.map((track) => (
             <PlaylistTrackInfoCard
               key={track.id}
               track={track}
