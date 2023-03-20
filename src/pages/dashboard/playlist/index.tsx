@@ -3,13 +3,54 @@ import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import Navigation from "@components/navigation";
 import { TrackCard } from "@components/playlist/playlist-track-card";
 import { Tooltip } from "@components/popovers/tooltip";
-import { useAccessSpotify } from "@hooks/useAccessSpotify";
+import { prisma } from "@server/db";
+import { getServerAuthSession } from "@server/auth";
+import { Socials } from "@server/types";
 import { api, RouterOutputs } from "@utils/api";
 import Link from "next/link";
-import type { NextPage } from "next/types";
+import type {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+  NextPage,
+} from "next/types";
 
-const Playlists: NextPage = () => {
-  const [hasSpotify, isProviderLoading] = useAccessSpotify();
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  const session = await getServerAuthSession({
+    req: context.req,
+    res: context.res,
+  });
+
+  if (!session || !session.user) {
+    return {
+      redirect: {
+        destination: "/dashboard",
+        permanent: false,
+      },
+    };
+  }
+
+  const { accounts } = await prisma.user.findUniqueOrThrow({
+    where: {
+      id: session.user.id,
+    },
+    select: {
+      accounts: true,
+    },
+  });
+
+  const providers = accounts.map((account) => account.provider as Socials);
+  const hasSpotify = providers?.includes("spotify");
+
+  return {
+    props: {
+      hasSpotify: hasSpotify,
+    },
+  };
+}
+
+const Playlists: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ hasSpotify }) => {
   const { data: playlists, refetch } = api.playlist.get_all.useQuery();
 
   const { mutate: erase } = api.playlist.delete.useMutation({
@@ -36,43 +77,43 @@ const Playlists: NextPage = () => {
     disconnect({ id: playlist.id });
   };
 
+  console.log(hasSpotify);
+
   return (
     <div className="min-h-screen w-screen">
       <Navigation />
       <div className="flex flex-wrap gap-4 p-4 px-28">
         <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">
-          {!isProviderLoading && (
-            <>
-              {hasSpotify ? (
-                <Link
-                  href="/dashboard/playlist/create"
-                  className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-                >
+          <>
+            {hasSpotify ? (
+              <Link
+                href="/dashboard/playlist/create"
+                className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+              >
+                Créer une playlist
+              </Link>
+            ) : (
+              <Tooltip timeoutDuration={500}>
+                <button className="w-80 rounded-full bg-white/50 px-6 py-1 text-center text-lg font-semibold text-black no-underline">
                   Créer une playlist
-                </Link>
-              ) : (
-                <Tooltip timeoutDuration={500}>
-                  <button className="w-80 rounded-full bg-white/50 px-6 py-1 text-center text-lg font-semibold text-black no-underline">
-                    Créer une playlist
-                  </button>
-                  <div className="absolute flex -translate-y-16 flex-col gap-2 rounded border border-gray-800 bg-black/10 p-2 backdrop-blur-sm">
-                    <p>
-                      La création de playlist est disponible uniquement au
-                      utilisateur ayant lié leur compte Spotify
-                      <span className="ml-2">
-                        <Link
-                          href="/settings/account"
-                          className="w-max rounded-full bg-white px-2 py-1 text-center text-sm font-semibold text-black no-underline transition-transform hover:scale-105"
-                        >
-                          Ajouter mon compte
-                        </Link>
-                      </span>
-                    </p>
-                  </div>
-                </Tooltip>
-              )}
-            </>
-          )}
+                </button>
+                <div className="absolute flex -translate-y-16 flex-col gap-2 rounded border border-gray-800 bg-black/10 p-2 backdrop-blur-sm">
+                  <p>
+                    La création de playlist est disponible uniquement au
+                    utilisateur ayant lié leur compte Spotify
+                    <span className="ml-2">
+                      <Link
+                        href="/settings/account"
+                        className="w-max rounded-full bg-white px-2 py-1 text-center text-sm font-semibold text-black no-underline transition-transform hover:scale-105"
+                      >
+                        Ajouter mon compte
+                      </Link>
+                    </span>
+                  </p>
+                </div>
+              </Tooltip>
+            )}
+          </>
           <Link
             href="/dashboard/playlist/search"
             className="w-80 rounded-full bg-pink-200 px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
@@ -132,14 +173,21 @@ const PlaylistCard = ({
               title={`Retirer la playlist`}
               message={`Êtes vous certain de vouloir retirer la playlist ${playlist.name} de vos playlist ?`}
               action="Retirer"
+              className="flex-1"
               onSuccess={() => {
                 onDisconnect(playlist);
               }}
             >
-              <button className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+              <button className="w-full rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                 Retirer
               </button>
             </ConfirmationModal>
+            <Link
+              href={`/dashboard/playlist/discover/${playlist.id}`}
+              className="flex-1 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            >
+              Découvrir
+            </Link>
           </>
         ) : (
           <>
