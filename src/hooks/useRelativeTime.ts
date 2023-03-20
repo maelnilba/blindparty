@@ -1,6 +1,22 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 
-export function useRelativeTime(date: Date, locale: "fr" | "en" = "fr") {
+type RelativeTimeOptions = {
+  locale?: "fr" | "en";
+  /*$
+   * Refresh time in seconds
+   */
+  refresh?: boolean | number;
+};
+export function useRelativeTime(date: Date, options?: RelativeTimeOptions) {
+  const [state, dispatch] = useReducer((state) => state + 1, 0);
+  const locale = options?.locale ?? "fr";
+  const refresh =
+    typeof options?.refresh === "undefined"
+      ? false
+      : typeof options.refresh === "number"
+      ? Math.max(5, options.refresh)
+      : 60;
+
   const relativeTime = useMemo(() => {
     const relativeFormatter = new Intl.RelativeTimeFormat(locale, {
       numeric: "always",
@@ -29,7 +45,19 @@ export function useRelativeTime(date: Date, locale: "fr" | "en" = "fr") {
     } else {
       return relativeFormatter.format(diffYear, "years");
     }
-  }, []);
+  }, [state]);
+
+  useEffect(() => {
+    let timer: NodeJS.Timer | undefined;
+    if (refresh) {
+      timer = setInterval(() => {
+        dispatch();
+      }, refresh * 1000);
+    }
+    return () => {
+      timer && clearInterval(timer);
+    };
+  }, [refresh]);
 
   return relativeTime;
 }
