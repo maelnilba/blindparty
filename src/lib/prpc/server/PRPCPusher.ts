@@ -91,4 +91,17 @@ export class PRPCPusher<
       },
     } as any;
   }
+
+  async members(): Promise<{ id: string }[]> {
+    const channel = setChannelName(
+      this.channel_type,
+      this.channel_name,
+      this.channel_id
+    );
+
+    const members = await this.pusher.get({
+      path: `/channels/${channel}/users`,
+    });
+    return await members.json();
+  }
 }

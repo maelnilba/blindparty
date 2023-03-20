@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { prpc } from "server/api/prpc";
 import { createTRPCRouter, enfonceSpotifyUserAuthed } from "server/api/trpc";
-import { z } from "zod";
+import { boolean, z } from "zod";
 
 export const gameRouter = createTRPCRouter({
   join: prpc.game
@@ -37,7 +37,7 @@ export const gameRouter = createTRPCRouter({
             players: {
               deleteMany: {
                 userId: ctx.session.user.id,
-                partyId: input.prpc.channel_id,
+                partyId: input.prpc.members,
               },
             },
           },
@@ -45,7 +45,31 @@ export const gameRouter = createTRPCRouter({
       }
       return ctx.pusher.trigger({ joined: input.joined, user: input.prpc.me });
     }),
-  "host-leave": prpc.game.trigger(({ ctx, input }) => {
+  "host-leave": prpc.game.trigger(async ({ ctx, input }) => {
+    const leaved = Object.values(input.prpc.members).every(
+      (m) => !(m as { isHost: boolean }).isHost
+    );
+
+    if (!leaved) {
+      throw new TRPCError({ code: "PRECONDITION_FAILED" });
+    }
+
+    await ctx.prisma.party.updateMany({
+      where: {
+        id: input.prpc.channel_id,
+        players: {
+          some: {
+            user: {
+              id: ctx.session.user.id,
+            },
+          },
+        },
+      },
+      data: {
+        status: "CANCELED",
+        endedAt: new Date().toISOString(),
+      },
+    });
     return ctx.pusher.trigger({});
   }),
   leave: prpc.game
