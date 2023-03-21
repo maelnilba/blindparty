@@ -1,5 +1,4 @@
 import { FriendCard } from "@components/friend/friend-card";
-import Navigation from "@components/layout/navigation";
 import { PartyCard } from "@components/party/party-card";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { api } from "@utils/api";

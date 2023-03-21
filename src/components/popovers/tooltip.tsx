@@ -1,18 +1,18 @@
+import { Popover, Transition } from "@headlessui/react";
 import {
-  Fragment,
-  useRef,
-  useState,
-  useEffect,
   Children,
-  ReactNode,
+  ComponentProps,
+  Fragment,
   isValidElement,
+  JSXElementConstructor,
   ReactElement,
   ReactFragment,
+  ReactNode,
   ReactPortal,
-  JSXElementConstructor,
-  ComponentProps,
+  useEffect,
+  useRef,
+  useState,
 } from "react";
-import { Popover, Transition } from "@headlessui/react";
 
 type Element =
   | string

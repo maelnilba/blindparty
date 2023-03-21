@@ -1,4 +1,3 @@
-import { TRPCClientError } from "@trpc/client";
 import { api } from "@utils/api";
 import { useReducer } from "react";
 

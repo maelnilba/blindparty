@@ -1,21 +1,20 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
-import Navigation from "@components/layout/navigation";
-import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
+import { GetLayoutThrough } from "@components/layout/layout";
+import { AlbumsPicture } from "@components/playlist/albums-picture";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
+import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
+import { useAsyncEffect } from "@hooks/useAsyncEffect";
 import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
 import { api } from "@utils/api";
-import type { NextPage, NextPageWithLayout } from "next";
+import { NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
 import { Track } from "pages/dashboard/playlist/#types";
-import { ReactElement, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
-import { useAsyncEffect } from "@hooks/useAsyncEffect";
 import { create } from "zustand";
-import { AlbumsPicture } from "@components/playlist/albums-picture";
-import { LayoutThrough } from "@components/layout/layout";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -40,7 +39,7 @@ const useAlbumsPictureStore = create<{
   },
 }));
 
-const PlaylistCreate: NextPageWithLayout = () => {
+const PlaylistCreate = () => {
   const router = useRouter();
   const {
     map: tracksMap,
@@ -317,7 +316,7 @@ const PlaylistCreate: NextPageWithLayout = () => {
   );
 };
 
-const PlaylistCreateWrapper = () => {
+const PlaylistCreateWrapper: NextPageWithLayout = () => {
   return (
     <TrackPlayer>
       <PlaylistCreate />
@@ -327,6 +326,4 @@ const PlaylistCreateWrapper = () => {
 
 export default PlaylistCreateWrapper;
 
-PlaylistCreateWrapper.getLayout = (page: ReactElement) => {
-  return <LayoutThrough>{page}</LayoutThrough>;
-};
+PlaylistCreateWrapper.getLayout = GetLayoutThrough;

@@ -2,7 +2,6 @@ import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { PlusIcon } from "@components/icons/plus";
 import { ensureProvider, SocialIcon } from "@components/icons/socials";
 import { Modal } from "@components/modals/modal";
-import Navigation from "@components/layout/navigation";
 import { getServerAuthSession } from "@server/auth";
 import { useQuery } from "@tanstack/react-query";
 import { api, RouterOutputs } from "@utils/api";

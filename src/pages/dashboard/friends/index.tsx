@@ -7,7 +7,6 @@ import { XMarkIcon } from "@components/icons/x-mark";
 import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
-import Navigation from "@components/layout/navigation";
 import { useDebounce } from "@hooks/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import { useSession } from "next-auth/react";

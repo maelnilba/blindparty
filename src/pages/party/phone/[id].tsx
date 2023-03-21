@@ -2,30 +2,29 @@ import { Divider } from "@components/elements/divider";
 import { MicroIcon } from "@components/icons/micro";
 import { Picture } from "@components/images/picture";
 import { Modal } from "@components/modals/modal";
-import Navigation from "@components/layout/navigation";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useMicroPermission } from "@hooks/useMicroPermission";
 import { useVoiceDetector } from "@hooks/useVoiceDetector";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
+import { getServerAuthSession } from "@server/auth";
+import { prisma } from "@server/db";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
+import { sleep } from "lib/helpers/sleep";
 import { raw } from "lib/tailwindcolors";
-import SpeechRecognition, {
-  useSpeechRecognition,
-} from "react-speech-recognition";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
 } from "next";
+import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getServerAuthSession } from "@server/auth";
-import { prisma } from "@server/db";
-import { TRACK_TIMER_MS } from "../#constant";
-import { sleep } from "lib/helpers/sleep";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 import { exclude } from "..";
-import { useRouter } from "next/router";
+import { TRACK_TIMER_MS } from "../#constant";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);

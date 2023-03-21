@@ -1,5 +1,5 @@
+import { config, S3 } from "aws-sdk";
 import { env } from "../env/server.mjs";
-import { S3, config } from "aws-sdk";
 
 config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY,

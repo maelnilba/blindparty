@@ -3,10 +3,10 @@ import type {
   ProcedureParams,
   RootConfig,
 } from "@trpc/server";
+import type superjson from "superjson";
 import { z, type ZodSchema } from "zod";
 import { InferTRPCProcedureContext } from "../server/types";
 import type { ChannelType, ChannelWithMember, ResponseFrom } from "./types";
-import type superjson from "superjson";
 export const channels = [
   "public",
   "private",

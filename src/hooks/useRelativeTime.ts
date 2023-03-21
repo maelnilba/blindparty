@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useReducer, useState } from "react";
+import { useEffect, useMemo, useReducer } from "react";
 
 type RelativeTimeOptions = {
   locale?: "fr" | "en";

@@ -1,21 +1,18 @@
+import { ClockIcon } from "@components/icons/clock";
 import { Picture } from "@components/images/picture";
-import Navigation from "@components/layout/navigation";
-import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
+import { GetLayoutThrough } from "@components/layout/layout";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
+import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
+import { useRelativeTime } from "@hooks/useRelativeTime";
 import { getServerAuthSession } from "@server/auth";
+import { prisma } from "@server/db";
 import { getQuery } from "@utils/next-router";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
-  NextPage,
   NextPageWithLayout,
 } from "next";
 import { Track } from "../#types";
-import { prisma } from "@server/db";
-import { ClockIcon } from "@components/icons/clock";
-import { useRelativeTime } from "@hooks/useRelativeTime";
-import { ReactElement } from "react";
-import { LayoutThrough } from "@components/layout/layout";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -174,6 +171,4 @@ const PlaylistDiscoverWrapper: NextPageWithLayout<
 
 export default PlaylistDiscoverWrapper;
 
-PlaylistDiscoverWrapper.getLayout = (page: ReactElement) => {
-  return <LayoutThrough>{page}</LayoutThrough>;
-};
+PlaylistDiscoverWrapper.getLayout = GetLayoutThrough;

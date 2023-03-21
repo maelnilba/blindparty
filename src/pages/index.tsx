@@ -1,6 +1,5 @@
-import Navigation from "@components/layout/navigation";
-import type { GetServerSidePropsContext, NextPage } from "next";
 import { getServerAuthSession } from "@server/auth";
+import type { GetServerSidePropsContext, NextPage } from "next";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerAuthSession({

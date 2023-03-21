@@ -1,6 +1,6 @@
 import { AnyRouter } from "@trpc/server";
-import { Channel, PresenceChannel, Members } from "pusher-js";
-import { useRef, useState, useEffect } from "react";
+import { Channel, Members, PresenceChannel } from "pusher-js";
+import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
 import { PusherEvent } from "../shared/types";
 import {
@@ -10,15 +10,15 @@ import {
   setChannelName,
 } from "../shared/utils";
 import {
+  AnyPresenceOptions,
   AnyRoute,
   ConnectOptions,
+  InferEventInput,
+  InferEventOutput,
   InferRouteUser,
   InternalConnect,
   PusherUser,
-  AnyPresenceOptions,
   TRPCRouterEvent,
-  InferEventOutput,
-  InferEventInput,
 } from "./types";
 import { usePRPC } from "./usePRPCContext";
 import { listen, mute } from "./ws-interceptor";

@@ -1,4 +1,4 @@
-import { z, ZodObject } from "zod";
+import { type ZodObject } from "zod";
 
 export const createQueryValidator = <T extends ZodObject<any>>(schema: T) => {
   return {

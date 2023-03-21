@@ -1,10 +1,9 @@
 import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
-import Navigation from "@components/layout/navigation";
 import { TrackCard } from "@components/playlist/playlist-track-card";
 import { Tooltip } from "@components/popovers/tooltip";
-import { prisma } from "@server/db";
 import { getServerAuthSession } from "@server/auth";
+import { prisma } from "@server/db";
 import { Socials } from "@server/types";
 import { api, RouterOutputs } from "@utils/api";
 import Link from "next/link";

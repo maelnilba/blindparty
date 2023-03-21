@@ -1,4 +1,4 @@
-import { isValidElement, ReactElement, ReactNode, useState } from "react";
+import { isValidElement, ReactElement, useState } from "react";
 import { Placeholder } from "./placeholder";
 
 type PictureProps = {

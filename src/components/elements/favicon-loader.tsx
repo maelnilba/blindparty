@@ -1,5 +1,4 @@
-import { useIsFetching, useIsMutating, useQuery } from "@tanstack/react-query";
-import { sleep } from "lib/helpers/sleep";
+import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import { memo, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 

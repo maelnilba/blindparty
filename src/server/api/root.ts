@@ -1,11 +1,11 @@
-import { createTRPCRouter } from "./trpc";
-import { spotifyRouter } from "./routers/spotify";
-import { playlistRouter } from "./routers/playlist";
 import { adminRouter } from "./routers/admin/root";
 import { friendRouter } from "./routers/friend";
-import { userRouter } from "./routers/user";
-import { partyRouter } from "./routers/party";
 import { s3Router } from "./routers/infra/s3";
+import { partyRouter } from "./routers/party";
+import { playlistRouter } from "./routers/playlist";
+import { spotifyRouter } from "./routers/spotify";
+import { userRouter } from "./routers/user";
+import { createTRPCRouter } from "./trpc";
 
 /**
  * This is the primary router for your server.

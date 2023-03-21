@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { prpc } from "server/api/prpc";
 import { createTRPCRouter, enfonceSpotifyUserAuthed } from "server/api/trpc";
-import { boolean, z } from "zod";
+import { z } from "zod";
 
 export const gameRouter = createTRPCRouter({
   join: prpc.game

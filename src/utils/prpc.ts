@@ -1,7 +1,7 @@
-import { AppRouter } from "../server/api/root";
-import { api } from "./api";
 import { createPRPCNext } from "@prpc/client";
 import { PRPCRouter } from "server/api/prpc";
+import { AppRouter } from "../server/api/root";
+import { api } from "./api";
 
 const ap = api.party;
 export const prpc = createPRPCNext<AppRouter["party"], PRPCRouter>(api.party, {

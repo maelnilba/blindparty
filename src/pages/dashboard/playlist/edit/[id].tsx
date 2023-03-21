@@ -1,25 +1,24 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
-import Navigation from "@components/layout/navigation";
-import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
+import { GetLayoutThrough } from "@components/layout/layout";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
+import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useMap } from "@hooks/useMap";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
-import type { NextPage, NextPageWithLayout } from "next";
+import type { NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
-import { ReactElement, useRef } from "react";
+import { useRef } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
 import { Track } from "../#types";
-import { LayoutThrough } from "@components/layout/layout";
 
 const editSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
 });
 
-const PlaylistEdit: NextPageWithLayout = () => {
+const PlaylistEdit = () => {
   const { query, push } = useRouter();
   const id = getQuery(query.id);
 
@@ -257,7 +256,7 @@ const PlaylistEdit: NextPageWithLayout = () => {
   );
 };
 
-const PlaylistEditWrapper = () => {
+const PlaylistEditWrapper: NextPageWithLayout = () => {
   return (
     <TrackPlayer>
       <PlaylistEdit />
@@ -267,6 +266,4 @@ const PlaylistEditWrapper = () => {
 
 export default PlaylistEditWrapper;
 
-PlaylistEditWrapper.getLayout = (page: ReactElement) => {
-  return <LayoutThrough>{page}</LayoutThrough>;
-};
+PlaylistEditWrapper.getLayout = GetLayoutThrough;

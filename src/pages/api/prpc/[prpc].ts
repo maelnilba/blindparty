@@ -1,6 +1,6 @@
-import { env } from "../../../env/server.mjs";
-import { prpc } from "@server/api/prpc";
 import { createNextApiHandler } from "@prpc/server";
+import { prpc } from "@server/api/prpc";
+import { env } from "../../../env/server.mjs";
 
 export default createNextApiHandler({
   router: prpc,

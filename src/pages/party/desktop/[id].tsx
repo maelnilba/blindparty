@@ -1,36 +1,34 @@
 import { Divider } from "@components/elements/divider";
 import { Url } from "@components/elements/url";
+import { Score, ScoreBoard } from "@components/game/score-board";
+import { TrackPicture } from "@components/game/track-picture";
 import { TrackPlayer, TrackPlayerRef } from "@components/game/track-player";
 import { DesktopIcon } from "@components/icons/desktop";
 import { PhoneIcon } from "@components/icons/phone";
-import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
-import Navigation from "@components/layout/navigation";
-import { Score, ScoreBoard } from "@components/game/score-board";
+import { PlayerCard } from "@components/party/player-card";
 import { PlaylistCard } from "@components/playlist/playlist-card";
+import { useMessagesBus } from "@hooks/useMessagesBus";
 import { useWindowLocation } from "@hooks/useWindowLocation";
 import { PartyStatus, PartyViewStatus } from "@prisma/client";
+import { getServerAuthSession } from "@server/auth";
+import { prisma } from "@server/db";
 import { RouterOutputs } from "@utils/api";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
+import { ONE_SECOND_IN_MS } from "lib/helpers/date";
 import { sleep } from "lib/helpers/sleep";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
 } from "next";
+import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { getServerAuthSession } from "@server/auth";
-import { prisma } from "@server/db";
-import { GUESS_MS, TRACK_TIMER_MS, VIEW_SCORE_MS } from "../#constant";
-import { TrackPicture } from "@components/game/track-picture";
-import { PlayerCard } from "@components/party/player-card";
-import { ONE_SECOND_IN_MS } from "lib/helpers/date";
-import { useMessagesBus } from "@hooks/useMessagesBus";
 import { z } from "zod";
-import { useRouter } from "next/router";
 import { exclude } from "..";
+import { GUESS_MS, TRACK_TIMER_MS, VIEW_SCORE_MS } from "../#constant";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);

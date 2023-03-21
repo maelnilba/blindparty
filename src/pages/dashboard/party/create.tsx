@@ -1,13 +1,12 @@
-import { Friend, FriendCard } from "@components/friend/friend-card";
 import { InputFade } from "@components/elements/input-fade";
+import { Friend, FriendCard } from "@components/friend/friend-card";
+import { ExclamationIcon } from "@components/icons/exclamation";
 import { Picture } from "@components/images/picture";
-import Navigation from "@components/layout/navigation";
 import { Playlist, PlaylistCard } from "@components/playlist/playlist-card";
 import { api } from "@utils/api";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
-import { ExclamationIcon } from "@components/icons/exclamation";
+import { useState } from "react";
 
 const PartyCreate: NextPage = () => {
   const router = useRouter();

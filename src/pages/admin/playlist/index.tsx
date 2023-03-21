@@ -1,6 +1,5 @@
 import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
-import Navigation from "@components/layout/navigation";
 import { api, RouterOutputs } from "@utils/api";
 import Link from "next/link";
 import type { NextPage } from "next/types";

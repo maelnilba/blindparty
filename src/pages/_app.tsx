@@ -1,16 +1,11 @@
-import { type AppProps, type AppType } from "next/app";
-import { type Session } from "next-auth";
-import { SessionProvider } from "next-auth/react";
-import { api } from "../utils/api";
-import "../styles/globals.css";
 import { FaviconLoader } from "@components/elements/favicon-loader";
 import { Layout } from "@components/layout/layout";
-import type { NextPage } from "next";
-import type { ReactElement, ReactNode } from "react";
-
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
-  getLayout?: (page: ReactElement) => ReactNode;
-};
+import type { NextPageWithLayout } from "next";
+import { type Session } from "next-auth";
+import { SessionProvider } from "next-auth/react";
+import { type AppProps, type AppType } from "next/app";
+import "../styles/globals.css";
+import { api } from "../utils/api";
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;

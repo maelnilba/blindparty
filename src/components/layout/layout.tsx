@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactElement, ReactNode } from "react";
 import Navigation from "./navigation";
 
 export const Layout = ({ children }: { children: ReactNode }) => {
@@ -18,3 +18,7 @@ export const LayoutThrough = ({ children }: { children: ReactNode }) => {
     </div>
   );
 };
+
+export function GetLayoutThrough(page: ReactElement) {
+  return <LayoutThrough>{page}</LayoutThrough>;
+}

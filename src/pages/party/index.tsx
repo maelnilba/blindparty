@@ -1,4 +1,3 @@
-import Navigation from "@components/layout/navigation";
 import { PartyCard } from "@components/party/party-card";
 import { api } from "@utils/api";
 import type {

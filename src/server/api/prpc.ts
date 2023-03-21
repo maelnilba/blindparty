@@ -1,9 +1,9 @@
+import { initPRPC } from "@prpc/server";
 import Pusher from "pusher";
-import { env } from "../../env/server.mjs";
-import { createTRPCContext, protectedProcedure, publicProcedure } from "./trpc";
 import superjson from "superjson";
 import { z } from "zod";
-import { initPRPC } from "@prpc/server";
+import { env } from "../../env/server.mjs";
+import { createTRPCContext, protectedProcedure } from "./trpc";
 
 const pusherClient = new Pusher({
   appId: env.PUSHER_APP_ID,

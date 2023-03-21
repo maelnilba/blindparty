@@ -1,8 +1,8 @@
+import { getServerAuthSession } from "@server/auth";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import type { BuiltInProviderType } from "next-auth/providers";
 import type { ClientSafeProvider, LiteralUnion } from "next-auth/react";
-import { signIn, getProviders } from "next-auth/react";
-import { getServerAuthSession } from "@server/auth";
+import { getProviders, signIn } from "next-auth/react";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const providers = await getProviders();

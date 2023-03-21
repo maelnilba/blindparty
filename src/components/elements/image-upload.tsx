@@ -1,10 +1,10 @@
 import { ImageIcon } from "@components/icons/image";
 import { Picture } from "@components/images/picture";
 import { useS3 } from "@hooks/useS3";
+import type { S3Prefix } from "@server/api/routers/infra/s3";
 import { api } from "@utils/api";
 import { PresignedPost } from "aws-sdk/clients/s3";
 import {
-  cloneElement,
   forwardRef,
   ReactNode,
   useDeferredValue,
@@ -12,7 +12,6 @@ import {
   useRef,
   useState,
 } from "react";
-import type { S3Prefix } from "@server/api/routers/infra/s3";
 export type ImageUploadRef = {
   set: (blob: Blob) => Promise<void>;
   remove: () => void;
