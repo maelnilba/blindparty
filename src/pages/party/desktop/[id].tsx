@@ -343,10 +343,10 @@ const Party: NextPage<
   }, [track]);
 
   return (
-    <div className="flex items-center justify-center gap-4 p-4">
+    <div className="flex flex-1 justify-center gap-4 p-4">
       {game === "PENDING" && (
         <>
-          <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+          <div className="scrollbar-hide relative flex w-96 max-w-[24rem] flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
             <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
               <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
                 Déroulement d'une partie
@@ -389,7 +389,7 @@ const Party: NextPage<
             </div>
           </div>
 
-          <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+          <div className="scrollbar-hide relative flex w-96 flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
             <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
               {isHost ? (
                 <>

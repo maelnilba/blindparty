@@ -3,7 +3,7 @@ import Navigation from "./navigation";
 
 export const Layout = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="relative min-h-screen w-screen">
+    <div className="relative flex min-h-screen w-screen flex-col">
       <Navigation />
       {children}
     </div>
@@ -12,7 +12,7 @@ export const Layout = ({ children }: { children: ReactNode }) => {
 
 export const LayoutThrough = ({ children }: { children: ReactNode }) => {
   return (
-    <div className="relative min-h-screen w-screen">
+    <div className="relative flex min-h-screen w-screen flex-col">
       <Navigation through />
       {children}
     </div>

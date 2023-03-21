@@ -41,8 +41,8 @@ const Friends: NextPage = () => {
   });
 
   return (
-    <div className="flex flex-wrap gap-4 p-4 px-28">
-      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
+    <div className="flex flex-1 flex-wrap gap-4 p-4 px-28">
+      <div className="scrollbar-hide relative flex w-96 flex-1 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <Modal>
             <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
@@ -77,7 +77,7 @@ const Friends: NextPage = () => {
           ))}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
+      <div className="scrollbar-hide relative flex w-96 flex-1 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
             Mes invitations

@@ -10,8 +10,8 @@ const DashBoard: NextPage = () => {
   const { data: friends } = api.friend.get_all.useQuery();
   const { data: partys } = api.party.get_all_invite.useQuery();
   return (
-    <div className="flex flex-wrap gap-4 p-4 px-28">
-      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+    <div className="flex flex-1 flex-wrap gap-4 p-4 px-28">
+      <div className="scrollbar-hide relative flex w-96 flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <Link
             href="/dashboard/party/create"
@@ -26,7 +26,7 @@ const DashBoard: NextPage = () => {
           ))}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+      <div className="scrollbar-hide relative flex w-96 flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <Link
             href="/dashboard/playlist"
@@ -41,7 +41,7 @@ const DashBoard: NextPage = () => {
           ))}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+      <div className="scrollbar-hide relative flex w-96 flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <Link
             href="/dashboard/friends"

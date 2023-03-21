@@ -113,8 +113,8 @@ const PlaylistDiscover = ({
   };
 
   return (
-    <div className="flex flex-row gap-2">
-      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto pt-20">
+    <div className="flex flex-1 flex-row gap-2">
+      <div className="scrollbar-hide relative flex flex-1 flex-col gap-2 overflow-y-auto pb-20 pt-20">
         <div className="sticky top-0 z-10 flex flex-col items-start justify-center gap-2 bg-black/10 py-2 backdrop-blur-sm">
           <div className="flex items-center justify-center gap-4 px-6">
             <Picture identifier={playlist?.picture}>
