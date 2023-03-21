@@ -87,8 +87,6 @@ const Playlists: NextPage<
     disconnect({ id: playlist.id });
   };
 
-  console.log(hasSpotify);
-
   return (
     <div className="flex flex-wrap gap-4 p-4 px-28">
       <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">

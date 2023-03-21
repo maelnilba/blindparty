@@ -144,7 +144,7 @@ const PlaylistCreate = () => {
 
       if (imageUpload.current && mockAlbumsPicture) {
         const img = await fetchMergeAlbum(mockAlbumsPicture);
-        imageUpload.current.set(img);
+        await imageUpload.current.set(img, true);
       }
 
       if (imageUpload.current && imageUpload.current.changed) {

@@ -1,4 +1,5 @@
 import { pictureLink } from "@server/s3";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
@@ -395,5 +396,57 @@ export const playlistRouter = createTRPCRouter({
           },
         },
       });
+    }),
+  discover: protectedProcedure
+    .input(z.object({ id: z.string().cuid() }))
+    .query(async ({ ctx, input }) => {
+      const playlist = await ctx.prisma.playlist.findFirst({
+        where: {
+          AND: [
+            {
+              id: input.id,
+            },
+            {
+              OR: [
+                {
+                  user: {
+                    some: {
+                      id: ctx.session.user.id,
+                    },
+                  },
+                  public: false,
+                },
+                {
+                  public: true,
+                },
+              ],
+            },
+          ],
+        },
+        include: {
+          _count: {
+            select: {
+              user: true,
+              Party: true,
+            },
+          },
+          tracks: {
+            include: {
+              album: {
+                include: {
+                  images: true,
+                },
+              },
+              artists: true,
+            },
+          },
+        },
+      });
+
+      if (!playlist) {
+        throw new TRPCError({ code: "PRECONDITION_FAILED" });
+      }
+
+      return playlist;
     }),
 });

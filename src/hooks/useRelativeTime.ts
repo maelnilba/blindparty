@@ -7,7 +7,10 @@ type RelativeTimeOptions = {
    */
   refresh?: boolean | number;
 };
-export function useRelativeTime(date: Date, options?: RelativeTimeOptions) {
+export function useRelativeTime(
+  date: Date | undefined,
+  options?: RelativeTimeOptions
+) {
   const [state, dispatch] = useReducer((state) => state + 1, 0);
   const locale = options?.locale ?? "fr";
   const refresh =
@@ -21,6 +24,7 @@ export function useRelativeTime(date: Date, options?: RelativeTimeOptions) {
     const relativeFormatter = new Intl.RelativeTimeFormat(locale, {
       numeric: "always",
     });
+    if (!date) return;
     const diff = date.getTime() - new Date().getTime();
     const diffDays = Math.ceil(diff / (1000 * 60 * 60 * 24));
     const diffWeek = Math.ceil(diff / (1000 * 60 * 60 * 24 * 7));
@@ -45,7 +49,7 @@ export function useRelativeTime(date: Date, options?: RelativeTimeOptions) {
     } else {
       return relativeFormatter.format(diffYear, "years");
     }
-  }, [state]);
+  }, [date, state]);
 
   useEffect(() => {
     let timer: NodeJS.Timer | undefined;

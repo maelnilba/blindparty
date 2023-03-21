@@ -126,8 +126,13 @@ const PlaylistEdit = () => {
   };
 
   return (
-    <div className="flex flex-row gap-2">
-      <div className="scrollbar-hide flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto p-4 pt-20">
+    <div className="scrollbar-hide flex flex-1 flex-row gap-2 p-4">
+      <style jsx global>{`
+        body {
+          overflow: hidden;
+        }
+      `}</style>
+      <div className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto p-4 pb-24 pt-20">
         {data?.map((playlist) => (
           <PlaylistCard
             key={playlist.id}
@@ -136,7 +141,7 @@ const PlaylistEdit = () => {
           />
         ))}
       </div>
-      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto">
+      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24">
         {tracks && (
           <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">
             <button
@@ -186,7 +191,7 @@ const PlaylistEdit = () => {
             })}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-[40rem] flex-1 flex-col gap-2 overflow-y-auto">
+      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24">
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <div className="px-4 pb-2">
             <button

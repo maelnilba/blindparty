@@ -1,104 +1,109 @@
 import { ClockIcon } from "@components/icons/clock";
 import { Picture } from "@components/images/picture";
+import { BlackScreen } from "@components/layout/blackscreen";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useRelativeTime } from "@hooks/useRelativeTime";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
+import { api, RouterOutputs } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPageWithLayout,
 } from "next";
+import { useRouter } from "next/router";
 import { Track } from "../#types";
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const id = getQuery(context.query.id);
-  if (!id)
-    return {
-      redirect: {
-        destination: "/dashboard",
-        permanent: false,
-      },
-    };
+// export async function getServerSideProps(context: GetServerSidePropsContext) {
+//   const id = getQuery(context.query.id);
+//   if (!id)
+//     return {
+//       redirect: {
+//         destination: "/dashboard",
+//         permanent: false,
+//       },
+//     };
 
-  const session = await getServerAuthSession({
-    req: context.req,
-    res: context.res,
-  });
+//   const session = await getServerAuthSession({
+//     req: context.req,
+//     res: context.res,
+//   });
 
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/dashboard",
-        permanent: false,
-      },
-    };
-  }
+//   if (!session || !session.user) {
+//     return {
+//       redirect: {
+//         destination: "/dashboard",
+//         permanent: false,
+//       },
+//     };
+//   }
 
-  const playlist = await prisma.playlist.findFirst({
-    where: {
-      AND: [
-        {
-          id: id,
-        },
-        {
-          OR: [
-            {
-              user: {
-                some: {
-                  id: session.user.id,
-                },
-              },
-              public: false,
-            },
-            {
-              public: true,
-            },
-          ],
-        },
-      ],
-    },
-    include: {
-      _count: {
-        select: {
-          user: true,
-          Party: true,
-        },
-      },
-      tracks: {
-        include: {
-          album: {
-            include: {
-              images: true,
-            },
-          },
-          artists: true,
-        },
-      },
-    },
-  });
+//   const playlist = await prisma.playlist.findFirst({
+//     where: {
+//       AND: [
+//         {
+//           id: id,
+//         },
+//         {
+//           OR: [
+//             {
+//               user: {
+//                 some: {
+//                   id: session.user.id,
+//                 },
+//               },
+//               public: false,
+//             },
+//             {
+//               public: true,
+//             },
+//           ],
+//         },
+//       ],
+//     },
+//     include: {
+//       _count: {
+//         select: {
+//           user: true,
+//           Party: true,
+//         },
+//       },
+//       tracks: {
+//         include: {
+//           album: {
+//             include: {
+//               images: true,
+//             },
+//           },
+//           artists: true,
+//         },
+//       },
+//     },
+//   });
 
-  if (!playlist)
-    return {
-      redirect: {
-        destination: "/dashboard",
-        permanent: false,
-      },
-    };
+//   if (!playlist)
+//     return {
+//       redirect: {
+//         destination: "/dashboard",
+//         permanent: false,
+//       },
+//     };
 
-  return {
-    props: {
-      playlist,
-    },
-  };
-}
+//   return {
+//     props: {
+//       playlist,
+//     },
+//   };
+// }
 
 const PlaylistDiscover = ({
   playlist,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+}: {
+  playlist: RouterOutputs["playlist"]["discover"];
+}) => {
   const relativeUpdate = useRelativeTime(playlist.updatedAt);
   const { load, start, pause, unpause, currentTrack, playing } = usePlayer();
   const playTrack = async (track: Track) => {
@@ -114,8 +119,13 @@ const PlaylistDiscover = ({
 
   return (
     <div className="flex flex-1 flex-row gap-2">
-      <div className="scrollbar-hide relative flex flex-1 flex-col gap-2 overflow-y-auto pb-20 pt-20">
-        <div className="sticky top-0 z-10 flex flex-col items-start justify-center gap-2 bg-black/10 py-2 backdrop-blur-sm">
+      <style jsx global>{`
+        body {
+          overflow: hidden;
+        }
+      `}</style>
+      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-20 pt-20">
+        <div className="sticky top-0 z-10 flex flex-col items-start justify-center gap-2 bg-black/5 py-2 backdrop-blur-sm">
           <div className="flex items-center justify-center gap-4 px-6">
             <Picture identifier={playlist?.picture}>
               <img
@@ -159,9 +169,23 @@ const PlaylistDiscover = ({
   );
 };
 
-const PlaylistDiscoverWrapper: NextPageWithLayout<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ playlist }) => {
+const PlaylistDiscoverWrapper: NextPageWithLayout = () => {
+  const { query, push } = useRouter();
+  const id = getQuery(query.id);
+  const { data: playlist } = api.playlist.discover.useQuery(
+    { id: id! },
+    {
+      enabled: id !== undefined,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+      onError: (error) => {},
+    }
+  );
+
+  if (!playlist) {
+    return <BlackScreen />;
+  }
+
   return (
     <TrackPlayer>
       <PlaylistDiscover playlist={playlist} />

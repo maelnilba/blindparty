@@ -13,7 +13,7 @@ import {
   useState,
 } from "react";
 export type ImageUploadRef = {
-  set: (blob: Blob) => Promise<void>;
+  set: (blob: Blob, upload: boolean) => Promise<Response | void>;
   remove: () => void;
   upload: (key?: string) => Promise<Response>;
   key: string | undefined;
@@ -53,8 +53,12 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
 
     const src = deferredSrc ? deferredSrc : _src;
 
-    const getPresigned = async () => {
-      if (expiresAt.current.valueOf() > Date.now() && isPresigned.current) {
+    const getPresigned = async (check: boolean = true) => {
+      if (
+        check &&
+        expiresAt.current.valueOf() > Date.now() &&
+        isPresigned.current
+      ) {
         return;
       }
       const { key: _key, post } = await mutateAsync({
@@ -70,20 +74,26 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
         Date.now() + (presignedOptions?.expires ?? 0) * 1000
       );
       isPresigned.current = true;
+
+      return { post, _key };
     };
 
-    const set = async (file: File) => {
+    const set = async (file: File, upload: boolean = false) => {
       setFile(file);
       const url = URL.createObjectURL(file);
       set__Src(url);
-      await getPresigned();
+      return await getPresigned(!upload);
     };
 
     useImperativeHandle(
       ref,
       () => ({
-        set: async (blob: Blob) => {
-          set(new File([blob], "albums_merged"));
+        set: async (blob: Blob, upload: boolean = false) => {
+          const file = new File([blob], "albums_merged");
+          const presign = await set(file, upload);
+          if (upload && presign) {
+            return await post(presign.post, file);
+          }
         },
         remove: () => {
           setFile(null);
@@ -105,7 +115,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
           return await post(presigned, file, _key);
         },
         key: key,
-        changed: Boolean(file && key && presigned),
+        changed: Boolean(file && key && presigned && !local),
         local: local,
       }),
       [presigned, key, file, local]
