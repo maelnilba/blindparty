@@ -432,7 +432,7 @@ const Party: NextPage<
                 <p>{party.max_round} rounds</p>
               </div>
               <Divider />
-              <div className="flex flex-wrap gap-2">
+              <div className="flex max-h-96 flex-wrap gap-x-2.5 gap-y-2 overflow-hidden">
                 {players.map(({ player, joined }) => (
                   <PlayerCard
                     key={player.id}

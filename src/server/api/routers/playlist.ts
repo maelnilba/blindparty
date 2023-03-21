@@ -238,34 +238,43 @@ export const playlistRouter = createTRPCRouter({
         },
       });
     }),
-  get_all: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.prisma.playlist.findMany({
-      where: {
-        user: {
-          some: {
-            id: ctx.session.user.id,
-          },
-        },
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        _count: true,
-        tracks: {
-          take: 10,
-          include: {
-            album: {
-              include: {
-                images: true,
-              },
+  get_all: protectedProcedure
+    .input(
+      z
+        .object({
+          take: z.number().min(1),
+        })
+        .optional()
+    )
+    .query(async ({ ctx, input }) => {
+      return ctx.prisma.playlist.findMany({
+        where: {
+          user: {
+            some: {
+              id: ctx.session.user.id,
             },
-            artists: true,
           },
         },
-      },
-    });
-  }),
+        take: input?.take,
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          _count: true,
+          tracks: {
+            take: 10,
+            include: {
+              album: {
+                include: {
+                  images: true,
+                },
+              },
+              artists: true,
+            },
+          },
+        },
+      });
+    }),
   get_playlist: protectedProcedure
     .input(z.object({ id: z.string().cuid() }))
     .query(async ({ ctx, input }) => {

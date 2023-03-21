@@ -2,24 +2,33 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 
 export const friendRouter = createTRPCRouter({
-  get_all: protectedProcedure.query(async ({ ctx }) => {
-    const user = await ctx.prisma.user.findUniqueOrThrow({
-      where: {
-        id: ctx.session.user.id,
-      },
-      select: {
-        friends: {
-          select: {
-            id: true,
-            friendId: true,
-            image: true,
-            name: true,
+  get_all: protectedProcedure
+    .input(
+      z
+        .object({
+          take: z.number().min(1),
+        })
+        .optional()
+    )
+    .query(async ({ ctx, input }) => {
+      const user = await ctx.prisma.user.findUniqueOrThrow({
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          friends: {
+            take: input?.take,
+            select: {
+              id: true,
+              friendId: true,
+              image: true,
+              name: true,
+            },
           },
         },
-      },
-    });
-    return user.friends;
-  }),
+      });
+      return user.friends;
+    }),
   get_invitations: protectedProcedure.query(async ({ ctx }) => {
     return ctx.prisma.friendInvitation.findMany({
       where: {

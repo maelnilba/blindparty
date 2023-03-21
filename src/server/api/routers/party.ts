@@ -57,33 +57,36 @@ export const partyRouter = createTRPCRouter({
     }),
 
   game: gameRouter,
-  get_all_invite: protectedProcedure.query(async ({ ctx }) => {
-    return ctx.prisma.party.findMany({
-      where: {
-        inviteds: {
-          some: {
-            id: ctx.session.user.id,
+  get_all_invite: protectedProcedure
+    .input(z.object({ take: z.number().optional() }).optional())
+    .query(async ({ ctx, input }) => {
+      return ctx.prisma.party.findMany({
+        where: {
+          inviteds: {
+            some: {
+              id: ctx.session.user.id,
+            },
+          },
+          status: "PENDING",
+        },
+        include: {
+          host: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
+          _count: {
+            select: {
+              inviteds: true,
+            },
           },
         },
-        status: "PENDING",
-      },
-      include: {
-        host: {
-          select: {
-            id: true,
-            name: true,
-            image: true,
-          },
+        orderBy: {
+          updatedAt: "desc",
         },
-        _count: {
-          select: {
-            inviteds: true,
-          },
-        },
-      },
-      orderBy: {
-        updatedAt: "desc",
-      },
-    });
-  }),
+        take: input?.take,
+      });
+    }),
 });

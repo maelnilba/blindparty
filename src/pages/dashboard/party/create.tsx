@@ -49,8 +49,13 @@ const PartyCreate: NextPage = () => {
   };
 
   return (
-    <div className="flex flex-1 flex-row gap-2 p-4">
-      <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
+    <div className="scrollbar-hide flex flex-1 flex-row gap-2 p-4">
+      <style jsx global>{`
+        body {
+          overflow: hidden;
+        }
+      `}</style>
+      <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <InputFade
             onChange={(e) =>
@@ -79,7 +84,7 @@ const PartyCreate: NextPage = () => {
             ))}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
+      <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <InputFade
             onChange={(e) => setFriendField(e.target.value.toLocaleLowerCase())}
@@ -105,7 +110,7 @@ const PartyCreate: NextPage = () => {
             ))}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
+      <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <button
             onClick={() => createParty()}
