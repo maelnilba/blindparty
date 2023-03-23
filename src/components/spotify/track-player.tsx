@@ -4,6 +4,7 @@ import { SpeakerIcon } from "@components/icons/speaker";
 import { Picture } from "@components/images/picture";
 import { usePrevious } from "@hooks/usePrevious";
 import { secondIntl } from "lib/helpers/date";
+import { useRouter } from "next/router";
 import { Track } from "pages/dashboard/playlist/#types";
 import {
   ComponentProps,
@@ -146,13 +147,13 @@ export const TrackPlayer = ({
       document.body.removeEventListener("keydown", prevent);
     };
   }, []);
-
   useHotkeys("space", () => toggle(), [playing]);
 
   const goto = (seconds: number) => {
     if (!audio.current) return;
     audio.current.currentTime = seconds;
   };
+
   const value: TrackPlayerContext = {
     currentTrack: track,
     playing: playing,
@@ -189,6 +190,41 @@ export const TrackPlayer = ({
     mute: mute,
     unmute: unmute,
   };
+
+  const router = useRouter();
+  useEffect(() => {
+    let slow: NodeJS.Timer | undefined;
+    let done = false;
+    const handleRouteChange = (url: string, opts: { shallow: boolean }) => {
+      if (done) return true;
+      if (!audio.current) return true;
+      if (!playing) return;
+      // Might find a way to descrease volume in inscreasing way
+      let count = 0;
+      slow = setInterval(() => {
+        if (!audio.current) return true;
+        if (!audio.current.muted) {
+          audio.current.volume = Math.max(0.1, audio.current.volume - 0.1);
+        }
+
+        count++;
+        if (count > 9) {
+          clearInterval(slow);
+          done = true;
+          router.push(url, undefined, opts);
+        }
+      }, 25);
+
+      router.events.emit("routeChangeError");
+      throw "Process to slow down song.";
+    };
+
+    router.events.on("routeChangeStart", handleRouteChange);
+    return () => {
+      router.events.off("routeChangeStart", handleRouteChange);
+      slow && clearInterval(slow);
+    };
+  }, [playing]);
 
   return (
     <TrackPlayerContext.Provider value={value}>
