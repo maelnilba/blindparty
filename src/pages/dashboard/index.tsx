@@ -11,11 +11,6 @@ const DashBoard: NextPage = () => {
   const { data: partys } = api.party.get_all_invite.useQuery();
   return (
     <div className="scrollbar-hide flex flex-1 gap-4 p-4">
-      <style jsx global>{`
-        body {
-          overflow: hidden;
-        }
-      `}</style>
       <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
         <div className="sticky top-0 mb-2 flex flex-col items-center justify-end gap-2 bg-black/10 p-6 pb-10 font-semibold backdrop-blur-sm">
           <Link

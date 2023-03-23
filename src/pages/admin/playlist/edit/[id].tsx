@@ -137,11 +137,6 @@ const PlaylistEdit = () => {
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 p-4">
-      <style jsx global>{`
-        body {
-          overflow: hidden;
-        }
-      `}</style>
       <div className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto px-4 pb-24">
         <div className="sticky top-0 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <label htmlFor="playlist-name" className="font-semibold">

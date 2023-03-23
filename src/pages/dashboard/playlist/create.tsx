@@ -162,11 +162,6 @@ const PlaylistCreate = () => {
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 overflow-y-hidden p-4">
-      <style jsx global>{`
-        body {
-          overflow: hidden;
-        }
-      `}</style>
       <div className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto p-4 pb-24 pt-20">
         {data?.map((playlist) => (
           <PlaylistCard
