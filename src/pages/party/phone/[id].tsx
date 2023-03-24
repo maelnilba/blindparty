@@ -57,10 +57,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
     include: {
       host: true,
-      inviteds: true,
+      inviteds: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
       players: {
         include: {
-          user: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
         },
       },
       link: {
@@ -68,20 +80,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
           url: true,
         },
       },
-      playlist: {
+      _count: {
+        select: {
+          tracks: true,
+        },
+      },
+      tracks: {
+        take: 10,
         include: {
-          _count: true,
-          tracks: {
-            take: 10,
+          album: {
             include: {
-              album: {
-                include: {
-                  images: true,
-                },
-              },
-              artists: true,
+              images: true,
             },
           },
+          artists: true,
         },
       },
     },
@@ -148,7 +160,7 @@ const Party: NextPage<
   const [view, setView] = useState<PartyViewStatus>(party.view);
   const [guesses, setGuesses] = useState<string[]>([]);
 
-  const { send, bind, members } = prpc.game.useConnect(
+  const { send, bind, members, unbind_all } = prpc.game.useConnect(
     party.id,
     {
       subscribeOnMount: true,
@@ -216,6 +228,10 @@ const Party: NextPage<
         setGuesses([]);
         setView("SCORE");
       });
+
+      return () => {
+        unbind_all();
+      };
     },
     [game, isJoined]
   );
@@ -366,9 +382,7 @@ const Party: NextPage<
             </div>
             <div className="flex flex-1 flex-col gap-6 p-2">
               <Divider />
-              <div>
-                <PlaylistCard playlist={party.playlist} />
-              </div>
+              <div>{/* <PlaylistCard playlist={party.playlist} /> */}</div>
               <Divider />
               <div className="text-center text-lg font-semibold">
                 <p>{party.max_round} rounds</p>

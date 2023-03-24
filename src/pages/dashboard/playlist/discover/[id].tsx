@@ -5,99 +5,11 @@ import { GetLayoutThrough } from "@components/layout/layout";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useRelativeTime } from "@hooks/useRelativeTime";
-import { getServerAuthSession } from "@server/auth";
-import { prisma } from "@server/db";
 import { api, RouterOutputs } from "@utils/api";
 import { getQuery } from "@utils/next-router";
-import type {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-  NextPageWithLayout,
-} from "next";
+import type { NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
 import { Track } from "../#types";
-
-// export async function getServerSideProps(context: GetServerSidePropsContext) {
-//   const id = getQuery(context.query.id);
-//   if (!id)
-//     return {
-//       redirect: {
-//         destination: "/dashboard",
-//         permanent: false,
-//       },
-//     };
-
-//   const session = await getServerAuthSession({
-//     req: context.req,
-//     res: context.res,
-//   });
-
-//   if (!session || !session.user) {
-//     return {
-//       redirect: {
-//         destination: "/dashboard",
-//         permanent: false,
-//       },
-//     };
-//   }
-
-//   const playlist = await prisma.playlist.findFirst({
-//     where: {
-//       AND: [
-//         {
-//           id: id,
-//         },
-//         {
-//           OR: [
-//             {
-//               user: {
-//                 some: {
-//                   id: session.user.id,
-//                 },
-//               },
-//               public: false,
-//             },
-//             {
-//               public: true,
-//             },
-//           ],
-//         },
-//       ],
-//     },
-//     include: {
-//       _count: {
-//         select: {
-//           user: true,
-//           Party: true,
-//         },
-//       },
-//       tracks: {
-//         include: {
-//           album: {
-//             include: {
-//               images: true,
-//             },
-//           },
-//           artists: true,
-//         },
-//       },
-//     },
-//   });
-
-//   if (!playlist)
-//     return {
-//       redirect: {
-//         destination: "/dashboard",
-//         permanent: false,
-//       },
-//     };
-
-//   return {
-//     props: {
-//       playlist,
-//     },
-//   };
-// }
 
 const PlaylistDiscover = ({
   playlist,
@@ -139,7 +51,7 @@ const PlaylistDiscover = ({
                   Ajoutée par {playlist._count.user} utilisateurs
                 </p>
                 <p className="text-xs font-normal">
-                  Jouée {playlist._count.Party} fois
+                  {/* Jouée {playlist._count.Party} fois */}
                 </p>
               </div>
             </div>

@@ -17,7 +17,7 @@ const Navigation = ({ through = false }: { through?: boolean }) => {
   if (session && session.user) {
     return (
       <>
-        <div className="fixed top-0 z-50 flex h-20 w-full flex-row items-center justify-around bg-black/5 p-6 backdrop-blur-sm">
+        <div className="fixed top-0 z-navigation flex h-20 w-full flex-row items-center justify-around bg-black/5 p-6 backdrop-blur-sm">
           <Link
             href="/dashboard"
             className="text-4xl font-extrabold transition-transform hover:scale-105"
@@ -92,7 +92,7 @@ const Navigation = ({ through = false }: { through?: boolean }) => {
 
   return (
     <>
-      <div className="fixed top-0 z-50 flex h-20 w-full flex-row items-center justify-around bg-black/5 p-6 backdrop-blur-sm">
+      <div className="fixed top-0 z-navigation flex h-20 w-full flex-row items-center justify-around bg-black/5 p-6 backdrop-blur-sm">
         <p className="text-4xl font-extrabold">BlindParty</p>
         <div className="flex-1"></div>
         <div>

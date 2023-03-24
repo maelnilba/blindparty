@@ -50,9 +50,7 @@ export const gameRouter = createTRPCRouter({
       (m) => !(m as { isHost: boolean }).isHost
     );
 
-    if (!leaved) {
-      throw new TRPCError({ code: "PRECONDITION_FAILED" });
-    }
+    if (!leaved) throw new TRPCError({ code: "PRECONDITION_FAILED" });
 
     await ctx.prisma.party.updateMany({
       where: {
@@ -153,9 +151,8 @@ export const gameRouter = createTRPCRouter({
       },
     });
 
-    if (!track || !track.track) {
+    if (!track || !track.track)
       throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-    }
 
     const trackname = [
       track.track.name,
@@ -197,48 +194,38 @@ export const gameRouter = createTRPCRouter({
         select: {
           max_round: true,
           round: true,
-          playlist: {
+          tracks: {
             select: {
-              tracks: {
+              album: {
                 select: {
-                  album: {
+                  images: {
                     select: {
-                      images: {
-                        select: {
-                          url: true,
-                          width: true,
-                          height: true,
-                        },
-                      },
+                      url: true,
+                      width: true,
+                      height: true,
                     },
                   },
-                  preview_url: true,
-                  id: true,
                 },
               },
+              preview_url: true,
+              id: true,
             },
           },
         },
       });
 
-      if (!party) {
-        throw new TRPCError({ code: "UNAUTHORIZED" });
-      }
+      if (!party) throw new TRPCError({ code: "UNAUTHORIZED" });
 
       if (party.round + 1 > party.max_round) {
         ctx.pusher.trigger({}, "over");
         throw new TRPCError({ code: "CONFLICT" });
       }
 
-      const tracks = party.playlist.tracks.filter(
-        (t) => !input.tracks.includes(t.id)
-      );
+      const tracks = party.tracks.filter((t) => !input.tracks.includes(t.id));
 
       let track = tracks[Math.floor(Math.random() * tracks.length)];
 
-      if (!track) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
+      if (!track) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
       await ctx.prisma.party.update({
         where: {
@@ -287,12 +274,11 @@ export const gameRouter = createTRPCRouter({
         },
       });
 
-      if (!party || !party.track) {
+      if (!party || !party.track)
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
-      if (party.status !== "RUNNING" || party.view !== "GUESS") {
+
+      if (party.status !== "RUNNING" || party.view !== "GUESS")
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-      }
 
       const trackname = [
         party.track.name,
@@ -373,7 +359,7 @@ export const gameRouter = createTRPCRouter({
           },
         });
 
-        const points = await ctx.prisma.party.findUnique({
+        const points = await ctx.prisma.party.findUniqueOrThrow({
           where: {
             id: input.prpc.channel_id,
           },
@@ -393,13 +379,10 @@ export const gameRouter = createTRPCRouter({
           },
         });
 
-        if (!points) {
-          throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
-        }
-
         return ctx.pusher.trigger({
           players: points.players,
           name: trackname,
+          winner: points.players.find((p) => p.user.id === ctx.session.user.id),
         });
       }
     }),

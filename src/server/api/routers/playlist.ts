@@ -436,7 +436,6 @@ export const playlistRouter = createTRPCRouter({
           _count: {
             select: {
               user: true,
-              Party: true,
             },
           },
           tracks: {

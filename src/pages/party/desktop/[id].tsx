@@ -1,13 +1,14 @@
 import { Divider } from "@components/elements/divider";
 import { Url } from "@components/elements/url";
-import { Score, ScoreBoard } from "@components/game/score-board";
+import { Score } from "@components/game/score-board";
 import { TrackPicture } from "@components/game/track-picture";
 import { TrackPlayer, TrackPlayerRef } from "@components/game/track-player";
 import { DesktopIcon } from "@components/icons/desktop";
 import { PhoneIcon } from "@components/icons/phone";
+import { GetLayoutThrough } from "@components/layout/layout";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { PlayerCard } from "@components/party/player-card";
-import { PlaylistCard } from "@components/playlist/playlist-card";
+import { PlayerStack } from "@components/game/players-stack";
 import { useMessagesBus } from "@hooks/useMessagesBus";
 import { useWindowLocation } from "@hooks/useWindowLocation";
 import { PartyStatus, PartyViewStatus } from "@prisma/client";
@@ -22,6 +23,7 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
+  NextPageWithLayout,
 } from "next";
 import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
@@ -29,6 +31,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
 import { GUESS_MS, TRACK_TIMER_MS, VIEW_SCORE_MS } from "../#constant";
+import { Winner } from "@components/game/round/winner";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -60,11 +63,29 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       id: id,
     },
     include: {
-      host: true,
-      inviteds: true,
+      host: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+      inviteds: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
       players: {
         include: {
-          user: true,
+          user: {
+            select: {
+              id: true,
+              name: true,
+              image: true,
+            },
+          },
         },
       },
       link: {
@@ -72,20 +93,20 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
           url: true,
         },
       },
-      playlist: {
+      _count: {
+        select: {
+          tracks: true,
+        },
+      },
+      tracks: {
+        take: 10,
         include: {
-          _count: true,
-          tracks: {
-            take: 10,
+          album: {
             include: {
-              album: {
-                include: {
-                  images: true,
-                },
-              },
-              artists: true,
+              images: true,
             },
           },
+          artists: true,
         },
       },
     },
@@ -125,23 +146,26 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     props: {
       party: party,
       isHost: party.host.id === session.user.id,
+      host: party.host,
     },
   };
 }
 
-type Player =
+export type Player =
   | InferGetServerSidePropsType<
       typeof getServerSideProps
     >["party"]["inviteds"][number];
 
 const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ party, isHost }) => {
+> = ({ party, isHost, host }) => {
   const router = useRouter();
   const [joineds, setJoineds] = useState<Set<string>>(new Set());
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
+
   const [scores, setScores] = useState<Score[]>([]);
+  const [winner, setWinner] = useState<Score | null | undefined>();
   const [itwas, setItwas] = useState<string | null>(null);
   const [track, setTrack] = useState<
     RouterOutputs["party"]["game"]["round"] | null
@@ -237,6 +261,7 @@ const Party: NextPage<
         }
 
         setView("SCORE");
+        setWinner(data.winner);
         setScores(players);
         setItwas(name);
         ok = false;
@@ -254,6 +279,7 @@ const Party: NextPage<
 
         setTracks([..._tracks]);
         setView("SCORE");
+        setWinner(null);
         setItwas(name);
 
         await sleep(VIEW_SCORE_MS);
@@ -291,17 +317,20 @@ const Party: NextPage<
   );
 
   const location = useWindowLocation();
+  // @TODO: Fix connected UI ?
   const players = useMemo<
     { player: Player; joined: boolean; connected: boolean }[]
   >(() => {
     return party.inviteds.map((invited) => ({
       player: invited,
-      joined: party.players
-        .map((player) => player.user.id)
-        .concat([...joineds])
-        .find((id) => id === invited.id)
-        ? true
-        : false,
+      joined:
+        invited.id === host.id ||
+        party.players
+          .map((player) => player.user.id)
+          .concat([...joineds])
+          .find((id) => id === invited.id)
+          ? true
+          : false,
       connected: members
         ? [...Object.values(members)].find((user) => user.id === invited.id)
           ? true
@@ -343,11 +372,11 @@ const Party: NextPage<
   }, [track]);
 
   return (
-    <div className="flex flex-1 justify-center gap-4 p-4">
+    <div className="scrollbar-hide flex flex-1 gap-4 p-4">
       {game === "PENDING" && (
         <>
-          <div className="scrollbar-hide relative flex w-96 max-w-[24rem] flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
-            <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+          <div className="scrollbar-hide relative mt-20 flex w-96 max-w-[24rem] flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
+            <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-4 font-semibold backdrop-blur-sm">
               <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
                 Déroulement d'une partie
               </div>
@@ -389,33 +418,33 @@ const Party: NextPage<
             </div>
           </div>
 
-          <div className="scrollbar-hide relative flex w-96 flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
-            <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+          <div className="scrollbar-hide relative mt-20 flex w-96 flex-1 flex-col overflow-y-auto rounded border border-gray-800">
+            <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-4 font-semibold backdrop-blur-sm">
               {isHost ? (
-                <>
+                <div className="flex w-full justify-center">
                   {missed ? (
                     <ConfirmationModal
                       title="Commencer la partie"
                       message="Certains amis invités n'ont pas encore rejoint la partie, êtes vous sur de vouloir commencer la partie ? Une fois une partie lancée, il n'est plus possible de la rejoindre."
                       action="Commencer"
-                      className="w-full"
+                      className="flex w-full items-center justify-center"
                       onSuccess={() => {
                         start();
                       }}
                     >
-                      <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+                      <button className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                         Commencer la partie
                       </button>
                     </ConfirmationModal>
                   ) : (
                     <button
                       onClick={() => start()}
-                      className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                      className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
                     >
                       Commencer la partie
                     </button>
                   )}
-                </>
+                </div>
               ) : (
                 <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                   Rejoindre la partie
@@ -424,9 +453,7 @@ const Party: NextPage<
             </div>
             <div className="flex flex-1 flex-col gap-6 p-2">
               <Divider />
-              <div>
-                <PlaylistCard playlist={party.playlist} />
-              </div>
+              <div>{/* <PlaylistCard playlist={party.playlist} /> */}</div>
               <Divider />
               <div className="text-center text-lg font-semibold">
                 <p>{party.max_round} rounds</p>
@@ -447,9 +474,32 @@ const Party: NextPage<
         </>
       )}
       {game === "RUNNING" && (
-        <>
+        <div className="relative flex flex-1 items-center justify-center">
+          <div className="fixed inset-0 flex w-max">
+            <button
+              onClick={() => {
+                setWinner({
+                  user: {
+                    id: "0",
+                    name: "ok",
+                    image:
+                      "https://blindparty-bucket.s3.eu-central-1.amazonaws.com/user:::kEhHQZ_BeXlsdw18fBC7W",
+                  },
+                  points: 0,
+                });
+              }}
+            >
+              Test animation
+            </button>
+            <PlayerStack
+              players={players.filter((p) => p.joined).map((p) => p.player)}
+            />
+            <div className="pt-32 pb-24">
+              <Winner player={winner} />
+            </div>
+          </div>
           {view === "GUESS" && (
-            <>
+            <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
               {track?.track && (
                 <TrackPlayer
                   tracktimer={TRACK_TIMER_MS}
@@ -458,36 +508,47 @@ const Party: NextPage<
                   track={track.track}
                 />
               )}
-            </>
-          )}
-          {view === "SCORE" && (
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-col items-center justify-center gap-2">
-                <p className="text-4xl font-extrabold">Le son était</p>
-                <p>{itwas}</p>
-                {track && track.track && (
-                  <TrackPicture className="h-28 w-28" track={track.track} />
-                )}
-              </div>
-              <div className="mt-10 mb-20">
-                <Divider />
-              </div>
-              <ScoreBoard scores={scores} />
             </div>
           )}
-        </>
+          {view === "SCORE" && (
+            <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
+              <div className="flex flex-col items-center justify-center gap-2">
+                <p className="text-4xl font-extrabold">Le son était</p>
+                <div className="px-10 py-6">
+                  {track && track.track && (
+                    <div className="scrollbar-hide relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded border border-gray-800">
+                      <TrackPicture
+                        width={600}
+                        height={600}
+                        className="h-full w-full object-cover"
+                        track={track.track}
+                      />
+                    </div>
+                  )}
+                </div>
+                <p className="text-center">{itwas}</p>
+              </div>
+              {/* <div className="mt-10 mb-20">
+                <Divider />
+              </div>
+              <ScoreBoard scores={scores} /> */}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
 };
 
-const PartyWrapper: NextPage<
+const PartyWrapper: NextPageWithLayout<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ party, isHost }) => {
+> = ({ party, isHost, host }) => {
   return (
     <prpc.withPRPC {...prpc.context}>
-      <Party party={party} isHost={isHost} />
+      <Party party={party} isHost={isHost} host={host} />
     </prpc.withPRPC>
   );
 };
+
 export default PartyWrapper;
+PartyWrapper.getLayout = GetLayoutThrough;

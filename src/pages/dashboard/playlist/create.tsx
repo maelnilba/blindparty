@@ -7,6 +7,7 @@ import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useAsyncEffect } from "@hooks/useAsyncEffect";
 import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
+import { createQueryValidator } from "@lib/helpers/query-validator";
 import { api } from "@utils/api";
 import { NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
@@ -21,6 +22,12 @@ const createSchema = z.object({
   description: z.string().optional(),
 });
 
+const validator = createQueryValidator(
+  z.object({
+    sources: z.array(z.string().url()).length(4),
+  })
+);
+
 const useAlbumsPictureStore = create<{
   cache: Map<string, Blob>;
   fetch: (sources: string[]) => Promise<Blob>;
@@ -30,9 +37,11 @@ const useAlbumsPictureStore = create<{
     const hash = sources.join("|");
     const _cache = get().cache;
     if (_cache.has(hash)) return _cache.get(hash)!;
-    const res = await fetch(
-      "/api/og/merge?" + sources.map((source) => `sources=${source}`).join("&")
-    );
+
+    const url = validator.createSearchURL({
+      sources: sources,
+    });
+    const res = await fetch(`/api/og/merge${url}`);
     const img = await res.blob();
     set({ cache: new Map(_cache.set(hash, img)) });
     return img;
@@ -161,7 +170,7 @@ const PlaylistCreate = () => {
   });
 
   return (
-    <div className="scrollbar-hide flex flex-1 flex-row gap-2 overflow-y-hidden p-4">
+    <div className="scrollbar-hide flex flex-1 flex-row gap-2 overflow-y-hidden">
       <div className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto p-4 pb-24 pt-20">
         {data?.map((playlist) => (
           <PlaylistCard

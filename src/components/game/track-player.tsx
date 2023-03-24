@@ -53,10 +53,10 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
     }));
 
     return (
-      <div className="flex flex-col gap-4">
-        <div className="scrollbar-hide relative flex h-72 w-72 flex-col items-center justify-center overflow-y-auto rounded border border-gray-800">
+      <div className="flex h-full w-full flex-col gap-4">
+        <div className="scrollbar-hide relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded border border-gray-800">
           {state === "LOADING" && (
-            <p className="z-10 text-9xl font-extrabold">{count}</p>
+            <p className="z-10 scale-150 text-9xl font-extrabold">{count}</p>
           )}
           <TrackBluredPicture track={track} />
           {track?.preview_url && (

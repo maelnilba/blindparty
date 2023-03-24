@@ -22,7 +22,8 @@
       "@shared/*": ["shared/*"],
       "@utils/*": ["utils/*"],
       "@prpc/*": ["lib/prpc/*"],
-      "@server/*": ["server/*"]
+      "@server/*": ["server/*"],
+      "@lib/*": ["lib/*"]
     }
   },
   "include": [

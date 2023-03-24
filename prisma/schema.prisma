@@ -127,21 +127,21 @@ model Playlist {
     updatedAt   DateTime @updatedAt
     tracks      Track[]
     public      Boolean
-    Party       Party[]
 }
 
 // Spotify schema
 
 model Track {
-    id          String     @id
-    name        String
-    picture     String?
-    preview_url String?
-    album       Album      @relation(fields: [albumId], references: [id])
-    albumId     String
-    artists     Artist[]
-    Playlist    Playlist[]
-    Party       Party[]
+    id             String     @id
+    name           String
+    picture        String?
+    preview_url    String?
+    album          Album      @relation(fields: [albumId], references: [id])
+    albumId        String
+    artists        Artist[]
+    playlist       Playlist[]
+    playingInParty Party[]    @relation(name: "current")
+    party          Party[]
 }
 
 model Album {
@@ -179,23 +179,22 @@ model Player {
 }
 
 model Party {
-    id         String          @id @default(cuid())
-    createdAt  DateTime        @default(now())
-    updatedAt  DateTime        @updatedAt
-    endedAt    DateTime?
-    playlist   Playlist        @relation(fields: [playlistId], references: [id])
-    playlistId String
-    inviteds   User[]
-    players    Player[]
-    host       User            @relation(name: "host", fields: [hostId], references: [id])
-    hostId     String
-    status     PartyStatus     @default(PENDING)
-    view       PartyViewStatus @default(NONE)
-    max_round  Int
-    round      Int             @default(1)
-    track      Track?          @relation(fields: [trackId], references: [id])
-    trackId    String?
-    link       PartyLink?
+    id        String          @id @default(cuid())
+    createdAt DateTime        @default(now())
+    updatedAt DateTime        @updatedAt
+    endedAt   DateTime?
+    tracks    Track[]
+    inviteds  User[]
+    players   Player[]
+    host      User            @relation(name: "host", fields: [hostId], references: [id])
+    hostId    String
+    status    PartyStatus     @default(PENDING)
+    view      PartyViewStatus @default(NONE)
+    max_round Int
+    round     Int             @default(1)
+    track     Track?          @relation(name: "current", fields: [trackId], references: [id])
+    trackId   String?
+    link      PartyLink?
 }
 
 enum PartyStatus {

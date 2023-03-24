@@ -22,5 +22,12 @@ const config = {
       ],
     ],
   },
+  images: {
+    remotePatterns: [
+      {
+        hostname: "localhost",
+      },
+    ],
+  },
 };
 export default config;

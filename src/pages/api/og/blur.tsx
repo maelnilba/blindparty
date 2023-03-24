@@ -1,7 +1,7 @@
 import { ImageResponse } from "@vercel/og";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { createQueryValidator } from "@lib/query-validator";
+import { createQueryValidator } from "@lib/helpers/query-validator";
 
 export const config = {
   runtime: "experimental-edge",
@@ -10,12 +10,13 @@ export const config = {
 const validator = createQueryValidator(
   z.object({
     src: z.string(),
+    blur: z.number().min(1),
   })
 );
 
 export default async function (req: NextRequest) {
   const { searchParams } = new URL(req.url);
-  const { src } = validator.validate(searchParams);
+  const { src, blur } = validator.validate(searchParams);
 
   const _src = src.split("").reverse().join("");
 
@@ -28,7 +29,7 @@ export default async function (req: NextRequest) {
           width: "100%",
           flexDirection: "column",
           alignItems: "center",
-          filter: "blur(36px)",
+          filter: `blur(${blur}px)`,
         }}
       >
         <img placeholder="blur" src={_src} />
@@ -36,6 +37,7 @@ export default async function (req: NextRequest) {
     ),
     {
       width: 600,
+      height: 600,
     }
   );
 }

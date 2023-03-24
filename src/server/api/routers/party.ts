@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { customAlphabet } from "nanoid";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
@@ -15,14 +16,23 @@ export const partyRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.$transaction(async (prisma) => {
+        const playlist = await prisma.playlist.findFirst({
+          where: {
+            id: input.playlist_id,
+          },
+          include: {
+            tracks: true,
+          },
+        });
+
+        if (!playlist) throw new TRPCError({ code: "PRECONDITION_FAILED" });
+
         const party = await prisma.party.create({
           data: {
-            max_round: input.max_round,
-            playlist: {
-              connect: {
-                id: input.playlist_id,
-              },
+            tracks: {
+              connect: playlist.tracks.map((t) => ({ id: t.id })),
             },
+            max_round: input.max_round,
             host: {
               connect: {
                 id: ctx.session.user.id,

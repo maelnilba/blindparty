@@ -9,6 +9,7 @@ export type Score = Exclude<
 type ScoreBoardProps = {
   scores: Score[];
 };
+
 export const ScoreBoard = ({ scores }: ScoreBoardProps) => {
   const sorted = useMemo(
     () => scores.sort((a, b) => b.points - a.points),
