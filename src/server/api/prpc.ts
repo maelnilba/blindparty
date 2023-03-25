@@ -28,7 +28,7 @@ export const prpc = p.router({
         isHost: z.boolean(),
       }),
     })
-    .auth(async ({ ctx, data, req, res }) => {
+    .auth(async ({ ctx, data }) => {
       return {
         id: ctx.session?.user?.id || "",
         name: ctx.session?.user?.name || "",

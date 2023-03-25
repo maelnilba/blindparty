@@ -1,6 +1,10 @@
 import { TRPCError } from "@trpc/server";
 import { prpc } from "server/api/prpc";
-import { createTRPCRouter, enfonceSpotifyUserAuthed } from "server/api/trpc";
+import {
+  createTRPCRouter,
+  enforceSpotifyUserAuthed,
+  enforceUserIsHost,
+} from "server/api/trpc";
 import { z } from "zod";
 
 export const gameRouter = createTRPCRouter({
@@ -11,6 +15,7 @@ export const gameRouter = createTRPCRouter({
       })
     )
     .trigger(async ({ ctx, input }) => {
+      console.log(input.prpc.members);
       if (input.joined) {
         await ctx.prisma.party.update({
           where: {
@@ -93,7 +98,24 @@ export const gameRouter = createTRPCRouter({
 
       return ctx.pusher.trigger({ id: input.id });
     }),
-  start: prpc.game.trigger(async ({ ctx, input }) => {
+  ban: prpc.game
+    .use(enforceUserIsHost)
+    .data(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .trigger(async ({ ctx, input }) => {
+      const [id, user] = Object.entries<{ id: string }>(
+        input.prpc.members
+      ).find(([id, user]) => user.id === input.id) ?? [undefined, undefined];
+
+      if (!user) throw new TRPCError({ code: "NOT_FOUND" });
+
+      await ctx.pusher.terminate(id);
+      return ctx.pusher.trigger({ id: user.id });
+    }),
+  start: prpc.game.use(enforceUserIsHost).trigger(async ({ ctx, input }) => {
     const party = await ctx.prisma.party.updateMany({
       where: {
         id: input.prpc.channel_id,
@@ -108,7 +130,7 @@ export const gameRouter = createTRPCRouter({
 
     return ctx.pusher.trigger({ running: !!party });
   }),
-  over: prpc.game.trigger(async ({ ctx, input }) => {
+  over: prpc.game.use(enforceUserIsHost).trigger(async ({ ctx, input }) => {
     await ctx.prisma.party.updateMany({
       where: {
         id: input.prpc.channel_id,
@@ -151,8 +173,7 @@ export const gameRouter = createTRPCRouter({
       },
     });
 
-    if (!track || !track.track)
-      throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
+    if (!track || !track.track) throw new TRPCError({ code: "NOT_FOUND" });
 
     const trackname = [
       track.track.name,
@@ -177,7 +198,7 @@ export const gameRouter = createTRPCRouter({
     return ctx.pusher.trigger({ track: track.track, name: trackname });
   }),
   round: prpc.game
-    .use(enfonceSpotifyUserAuthed)
+    .use(enforceUserIsHost)
     .data(
       z.object({
         tracks: z.array(z.string()),

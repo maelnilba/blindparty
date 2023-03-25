@@ -7,9 +7,10 @@ import { useEffect } from "react";
 
 type PlayerStackProps = {
   players: Player[];
+  onBan?: (id: string) => void;
 };
 
-export const PlayerStack = ({ players }: PlayerStackProps) => {
+export const PlayerStack = ({ players, onBan }: PlayerStackProps) => {
   const observable = useSubscriber({
     hover: false,
   });
@@ -31,7 +32,7 @@ export const PlayerStack = ({ players }: PlayerStackProps) => {
               style={{ zIndex: 100 - idx }}
               className=" mt-2 cursor-pointer transition-all duration-200"
             >
-              <ItemWrapper user={user} subscriber={observable} />
+              <ItemWrapper user={user} subscriber={observable} onBan={onBan} />
             </div>
           ))
         : players.map((user, idx) => (
@@ -40,7 +41,7 @@ export const PlayerStack = ({ players }: PlayerStackProps) => {
               style={{ zIndex: 100 - idx }}
               className="absolute z-10 mt-2 cursor-pointer transition-all duration-200 first:visible first:mt-0 first:scale-110 last:visible last:mt-4 last:scale-90 group-hover/stack:relative group-hover/stack:mt-0 group-hover/stack:scale-100"
             >
-              <ItemWrapper user={user} subscriber={observable} />
+              <ItemWrapper user={user} subscriber={observable} onBan={onBan} />
             </div>
           ))}
     </div>
@@ -50,8 +51,9 @@ export const PlayerStack = ({ players }: PlayerStackProps) => {
 type ItemWrapperProps = {
   user: Player;
   subscriber: SubscriberProxy<{ hover: boolean }>;
+  onBan?: (id: string) => void;
 };
-const ItemWrapper = ({ user, subscriber }: ItemWrapperProps) => {
+const ItemWrapper = ({ user, subscriber, onBan }: ItemWrapperProps) => {
   return (
     <Menu as="div" className="relative inline-block">
       <Menu.Button as="button">
@@ -85,6 +87,7 @@ const ItemWrapper = ({ user, subscriber }: ItemWrapperProps) => {
               subscriber={subscriber}
               close={close}
               active={active}
+              onBan={onBan}
             />
           )}
         </Menu.Item>
@@ -97,7 +100,7 @@ type ItemProps = {
   active: boolean;
   close: () => void;
 } & ItemWrapperProps;
-const Item = ({ subscriber, user, close, active }: ItemProps) => {
+const Item = ({ subscriber, user, close, active, onBan }: ItemProps) => {
   useEffect(() => {
     subscriber.subscribe("hover", (isHover) => {
       if (isHover && !active) {
@@ -117,7 +120,11 @@ const Item = ({ subscriber, user, close, active }: ItemProps) => {
       message={`Êtes vous certain de vouloir exclure ${user.name} de la partie ? Une fois exclu, il n'est plus possible de rejoindre la partie en cours`}
       action="Exclure"
       className="flex w-full items-center justify-center"
-      onSuccess={() => {}}
+      onSuccess={() => {
+        if (onBan) {
+          onBan(user.id);
+        }
+      }}
     >
       <button
         className={`${

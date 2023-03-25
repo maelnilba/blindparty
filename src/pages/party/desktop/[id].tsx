@@ -361,6 +361,10 @@ const Party: NextPage<
     send("round", { tracks: _tracks ?? tracks });
   };
 
+  const ban = (id: string) => {
+    send("ban", { id: id });
+  };
+
   useEffect(() => {
     if (track) {
       if (audio.current) {
@@ -476,6 +480,7 @@ const Party: NextPage<
           <div className="fixed inset-0 flex w-max">
             <PlayerStack
               players={players.filter((p) => p.joined).map((p) => p.player)}
+              onBan={ban}
             />
             <div className="pt-32 pb-24">
               <Winner player={winner} />

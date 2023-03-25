@@ -92,7 +92,13 @@ const enforceUserIsAdmin = t.middleware(async ({ ctx, next }) => {
 export const protectedAdminProcedure =
   protectedProcedure.use(enforceUserIsAdmin);
 
-export const enfonceSpotifyUserAuthed = t.middleware(async ({ ctx, next }) => {
+export const enforceUserIsHost = t.middleware(({ input, ctx, next }) => {
+  if (!(input as any).prpc.me.info.isHost)
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  return next({ ctx });
+});
+
+export const enforceSpotifyUserAuthed = t.middleware(async ({ ctx, next }) => {
   if (!ctx.session || !ctx.session.user) {
     throw new TRPCError({ code: "UNAUTHORIZED" });
   }
@@ -157,5 +163,5 @@ export const enfonceSpotifyUserAuthed = t.middleware(async ({ ctx, next }) => {
 });
 
 export const spotifyProcedure = protectedProcedure.use(
-  enfonceSpotifyUserAuthed
+  enforceSpotifyUserAuthed
 );
