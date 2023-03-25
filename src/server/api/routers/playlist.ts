@@ -10,6 +10,7 @@ export const playlistRouter = createTRPCRouter({
         name: z.string(),
         description: z.string().optional(),
         s3key: z.string().optional(),
+        generated: z.boolean(),
         tracks: z
           .array(
             z.object({
@@ -52,6 +53,7 @@ export const playlistRouter = createTRPCRouter({
           description: input.description,
           picture: picture,
           s3key: input.s3key,
+          generated: input.generated,
           public: false,
           tracks: {
             connectOrCreate: input.tracks.map((track) => ({
@@ -110,6 +112,7 @@ export const playlistRouter = createTRPCRouter({
         name: z.string(),
         description: z.string().optional(),
         s3key: z.string().optional(),
+        generated: z.boolean(),
         tracks: z
           .array(
             z.object({
@@ -151,6 +154,7 @@ export const playlistRouter = createTRPCRouter({
           description: input.description,
           picture: picture,
           s3key: input.s3key,
+          generated: input.generated,
           tracks: {
             disconnect: input.removed_tracks.map((track_id) => ({
               id: track_id,

@@ -13,7 +13,7 @@ import {
   useState,
 } from "react";
 export type ImageUploadRef = {
-  set: (blob: Blob, upload: boolean) => Promise<Response | void>;
+  set: (blob: Blob, upload: boolean, key?: string) => Promise<Response | void>;
   remove: () => void;
   upload: (key?: string) => Promise<Response>;
   key: string | undefined;
@@ -25,6 +25,7 @@ type ImageUploadProps = {
   children?: ReactNode;
   className?: string;
   src?: string | null;
+  generated?: boolean;
   prefix: S3Prefix;
   presignedOptions?: {
     /**
@@ -36,7 +37,17 @@ type ImageUploadProps = {
   };
 };
 export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
-  ({ className, src: _src, prefix, presignedOptions, children }, ref) => {
+  (
+    {
+      className,
+      src: _src,
+      prefix,
+      presignedOptions,
+      children,
+      generated = false,
+    },
+    ref
+  ) => {
     const { mutateAsync } = api.s3.presigned.useMutation();
     const { post } = useS3({ prefix });
     const [__src, set__Src] = useState<string | null | undefined>(_src);
@@ -88,11 +99,11 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
     useImperativeHandle(
       ref,
       () => ({
-        set: async (blob: Blob, upload: boolean = false) => {
+        set: async (blob: Blob, upload: boolean = false, _key?: string) => {
           const file = new File([blob], "albums_merged");
           const presign = await set(file, upload);
           if (upload && presign) {
-            return await post(presign.post, file);
+            return await post(presign.post, file, _key);
           }
         },
         remove: () => {
@@ -147,7 +158,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
         ) : (
           <ImageIcon className="pointer-events-none h-12 w-12 group-hover:scale-105" />
         )}
-        {children && !src && (
+        {children && (!generated ? !src : true) && (
           <div className="pointer-events-none absolute">{children}</div>
         )}
       </div>

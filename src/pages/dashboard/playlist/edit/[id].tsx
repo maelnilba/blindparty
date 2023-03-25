@@ -1,14 +1,20 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { GetLayoutThrough } from "@components/layout/layout";
+import {
+  AlbumsPicture,
+  useAlbumsPictureStore,
+} from "@components/playlist/albums-picture";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
+import { useAsyncEffect } from "@hooks/useAsyncEffect";
+import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import type { NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
 import { Track } from "../#types";
@@ -37,6 +43,48 @@ const PlaylistEdit = () => {
       push("/dashboard/playlist");
     },
   });
+
+  const [mockAlbumsPicture, setMockAlbumsPicture] = useState<
+    string[] | undefined
+  >();
+  const fetchMergeAlbum = useAlbumsPictureStore((state) => state.fetch);
+  const setMergeAlbum = useDebounce(async (sources: string[]) => {
+    if (!imageUpload.current) return;
+    setMockAlbumsPicture(sources);
+  }, 100);
+
+  useAsyncEffect(async () => {
+    if (
+      tracksMap.size > 3 &&
+      imageUpload.current &&
+      !imageUpload.current.local
+    ) {
+      const images = [
+        ...[...tracksMap]
+          .map(([_, v]) => v.album.images)
+          .reduce((map, images) => {
+            const image = images[0];
+            if (image) map.set(image.url, (map.get(image.url) ?? 0) + 1);
+            return map;
+          }, new Map<string, number>()),
+      ]
+        .map(([k, v]) => ({
+          count: v,
+          image: k,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 4);
+
+      if (images.length !== 4) return;
+      const sources = images.map((img) => img.image).sort();
+      await setMergeAlbum(sources);
+    }
+
+    if (tracksMap.size < 4) {
+      setMockAlbumsPicture(undefined);
+    }
+  }, [tracksMap]);
+
   const { load, start, pause, unpause, currentTrack, playing } = usePlayer();
   const playTrack = async (track: Track) => {
     if (currentTrack?.id === track.id && playing) {
@@ -48,6 +96,7 @@ const PlaylistEdit = () => {
       await start();
     }
   };
+
   const s3key = useRef<string>();
   const { data: playlist } = api.playlist.get_playlist.useQuery(
     { id: id! },
@@ -72,6 +121,7 @@ const PlaylistEdit = () => {
       },
     }
   );
+
   const imageUpload = useRef<ImageUploadRef | null>(null);
   const zo = useZorm("create", editSchema, {
     async onValidSubmit(e) {
@@ -106,7 +156,20 @@ const PlaylistEdit = () => {
         return;
       }
 
-      if (imageUpload.current && imageUpload.current.changed) {
+      if (
+        imageUpload.current &&
+        mockAlbumsPicture &&
+        !imageUpload.current.changed
+      ) {
+        const img = await fetchMergeAlbum(mockAlbumsPicture);
+        await imageUpload.current.set(img, true, s3key.current);
+      }
+
+      if (
+        imageUpload.current &&
+        imageUpload.current.changed &&
+        imageUpload.current.local
+      ) {
         await imageUpload.current.upload(s3key.current);
       }
 
@@ -117,6 +180,7 @@ const PlaylistEdit = () => {
         s3key: imageUpload.current ? imageUpload.current.key : undefined,
         tracks: tracks,
         removed_tracks: removed_tracks,
+        generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
       });
     },
   });
@@ -199,12 +263,21 @@ const PlaylistEdit = () => {
           </div>
           <div className="flex flex-grow items-center justify-center gap-4">
             <ImageUpload
+              generated={playlist?.generated}
               src={playlist?.picture}
               ref={imageUpload}
               className="flex-1"
               prefix="playlist"
               presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
-            />
+            >
+              {mockAlbumsPicture && (
+                <AlbumsPicture
+                  className="flex-1"
+                  row1={mockAlbumsPicture.slice(0, 2)}
+                  row2={mockAlbumsPicture.slice(2, 4)}
+                />
+              )}
+            </ImageUpload>
             <form
               ref={zo.ref}
               id="create-playlist"

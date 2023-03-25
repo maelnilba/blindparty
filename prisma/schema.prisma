@@ -123,6 +123,7 @@ model Playlist {
     description String?
     picture     String?
     s3key       String?
+    generated   Boolean  @default(false)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     tracks      Track[]

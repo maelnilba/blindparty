@@ -1,13 +1,15 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { GetLayoutThrough } from "@components/layout/layout";
-import { AlbumsPicture } from "@components/playlist/albums-picture";
+import {
+  AlbumsPicture,
+  useAlbumsPictureStore,
+} from "@components/playlist/albums-picture";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useAsyncEffect } from "@hooks/useAsyncEffect";
 import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
-import { createQueryValidator } from "@lib/helpers/query-validator";
 import { api } from "@utils/api";
 import { NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
@@ -15,38 +17,11 @@ import { Track } from "pages/dashboard/playlist/#types";
 import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
-import { create } from "zustand";
 
 const createSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
 });
-
-const validator = createQueryValidator(
-  z.object({
-    sources: z.array(z.string().url()).length(4),
-  })
-);
-
-const useAlbumsPictureStore = create<{
-  cache: Map<string, Blob>;
-  fetch: (sources: string[]) => Promise<Blob>;
-}>((set, get) => ({
-  cache: new Map(),
-  fetch: async (sources) => {
-    const hash = sources.join("|");
-    const _cache = get().cache;
-    if (_cache.has(hash)) return _cache.get(hash)!;
-
-    const url = validator.createSearchURL({
-      sources: sources,
-    });
-    const res = await fetch(`/api/og/merge${url}`);
-    const img = await res.blob();
-    set({ cache: new Map(_cache.set(hash, img)) });
-    return img;
-  },
-}));
 
 const PlaylistCreate = () => {
   const router = useRouter();
@@ -157,12 +132,20 @@ const PlaylistCreate = () => {
         return;
       }
 
-      if (imageUpload.current && mockAlbumsPicture) {
+      if (
+        imageUpload.current &&
+        mockAlbumsPicture &&
+        !imageUpload.current.changed
+      ) {
         const img = await fetchMergeAlbum(mockAlbumsPicture);
         await imageUpload.current.set(img, true);
       }
 
-      if (imageUpload.current && imageUpload.current.changed) {
+      if (
+        imageUpload.current &&
+        imageUpload.current.changed &&
+        imageUpload.current.local
+      ) {
         await imageUpload.current.upload();
       }
 
@@ -171,6 +154,7 @@ const PlaylistCreate = () => {
         description: e.data.description,
         s3key: imageUpload.current ? imageUpload.current.key : undefined,
         tracks: tracks,
+        generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
       });
     },
   });
