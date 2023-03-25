@@ -15,7 +15,7 @@ export const Winner = ({ player }: WinnerProps) => {
   }, [player]);
 
   return (
-    <div className="relative mt-2">
+    <div className="pointer-events-none relative mt-2">
       <Transition
         show={cardAppear}
         enter="transition-all duration-500 ease-out"

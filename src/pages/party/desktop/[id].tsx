@@ -323,14 +323,12 @@ const Party: NextPage<
   >(() => {
     return party.inviteds.map((invited) => ({
       player: invited,
-      joined:
-        invited.id === host.id ||
-        party.players
-          .map((player) => player.user.id)
-          .concat([...joineds])
-          .find((id) => id === invited.id)
-          ? true
-          : false,
+      joined: party.players
+        .map((player) => player.user.id)
+        .concat([...joineds])
+        .find((id) => id === invited.id)
+        ? true
+        : false,
       connected: members
         ? [...Object.values(members)].find((user) => user.id === invited.id)
           ? true
@@ -476,21 +474,6 @@ const Party: NextPage<
       {game === "RUNNING" && (
         <div className="relative flex flex-1 items-center justify-center">
           <div className="fixed inset-0 flex w-max">
-            <button
-              onClick={() => {
-                setWinner({
-                  user: {
-                    id: "0",
-                    name: "ok",
-                    image:
-                      "https://blindparty-bucket.s3.eu-central-1.amazonaws.com/user:::kEhHQZ_BeXlsdw18fBC7W",
-                  },
-                  points: 0,
-                });
-              }}
-            >
-              Test animation
-            </button>
             <PlayerStack
               players={players.filter((p) => p.joined).map((p) => p.player)}
             />
