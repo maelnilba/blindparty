@@ -9,30 +9,44 @@ export const partyRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        playlist_id: z.string().cuid(),
+        playlists_id: z.array(z.string().cuid()),
         inviteds: z.array(z.string().cuid()),
         max_round: z.number().min(10),
       })
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.$transaction(async (prisma) => {
-        const playlist = await prisma.playlist.findFirst({
+        const playlists = await prisma.playlist.findMany({
           where: {
-            id: input.playlist_id,
+            id: {
+              in: input.playlists_id,
+            },
           },
           include: {
             tracks: true,
           },
         });
 
-        if (!playlist) throw new TRPCError({ code: "PRECONDITION_FAILED" });
+        if (!playlists) throw new TRPCError({ code: "PRECONDITION_FAILED" });
+
+        const tracks = playlists
+          .map((p) => p.tracks)
+          .flat()
+          .map((t) => ({ id: t.id }))
+          .filter(
+            (value, index, self) =>
+              index === self.findIndex((t) => t.id === value.id)
+          );
 
         const party = await prisma.party.create({
           data: {
             tracks: {
-              connect: playlist.tracks.map((t) => ({ id: t.id })),
+              connect: tracks,
             },
-            max_round: input.max_round,
+            max_round:
+              input.max_round <= tracks.length
+                ? input.max_round
+                : tracks.length,
             host: {
               connect: {
                 id: ctx.session.user.id,

@@ -13,7 +13,15 @@ const PartyCreate: NextPage = () => {
   const router = useRouter();
   const { data: playlists } = api.playlist.get_all.useQuery();
   const { data: allfriends } = api.friend.get_all.useQuery();
-  const [playlist, setPlaylist] = useState<Playlist | null>(null);
+  // const [playlist, setPlaylist] = useState<Playlist | null>(null);
+  const [selectedsPlaylist, setSelectedsPlaylist] = useState<
+    Map<string, Playlist>
+  >(new Map());
+  const selectedsPlaylistCount = [...selectedsPlaylist.values()]
+    .map((p) => p._count.tracks)
+    .reduce((total, cur) => total + cur, 0);
+  const [random, setRandom] = useState(false);
+
   const [friends, setFriends] = useState<Map<string, Friend>>(new Map());
   const handleFriends = (friend: Friend) => {
     if (friends.has(friend.id)) {
@@ -36,13 +44,17 @@ const PartyCreate: NextPage = () => {
     },
   });
   const createParty = () => {
-    if (!playlist || !friends.size) {
-      return;
-    }
+    if (!friends.size || !playlists) return;
+    let playlist: Playlist | undefined;
+    if (random) {
+      playlist = playlists[Math.floor(Math.random() * playlists.length)];
+    } else if (!selectedsPlaylist.size) return;
+    const max_round =
+      random && playlist ? playlist._count.tracks : selectedsPlaylistCount;
 
     create({
-      max_round: Math.min(playlist._count.tracks, rounds),
-      playlist_id: playlist.id,
+      max_round: Math.min(max_round, rounds),
+      playlists_id: [...selectedsPlaylist.values()].map((p) => p.id),
       inviteds: [...friends]
         .map(([_, friend]) => friend.friendId!)
         .filter((id) => id),
@@ -73,7 +85,11 @@ const PartyCreate: NextPage = () => {
                 <PlaylistCard
                   key={playlist.id}
                   playlist={playlist}
-                  onClick={(playlist) => setPlaylist(playlist)}
+                  onClick={(playlist) =>
+                    setSelectedsPlaylist(
+                      (p) => new Map(p.set(playlist.id, playlist))
+                    )
+                  }
                   canShow
                 />
               </div>
@@ -118,9 +134,14 @@ const PartyCreate: NextPage = () => {
         <div className="flex flex-1 flex-col gap-10">
           <div className="">
             <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto">
-              <Tab.Group>
+              <Tab.Group
+                onChange={(e) => {
+                  setRandom(Boolean(e));
+                }}
+                defaultIndex={0}
+              >
                 <Tab.List className="absolute top-0 flex w-full gap-2 bg-black/10 px-6 py-2 backdrop-blur-sm">
-                  <div className="flex flex-1 justify-evenly gap-2 rounded-full border border-gray-800">
+                  <div className="flex flex-1 justify-evenly gap-2 rounded-full ring-2 ring-white ring-opacity-5">
                     <Tab
                       className={({ selected }) =>
                         `flex-1 rounded-full py-1 px-6 text-lg font-semibold text-white no-underline transition-all duration-300 focus:outline-none ${
@@ -128,7 +149,7 @@ const PartyCreate: NextPage = () => {
                         }`
                       }
                     >
-                      Playlist
+                      Sélection
                     </Tab>
                     <Tab
                       className={({ selected }) =>
@@ -137,50 +158,26 @@ const PartyCreate: NextPage = () => {
                         }`
                       }
                     >
-                      Tracks
+                      Aléatoire
                     </Tab>
                   </div>
                 </Tab.List>
-                <Tab.Panels className="h-44 overflow-auto pt-12">
-                  <Tab.Panel className="flex h-full w-full flex-col justify-start">
-                    {playlist && (
-                      <PlaylistCard
-                        key={playlist.id}
-                        playlist={playlist}
-                        canShow
-                      />
-                    )}
+                <Tab.Panels className="overflow-auto pt-12">
+                  <Tab.Panel className="flex h-44 w-full flex-col justify-start px-4 pt-2">
+                    {[...selectedsPlaylist.values()].map((playlist) => (
+                      <div key={playlist.id} className="cursor-pointer">
+                        <PlaylistCard
+                          playlist={playlist}
+                          canShow
+                          onClick={(playlist) => {
+                            selectedsPlaylist.delete(playlist.id);
+                            setSelectedsPlaylist(new Map(selectedsPlaylist));
+                          }}
+                        />
+                      </div>
+                    ))}
                   </Tab.Panel>
-                  <Tab.Panel className="">
-                    {playlist && (
-                      <PlaylistCard
-                        key={playlist.id}
-                        playlist={playlist}
-                        canShow
-                      />
-                    )}{" "}
-                    {playlist && (
-                      <PlaylistCard
-                        key={playlist.id}
-                        playlist={playlist}
-                        canShow
-                      />
-                    )}{" "}
-                    {playlist && (
-                      <PlaylistCard
-                        key={playlist.id}
-                        playlist={playlist}
-                        canShow
-                      />
-                    )}{" "}
-                    {playlist && (
-                      <PlaylistCard
-                        key={playlist.id}
-                        playlist={playlist}
-                        canShow
-                      />
-                    )}
-                  </Tab.Panel>
+                  <Tab.Panel className="flex h-full w-full flex-col justify-start px-4"></Tab.Panel>
                 </Tab.Panels>
               </Tab.Group>
             </div>
@@ -220,14 +217,19 @@ const PartyCreate: NextPage = () => {
                     ))}
                 </select>
               </div>
-              {playlist && playlist._count.tracks < rounds && (
+              {Boolean(
+                selectedsPlaylist.size &&
+                  selectedsPlaylistCount < rounds &&
+                  !random
+              ) && (
                 <div>
                   <div className="float-left px-2">
                     <ExclamationIcon className="mt-4 h-6 w-6" />
                   </div>
                   <p>
-                    La playlist sélectionnée contient moins de tracks que de
-                    round. Le nombre de round sera de {playlist._count.tracks}
+                    Les playlists sélectionnées contiennent moins de tracks que
+                    de round. Le nombre de round sera de{" "}
+                    {selectedsPlaylistCount}
                   </p>
                 </div>
               )}
