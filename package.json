@@ -9,7 +9,8 @@
     "lint": "next lint",
     "start": "next start",
     "db:push": "prisma db push",
-    "cron:start": "ts-node cron/index.ts"
+    "cron:start": "ts-node cron/index.ts",
+    "dev:time": "ts-node devtime/index.ts run"
   },
   "dependencies": {
     "@headlessui/react": "^1.7.7",
