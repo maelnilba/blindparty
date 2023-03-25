@@ -138,19 +138,10 @@ export const TrackPlayer = ({
     else unpause();
   };
 
-  useEffect(() => {
-    const prevent = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement;
-      if (target instanceof HTMLInputElement) return;
-      if (e.key === " ") e.preventDefault();
-    };
-    document.body.addEventListener("keydown", prevent);
-    return () => {
-      document.body.removeEventListener("keydown", prevent);
-    };
-  }, []);
-
-  useHotkeys("space", () => toggle(), [playing], { enableOnFormTags: false });
+  useHotkeys("space", () => toggle(), [playing], {
+    enableOnFormTags: false,
+    preventDefault: true,
+  });
 
   const goto = (seconds: number) => {
     if (!audio.current) return;
