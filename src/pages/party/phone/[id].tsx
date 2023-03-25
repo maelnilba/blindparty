@@ -5,6 +5,7 @@ import { Modal } from "@components/modals/modal";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useMicroPermission } from "@hooks/useMicroPermission";
 import { useVoiceDetector } from "@hooks/useVoiceDetector";
+import { near, parse } from "@lib/helpers/accept-language";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
@@ -142,6 +143,10 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       party: party,
+      language: near(
+        parse(context.req.headers["accept-language"] ?? "en-GB"),
+        "en - GB"
+      ),
     },
   };
 }
@@ -152,7 +157,7 @@ export type Player =
 
 const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ party }) => {
+> = ({ party, language }) => {
   const router = useRouter();
   const [joineds, setJoineds] = useState<Set<string>>(new Set());
   const [isJoined, setIsJoined] = useState(false);
@@ -263,7 +268,7 @@ const Party: NextPage<
     }
     await SpeechRecognition.startListening({
       continuous: true,
-      language: "fr-FR",
+      language: language,
     });
   };
   const vadMicro = useRef<SVGSVGElement | null>(null);
@@ -361,7 +366,7 @@ const Party: NextPage<
                       paramètrages de votre télèphone
                     </p>
                     <button
-                      onClick={() => activation()}
+                      onClick={activation}
                       className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
                     >
                       Activer
@@ -370,7 +375,7 @@ const Party: NextPage<
                 </Modal>
               ) : (
                 <button
-                  onClick={() => join()}
+                  onClick={join}
                   disabled={isJoined}
                   className={`${
                     isJoined && "opacity-50"
@@ -486,10 +491,10 @@ const PlayerCard = ({ player, joined, connected }: PlayerCardProps) => {
 
 const PartyWrapper: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ party }) => {
+> = ({ party, language }) => {
   return (
     <prpc.withPRPC {...prpc.context}>
-      <Party party={party} />
+      <Party party={party} language={language} />
     </prpc.withPRPC>
   );
 };
