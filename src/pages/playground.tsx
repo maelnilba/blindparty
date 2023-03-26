@@ -8,7 +8,6 @@ const Playground: NextPageWithLayout = () => {
     <div className="scrollbar-hide flex flex-1 justify-center gap-4">
       <div className="w-full max-w-lg">
         <InputSelect
-          ref={ref}
           type="number"
           min="1"
           max="100"

@@ -26,7 +26,6 @@ export const partyRouter = createTRPCRouter({
             tracks: true,
           },
         });
-
         if (!playlists) throw new TRPCError({ code: "PRECONDITION_FAILED" });
 
         const tracks = playlists

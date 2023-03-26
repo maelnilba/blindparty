@@ -15,7 +15,6 @@ export const gameRouter = createTRPCRouter({
       })
     )
     .trigger(async ({ ctx, input }) => {
-      console.log(input.prpc.members);
       if (input.joined) {
         await ctx.prisma.party.update({
           where: {

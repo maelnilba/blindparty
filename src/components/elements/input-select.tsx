@@ -23,7 +23,7 @@ type InputSelectProps = Omit<
   label?: string;
 };
 
-export const InputSelect = forwardRef<HTMLInputElement, InputSelectProps>(
+export const InputSelect = forwardRef<HTMLSelectElement, InputSelectProps>(
   (
     {
       children,
@@ -41,40 +41,43 @@ export const InputSelect = forwardRef<HTMLInputElement, InputSelectProps>(
 
     const [mode, setMode] = useState<"SELECT" | "INPUT">("SELECT");
     const sref = useRef<HTMLSelectElement>(null);
-    const [iref, subscribe, cleanup] = useEventListener<HTMLInputElement>(
-      "focusout",
-      (ref) => {
-        if (!ref.current.value) {
-        } else {
-          const value = ref.current.value;
-          if (sref.current && ref.current.checkValidity()) {
-            const options = sref.current.options;
-            let ok = true;
-            for (const option of options) {
-              if (option.value == value) {
-                ok = false;
-                sref.current.value = value;
+    const handle = (target: HTMLInputElement) => {
+      if (!target.value) {
+      } else {
+        const val = target.value;
+        if (sref.current && target.checkValidity()) {
+          const options = sref.current.options;
+          let ok = true;
+          for (const option of options) {
+            if (option.value == val) {
+              ok = false;
+              sref.current.value = val;
 
-                // Trigger the change event to React
-                const event = new Event("change", { bubbles: true });
-                sref.current.dispatchEvent(event);
-                break;
-              }
-            }
-            if (ok) {
-              const opt = document.createElement("option");
-              opt.value = value;
-              opt.text = value;
-              sref.current.options.add(opt, options.length - 1);
-              sref.current.value = value;
               // Trigger the change event to React
               const event = new Event("change", { bubbles: true });
               sref.current.dispatchEvent(event);
+              break;
             }
           }
+          if (ok) {
+            const opt = document.createElement("option");
+            opt.value = val;
+            opt.text = val;
+            sref.current.options.add(opt, options.length - 1);
+            sref.current.value = val;
+            // Trigger the change event to React
+            const event = new Event("change", { bubbles: true });
+            sref.current.dispatchEvent(event);
+          }
         }
-        setInput("");
-        setMode("SELECT");
+      }
+      setInput("");
+      setMode("SELECT");
+    };
+    const [iref, subscribe, cleanup] = useEventListener<HTMLInputElement>(
+      "focusout",
+      (ref) => {
+        handle(ref.current);
       }
     );
     useEffect(() => {
@@ -84,12 +87,11 @@ export const InputSelect = forwardRef<HTMLInputElement, InputSelectProps>(
       };
     }, [iref]);
 
-    const [hidden, setHidden] = useState(value ?? "");
     // Remove type for the hidden input
     const { type, ...hiddenProps } = props;
+    // Remove id, name for the input input
     return (
       <>
-        <input ref={ref} type="hidden" value={hidden} {...hiddenProps} />
         <input
           ref={iref}
           {...props}
@@ -97,6 +99,8 @@ export const InputSelect = forwardRef<HTMLInputElement, InputSelectProps>(
           onKeyDown={(e) => {
             if (!iref.current) return;
             if (e.key === "Enter") {
+              e.preventDefault();
+              handle(e.target as HTMLInputElement);
             } else return;
             setMode("SELECT");
           }}
@@ -111,8 +115,8 @@ export const InputSelect = forwardRef<HTMLInputElement, InputSelectProps>(
           className={props.className}
         />
         <select
-          id="rounds"
           ref={sref}
+          {...(hiddenProps as any)}
           value={select}
           onChange={(e) => {
             if (e.target.value === choisir) {
@@ -128,7 +132,6 @@ export const InputSelect = forwardRef<HTMLInputElement, InputSelectProps>(
               return;
             } else {
               if (onChange) onChange(e);
-              setHidden(e.target.value);
             }
             setSelect(e.target.value);
           }}
