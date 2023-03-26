@@ -7,6 +7,21 @@ body {
   overscroll-behavior: none;
 }
 
+@keyframes dash-twice {
+  50% {
+    stroke-dashoffset: 0;
+  }
+  100% {
+    stroke-dashoffset: calc(400% * -1);
+  }
+}
+
+@keyframes dash {
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
 @layer components {
   .scrollbar-hide::-webkit-scrollbar {
     display: none;

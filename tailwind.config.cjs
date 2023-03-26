@@ -13,6 +13,25 @@ module.exports = {
         300: "300",
         max: "9999",
       },
+      animation: {
+        "fill-dash": "dash-twice 2s infinite 0s forwards",
+      },
+      keyframes: {
+        // Keyframes look like bug so I added them in globals.css too
+        "dash-twice": {
+          "50%": {
+            "stroke-dashoffset": 0,
+          },
+          "100%": {
+            "stroke-dashoffset": "calc(400% * -1)",
+          },
+        },
+        dash: {
+          "100%": {
+            "stroke-dashoffset": 0,
+          },
+        },
+      },
     },
   },
   plugins: [],

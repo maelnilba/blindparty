@@ -24,7 +24,7 @@ export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
   return (
     <Image
       loader={() => apiUrl}
-      className="absolute object-cover"
+      className="object-cover"
       width={600}
       height={600}
       src={apiUrl}

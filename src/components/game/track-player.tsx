@@ -1,3 +1,4 @@
+import { Square } from "@components/elements/square-loader";
 import { useCountdown } from "@hooks/useCountdown";
 import { RouterOutputs } from "@utils/api";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
@@ -53,27 +54,41 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
     }));
 
     return (
-      <div className="flex h-full w-full flex-col gap-4">
-        <div className="scrollbar-hide relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded border border-gray-800">
-          {state === "LOADING" && (
-            <p className="z-10 scale-150 text-9xl font-extrabold">{count}</p>
-          )}
-          <TrackBluredPicture track={track} />
-          {track?.preview_url && (
-            <>
-              <audio ref={audio} className="invisible opacity-0">
-                <source src={track.preview_url} />
-              </audio>
-            </>
-          )}
-        </div>
-        <div className="relative h-2 w-full rounded-lg border border-gray-800 bg-black ">
-          <div
-            ref={range}
-            style={{ width: "100%" }}
-            className={`absolute top-0 left-0 h-2 rounded-lg bg-white transition-all`}
-          ></div>
-        </div>
+      <div className="relative flex h-full w-full flex-col gap-4">
+        {state === "LOADING" && (
+          <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+            <p className="scale-150 text-9xl font-extrabold">{count}</p>
+          </div>
+        )}
+        <Square
+          className={`scrollbar-hide h-full w-full rounded-lg ${
+            state === "RUNNING" && "bg-gray-800/50"
+          }`}
+          active={state === "RUNNING"}
+          timing="linear"
+          speed={30}
+        >
+          <Square.Child className="h-full w-full flex-col overflow-hidden rounded p-1.5">
+            <div
+              className={`relative h-full w-full overflow-hidden ${
+                state === "RUNNING" ? "border-0" : "border"
+              } rounded border-gray-800`}
+            >
+              <TrackBluredPicture track={track} />
+              {track?.preview_url && (
+                <>
+                  <audio ref={audio} className="invisible opacity-0">
+                    <source src={track.preview_url} />
+                  </audio>
+                </>
+              )}
+            </div>
+          </Square.Child>
+          <Square.Dash
+            className="stroke-white stroke-[3]"
+            parent={{ className: "rounded-lg" }}
+          />
+        </Square>
       </div>
     );
   }

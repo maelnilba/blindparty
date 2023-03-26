@@ -32,6 +32,8 @@ import { z } from "zod";
 import { exclude } from "..";
 import { GUESS_MS, TRACK_TIMER_MS, VIEW_SCORE_MS } from "../#constant";
 import { Winner } from "@components/game/round/winner";
+import { Square } from "@components/elements/square-loader";
+import { Round } from "@components/game/round/round";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -166,6 +168,7 @@ const Party: NextPage<
 
   const [scores, setScores] = useState<Score[]>([]);
   const [winner, setWinner] = useState<Score | null | undefined>();
+  const [roundCount, setRoundCount] = useState(1);
   const [itwas, setItwas] = useState<string | null>(null);
   const [track, setTrack] = useState<
     RouterOutputs["party"]["game"]["round"] | null
@@ -267,6 +270,7 @@ const Party: NextPage<
         ok = false;
         await sleep(VIEW_SCORE_MS);
         ok = true;
+        setRoundCount((c) => c + 1);
         round([..._tracks]);
       });
 
@@ -283,6 +287,7 @@ const Party: NextPage<
         setItwas(name);
 
         await sleep(VIEW_SCORE_MS);
+        setRoundCount((c) => c + 1);
         round([..._tracks]);
       });
 
@@ -484,6 +489,13 @@ const Party: NextPage<
             />
             <div className="pt-32 pb-24">
               <Winner player={winner} />
+            </div>
+          </div>
+          <div className="fixed right-0 top-0 flex w-max">
+            <div className="flex flex-col items-center gap-4 px-8 pt-32">
+              <Round round={roundCount} />
+              <Divider />
+              <p className="text-4xl font-extrabold">{party.max_round}</p>
             </div>
           </div>
           {view === "GUESS" && (
