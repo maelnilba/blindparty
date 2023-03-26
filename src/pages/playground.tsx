@@ -1,15 +1,28 @@
-import { Square } from "@components/elements/square-loader";
+import { InputSelect } from "@components/elements/input-select";
 import { NextPageWithLayout } from "next";
+import { useRef } from "react";
 
 const Playground: NextPageWithLayout = () => {
+  const ref = useRef<HTMLInputElement>(null);
   return (
     <div className="scrollbar-hide flex flex-1 justify-center gap-4">
-      <Square className="h-80 w-80 rounded border border-gray-800" active>
-        <Square.Child>
-          <p className="text-4xl font-extrabold">10</p>
-        </Square.Child>
-        <Square.Dash className="stroke-white stroke-[6]" />
-      </Square>
+      <div className="w-full max-w-lg">
+        <InputSelect
+          ref={ref}
+          type="number"
+          min="1"
+          max="100"
+          className={`block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500`}
+        >
+          {Array(10)
+            .fill(null)
+            .map((_, idx) => (
+              <option key={idx} value={(idx + 1) * 10}>
+                {(idx + 1) * 10}
+              </option>
+            ))}
+        </InputSelect>
+      </div>
     </div>
   );
 };
