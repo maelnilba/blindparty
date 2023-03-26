@@ -100,14 +100,12 @@ export const near = (
   for (const lang of languages) {
     if (!lang.languageCode) return fallback;
     if (!lang.countryCode) {
-      if (speechLanguages.includes(lang.languageCode as SpeechLanguage)) {
+      if (speechLanguages.includes(lang.languageCode)) {
         return lang.languageCode as SpeechLanguage;
       } else return fallback;
     }
     if (
-      speechLanguages.includes(
-        `${lang.languageCode!}-${lang.countryCode!}` as SpeechLanguage
-      )
+      speechLanguages.includes(`${lang.languageCode!}-${lang.countryCode!}`)
     ) {
       return `${lang.languageCode!}-${lang.countryCode!}` as SpeechLanguage;
     } else return fallback;

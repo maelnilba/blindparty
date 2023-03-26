@@ -24,12 +24,10 @@ type QueryZodSchema = ZodObject<{
 
 export const createBodyValidator = <T extends ZodObject<any>>(schema: T) => {
   return {
-    validate: (body: any) => validateBody(JSON.parse(body), schema),
-    validateAsync: async (body: any) =>
-      validateBodyAsync(JSON.parse(body), schema),
-    safeValidate: (body: any) => safeValidateBody(JSON.parse(body), schema),
-    safeValidateAsync: async (body: any) =>
-      safeValidateBodyAsync(JSON.parse(body), schema),
+    validate: (body: any) => validateBody(body, schema),
+    validateAsync: async (body: any) => validateBodyAsync(body, schema),
+    safeValidate: (body: any) => safeValidateBody(body, schema),
+    safeValidateAsync: async (body: any) => safeValidateBodyAsync(body, schema),
     createBody: (body: z.infer<T>) => createBody(body),
   };
 };
@@ -38,29 +36,41 @@ const createBody = <T extends ZodObject<any>>(body: z.infer<T>) => {
   return JSON.stringify(body);
 };
 
-const validateBody = <T extends ZodObject<any>>(body: object, validator: T) => {
-  return validator.parse(body) as ReturnType<T["parse"]>;
+const validateBody = <T extends ZodObject<any>>(body: string, validator: T) => {
+  const parsed = JSON.parse(body);
+  if (typeof parsed !== "object")
+    throw new Error("Body is not a JSON valid stringify object");
+  return validator.parse(parsed) as ReturnType<T["parse"]>;
 };
 
 const safeValidateBody = <T extends ZodObject<any>>(
-  body: object,
+  body: string,
   validator: T
 ) => {
-  return validator.safeParse(body) as ReturnType<T["safeParse"]>;
+  const parsed = JSON.parse(body);
+  if (typeof parsed !== "object")
+    throw new Error("Body is not a JSON valid stringify object");
+  return validator.safeParse(parsed) as ReturnType<T["safeParse"]>;
 };
 
 const validateBodyAsync = async <T extends ZodObject<any>>(
-  body: object,
+  body: string,
   validator: T
 ) => {
-  return validator.parseAsync(body) as Awaited<ReturnType<T["parseAsync"]>>;
+  const parsed = JSON.parse(body);
+  if (typeof parsed !== "object")
+    throw new Error("Body is not a JSON valid stringify object");
+  return validator.parseAsync(parsed) as Awaited<ReturnType<T["parseAsync"]>>;
 };
 
 const safeValidateBodyAsync = async <T extends ZodObject<any>>(
-  body: object,
+  body: string,
   validator: T
 ) => {
-  return validator.safeParseAsync(body) as Awaited<
+  const parsed = JSON.parse(body);
+  if (typeof parsed !== "object")
+    throw new Error("Body is not a JSON valid stringify object");
+  return validator.safeParseAsync(parsed) as Awaited<
     ReturnType<T["safeParseAsync"]>
   >;
 };

@@ -205,7 +205,7 @@ export function useConnect<
 
     const json = await (await reproduceTRPCMutate(getQueryKey, input)).json();
 
-    if (callback && callback instanceof Function) {
+    if (callback && callback instanceof Function && json instanceof Array) {
       callback(
         new PRPCResponse<any>(json, {
           channel: parseChannelName(channel_name),
