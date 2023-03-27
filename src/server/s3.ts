@@ -2,8 +2,8 @@ import { config, S3 } from "aws-sdk";
 import { env } from "../env/server.mjs";
 
 config.update({
-  accessKeyId: process.env.AWS_ACCESS_KEY,
-  secretAccessKey: process.env.AWS_SECRET_KEY,
+  accessKeyId: process.env.AWS_ACCESSKEY,
+  secretAccessKey: process.env.AWS_SECRETKEY,
   region: process.env.AWS_REGION,
   signatureVersion: "v4",
 });
@@ -16,8 +16,8 @@ declare global {
 export const s3 =
   global.s3 ||
   new S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY,
-    secretAccessKey: process.env.AWS_SECRET_KEY,
+    accessKeyId: process.env.AWS_ACCESSKEY,
+    secretAccessKey: process.env.AWS_SECRETKEY,
     region: process.env.AWS_REGION,
     signatureVersion: "v4",
   });
