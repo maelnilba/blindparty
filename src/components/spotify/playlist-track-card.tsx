@@ -1,7 +1,7 @@
 import { PauseIcon } from "@components/icons/pause";
 import { PlayIcon } from "@components/icons/play";
 import { Picture } from "@components/images/picture";
-import { Track } from "pages/dashboard/playlist/#types";
+import { Track } from "@components/playlist/types";
 
 type PlaylistTrackCardProps = {
   track: Track;

@@ -4,6 +4,7 @@ import {
   AlbumsPicture,
   useAlbumsPictureStore,
 } from "@components/playlist/albums-picture";
+import { Track } from "@components/playlist/types";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
@@ -16,7 +17,6 @@ import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
-import { Track } from "./#types";
 
 const createSchema = z.object({
   name: z.string().min(1),

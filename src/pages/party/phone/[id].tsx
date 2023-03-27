@@ -2,6 +2,7 @@ import { Divider } from "@components/elements/divider";
 import { MicroIcon } from "@components/icons/micro";
 import { Picture } from "@components/images/picture";
 import { Modal } from "@components/modals/modal";
+import { TRACK_TIMER_MS } from "@components/party/constants";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useMicroPermission } from "@hooks/useMicroPermission";
 import { useVoiceDetector } from "@hooks/useVoiceDetector";
@@ -25,7 +26,6 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { exclude } from "..";
-import { TRACK_TIMER_MS } from "../#constant";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);

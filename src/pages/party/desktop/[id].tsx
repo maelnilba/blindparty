@@ -30,10 +30,14 @@ import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
-import { GUESS_MS, TRACK_TIMER_MS, VIEW_SCORE_MS } from "../#constant";
 import { Winner } from "@components/game/round/winner";
 import { Square } from "@components/elements/square-loader";
 import { Round } from "@components/game/round/round";
+import {
+  VIEW_SCORE_MS,
+  GUESS_MS,
+  TRACK_TIMER_MS,
+} from "@components/party/constants";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);

@@ -1,4 +1,5 @@
 import { FriendCard } from "@components/friend/friend-card";
+import { useInvitation } from "@components/friend/useInvitation";
 import { EnvelopeIcon } from "@components/icons/envelope";
 import { LockClosedIcon } from "@components/icons/lock-closed";
 import { PlusIcon } from "@components/icons/plus";
@@ -11,7 +12,6 @@ import { useDebounce } from "@hooks/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import { useSession } from "next-auth/react";
 import type { NextPage } from "next/types";
-import { useInvitation } from "./#hooks";
 
 const Friends: NextPage = () => {
   const { data: session } = useSession();

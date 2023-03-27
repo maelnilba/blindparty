@@ -1,4 +1,4 @@
-import { Playlist } from "pages/dashboard/playlist/#types";
+import { Playlist } from "@components/playlist/types";
 
 type PlaylistCardProps = {
   playlist: Playlist;

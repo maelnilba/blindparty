@@ -2,6 +2,7 @@ import { ClockIcon } from "@components/icons/clock";
 import { Picture } from "@components/images/picture";
 import { BlackScreen } from "@components/layout/blackscreen";
 import { GetLayoutThrough } from "@components/layout/layout";
+import { Track } from "@components/playlist/types";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useRelativeTime } from "@hooks/useRelativeTime";
@@ -9,7 +10,6 @@ import { api, RouterOutputs } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import type { NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
-import { Track } from "../#types";
 
 const PlaylistDiscover = ({
   playlist,

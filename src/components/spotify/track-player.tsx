@@ -2,10 +2,10 @@ import { PauseIcon } from "@components/icons/pause";
 import { PlayIcon } from "@components/icons/play";
 import { SpeakerIcon } from "@components/icons/speaker";
 import { Picture } from "@components/images/picture";
+import { Track } from "@components/playlist/types";
 import { usePrevious } from "@hooks/usePrevious";
 import { secondIntl } from "lib/helpers/date";
 import { useRouter } from "next/router";
-import { Track } from "pages/dashboard/playlist/#types";
 import {
   ComponentProps,
   createContext,
