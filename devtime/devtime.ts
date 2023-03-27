@@ -32,7 +32,7 @@ export class Timer {
       } else {
         fs.readFile(configPath, "utf8", (err, data) => {
           if (err) throw err;
-          const config = JSON.parse(data);
+          const config = JSON.parse(data) as Config;
           this._config = config;
         });
 
@@ -45,7 +45,7 @@ export class Timer {
               if (err) throw err;
             });
           } else {
-            const db = JSON.parse(data);
+            const db = JSON.parse(data) as DB;
             if (!db[this._config.name]) {
               this.db = { ...db, [this._config.name]: [] };
             } else {
