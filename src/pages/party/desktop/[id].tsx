@@ -236,6 +236,7 @@ const Party: NextPage<
       bind("start", () => {
         round();
       });
+
       bind("pusher:member_removed", (member) => {
         if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
           setJoineds((joineds) => {

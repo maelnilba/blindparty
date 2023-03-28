@@ -43,10 +43,10 @@ export class PRPCPusher<
     );
 
     if (eventName) {
-      this.pusher.trigger(channel, eventName, data);
+      await this.pusher.trigger(channel, eventName, data);
       return;
     }
-    this.pusher.trigger(channel, this.channel_event!, data);
+    await this.pusher.trigger(channel, this.channel_event!, data);
     return {
       result: data,
       from: {
