@@ -28,7 +28,7 @@ export const usePRPCContext = (props: any) => {
     log?: boolean;
   };
 
-  Pusher.logToConsole = !Pusher.logToConsole && !!log;
+  Pusher.logToConsole = true;
 
   const auth = useRef<Record<string, string>>({});
   const pusher = useRef<Pusher | undefined>();

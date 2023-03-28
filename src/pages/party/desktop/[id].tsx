@@ -319,7 +319,7 @@ const Party: NextPage<
       });
 
       return () => {
-        // unbind_all();
+        unbind_all();
       };
     },
     [game]
