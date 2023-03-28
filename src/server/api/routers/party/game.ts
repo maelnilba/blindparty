@@ -47,7 +47,10 @@ export const gameRouter = createTRPCRouter({
           },
         });
       }
-      return ctx.pusher.trigger({ joined: input.joined, user: input.prpc.me });
+      return await ctx.pusher.trigger({
+        joined: input.joined,
+        user: input.prpc.me,
+      });
     }),
   "host-leave": prpc.game.trigger(async ({ ctx, input }) => {
     const leaved = Object.values(input.prpc.members).every(
@@ -95,7 +98,7 @@ export const gameRouter = createTRPCRouter({
         },
       });
 
-      return ctx.pusher.trigger({ id: input.id });
+      return await ctx.pusher.trigger({ id: input.id });
     }),
   ban: prpc.game
     .use(enforceUserIsHost)
@@ -127,7 +130,7 @@ export const gameRouter = createTRPCRouter({
       },
     });
 
-    return ctx.pusher.trigger({ running: !!party });
+    return await ctx.pusher.trigger({ running: !!party });
   }),
   over: prpc.game.use(enforceUserIsHost).trigger(async ({ ctx, input }) => {
     await ctx.prisma.party.updateMany({
@@ -194,7 +197,7 @@ export const gameRouter = createTRPCRouter({
       },
     });
 
-    return ctx.pusher.trigger({ track: track.track, name: trackname });
+    return await ctx.pusher.trigger({ track: track.track, name: trackname });
   }),
   round: prpc.game
     .use(enforceUserIsHost)
@@ -237,7 +240,7 @@ export const gameRouter = createTRPCRouter({
       if (!party) throw new TRPCError({ code: "UNAUTHORIZED" });
 
       if (party.round + 1 > party.max_round) {
-        ctx.pusher.trigger({}, "over");
+        await ctx.pusher.trigger({}, "over");
         throw new TRPCError({ code: "CONFLICT" });
       }
 
@@ -264,7 +267,7 @@ export const gameRouter = createTRPCRouter({
         },
       });
 
-      return ctx.pusher.trigger({ track: track });
+      return await ctx.pusher.trigger({ track: track });
     }),
   guess: prpc.game
     .data(z.object({ guess: z.string() }))
@@ -399,7 +402,7 @@ export const gameRouter = createTRPCRouter({
           },
         });
 
-        return ctx.pusher.trigger({
+        return await ctx.pusher.trigger({
           players: points.players,
           name: trackname,
           winner: points.players.find((p) => p.user.id === ctx.session.user.id),
