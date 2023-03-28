@@ -234,7 +234,7 @@ const Party: NextPage<
       let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
 
       bind("start", () => {
-        console.log("start");
+        round();
       });
       bind("pusher:member_removed", (member) => {
         if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
@@ -368,7 +368,6 @@ const Party: NextPage<
       if (!error && result?.running) {
         setGame("RUNNING");
         message("start", true);
-        round();
       }
     });
   };
