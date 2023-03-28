@@ -230,194 +230,106 @@ const Party: NextPage<
         isHost: isHost,
       },
     },
-    () => {}
-    //   let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
+    () => {
+      let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
 
-    //   bind("pusher:member_removed", (member) => {
-    //     if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
-    //       setJoineds((joineds) => {
-    //         if (joineds.has(member.info.id)) {
-    //           joineds.delete(member.info.id);
-    //         }
-    //         return new Set(joineds);
-    //       });
-    //       send("leave", { id: member.info.id });
-    //     }
-    //   });
+      bind("start", () => {
+        console.log("start");
+      });
+      bind("pusher:member_removed", (member) => {
+        if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
+          setJoineds((joineds) => {
+            if (joineds.has(member.info.id)) {
+              joineds.delete(member.info.id);
+            }
+            return new Set(joineds);
+          });
+          send("leave", { id: member.info.id });
+        }
+      });
 
-    //   bind("join", ({ joined, user }) => {
-    //     setJoineds((joineds) => {
-    //       if (joined) {
-    //         joineds.add(user.info.id);
-    //       } else {
-    //         joineds.delete(user.info.id);
-    //       }
-    //       return new Set(joineds);
-    //     });
-    //   });
+      bind("join", ({ joined, user }) => {
+        setJoineds((joineds) => {
+          if (joined) {
+            joineds.add(user.info.id);
+          } else {
+            joineds.delete(user.info.id);
+          }
+          return new Set(joineds);
+        });
+      });
 
-    //   let ok = true; // avoid calling round multiple time
-    //   bind("guess", async (data) => {
-    //     if (!data) return;
-    //     if (!ok) return;
-    //     const { players, name } = data;
+      let ok = true; // avoid calling round multiple time
+      bind("guess", async (data) => {
+        if (!data) return;
+        if (!ok) return;
+        const { players, name } = data;
 
-    //     if (timer.current) {
-    //       clearInterval(timer.current);
-    //       timer.current = null;
-    //     }
+        if (timer.current) {
+          clearInterval(timer.current);
+          timer.current = null;
+        }
 
-    //     setView("SCORE");
-    //     setWinner(data.winner);
-    //     setScores(players);
-    //     setItwas(name);
-    //     ok = false;
-    //     await sleep(VIEW_SCORE_MS);
-    //     ok = true;
-    //     setRoundCount((c) => c + 1);
-    //     round([..._tracks]);
-    //   });
+        setView("SCORE");
+        setWinner(data.winner);
+        setScores(players);
+        setItwas(name);
+        ok = false;
+        await sleep(VIEW_SCORE_MS);
+        ok = true;
+        setRoundCount((c) => c + 1);
+        round([..._tracks]);
+      });
 
-    //   bind("next", async ({ name, track }) => {
-    //     if (timer.current) {
-    //       clearInterval(timer.current);
-    //       timer.current = null;
-    //     }
-    //     _tracks.add(track.id);
+      bind("next", async ({ name, track }) => {
+        if (timer.current) {
+          clearInterval(timer.current);
+          timer.current = null;
+        }
+        _tracks.add(track.id);
 
-    //     setTracks([..._tracks]);
-    //     setView("SCORE");
-    //     setWinner(null);
-    //     setItwas(name);
+        setTracks([..._tracks]);
+        setView("SCORE");
+        setWinner(null);
+        setItwas(name);
 
-    //     await sleep(VIEW_SCORE_MS);
-    //     setRoundCount((c) => c + 1);
-    //     round([..._tracks]);
-    //   });
+        await sleep(VIEW_SCORE_MS);
+        setRoundCount((c) => c + 1);
+        round([..._tracks]);
+      });
 
-    //   bind("round", ({ track }) => {
-    //     if (!track) {
-    //       return;
-    //     }
+      bind("round", ({ track }) => {
+        if (!track) {
+          return;
+        }
 
-    //     setView("GUESS");
-    //     setItwas(null);
+        setView("GUESS");
+        setItwas(null);
 
-    //     _tracks.add(track.id);
-    //     setTracks([..._tracks]);
-    //     setTrack({ track });
+        _tracks.add(track.id);
+        setTracks([..._tracks]);
+        setTrack({ track });
 
-    //     timer.current = setTimeout(
-    //       () => send("next"),
-    //       GUESS_MS + TRACK_TIMER_MS + ONE_SECOND_IN_MS
-    //     );
-    //   });
+        timer.current = setTimeout(
+          () => send("next"),
+          GUESS_MS + TRACK_TIMER_MS + ONE_SECOND_IN_MS
+        );
+      });
 
-    //   bind("over", () => {
-    //     setView("NONE");
-    //     setGame("ENDED");
-    //   });
+      bind("over", () => {
+        setView("NONE");
+        setGame("ENDED");
+      });
 
-    //   return () => {
-    //     unbind_all();
-    //   };
-    // },
-    // [game]
+      return () => {
+        unbind_all();
+      };
+    },
+    [game]
   );
 
   useEffect(() => {
     if (!isSubscribe) return;
-
-    let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
-
-    bind("pusher:member_removed", (member) => {
-      if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
-        setJoineds((joineds) => {
-          if (joineds.has(member.info.id)) {
-            joineds.delete(member.info.id);
-          }
-          return new Set(joineds);
-        });
-        send("leave", { id: member.info.id });
-      }
-    });
-
-    bind("join", ({ joined, user }) => {
-      setJoineds((joineds) => {
-        if (joined) {
-          joineds.add(user.info.id);
-        } else {
-          joineds.delete(user.info.id);
-        }
-        return new Set(joineds);
-      });
-    });
-
-    let ok = true; // avoid calling round multiple time
-    bind("guess", async (data) => {
-      if (!data) return;
-      if (!ok) return;
-      const { players, name } = data;
-
-      if (timer.current) {
-        clearInterval(timer.current);
-        timer.current = null;
-      }
-
-      setView("SCORE");
-      setWinner(data.winner);
-      setScores(players);
-      setItwas(name);
-      ok = false;
-      await sleep(VIEW_SCORE_MS);
-      ok = true;
-      setRoundCount((c) => c + 1);
-      round([..._tracks]);
-    });
-
-    bind("next", async ({ name, track }) => {
-      if (timer.current) {
-        clearInterval(timer.current);
-        timer.current = null;
-      }
-      _tracks.add(track.id);
-
-      setTracks([..._tracks]);
-      setView("SCORE");
-      setWinner(null);
-      setItwas(name);
-
-      await sleep(VIEW_SCORE_MS);
-      setRoundCount((c) => c + 1);
-      round([..._tracks]);
-    });
-
-    bind("round", ({ track }) => {
-      if (!track) {
-        return;
-      }
-
-      setView("GUESS");
-      setItwas(null);
-
-      _tracks.add(track.id);
-      setTracks([..._tracks]);
-      setTrack({ track });
-
-      timer.current = setTimeout(
-        () => send("next"),
-        GUESS_MS + TRACK_TIMER_MS + ONE_SECOND_IN_MS
-      );
-    });
-
-    bind("over", () => {
-      setView("NONE");
-      setGame("ENDED");
-    });
-
-    return () => {
-      unbind_all();
-    };
   }, [isSubscribe]);
 
   const location = useWindowLocation();

@@ -3,7 +3,6 @@ import { PRPCRouter } from "server/api/prpc";
 import { AppRouter } from "../server/api/root";
 import { api } from "./api";
 
-const ap = api.party;
 export const prpc = createPRPCNext<AppRouter["party"], PRPCRouter>(api.party, {
   app_key: process.env.NEXT_PUBLIC_PUSHER_KEY!,
   options: {
