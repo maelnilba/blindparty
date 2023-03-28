@@ -21,6 +21,7 @@ import {
   TRPCRouterEvent,
 } from "./types";
 import { usePRPC } from "./usePRPCContext";
+import { listen, mute } from "./ws-interceptor";
 
 export function useConnect<
   TPresence extends boolean = true,
@@ -125,15 +126,15 @@ export function useConnect<
 
   useEffect(() => {
     // @TODO Find a proper way to get back socket_id
-    // listen((data: { event: string; data: any }) => {
-    //   if (data.event === "pusher:connection_established") {
-    //     socket_id.current = data.data.socket_id;
-    //     mute();
-    //   }
-    // });
+    listen((data: { event: string; data: any }) => {
+      if (data.event === "pusher:connection_established") {
+        socket_id.current = data.data.socket_id;
+        mute();
+      }
+    });
 
     return () => {
-      // mute();
+      mute();
     };
   }, []);
 
