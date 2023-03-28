@@ -10,5 +10,5 @@ export const prpc = createPRPCNext<AppRouter["party"], PRPCRouter>(api.party, {
     authEndpoint: "/api/prpc/",
     cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!,
   },
-  log: process.env.NODE_ENV !== "production" && typeof window !== "undefined",
+  log: true, //process.env.NODE_ENV !== "production" && typeof window !== "undefined",
 });
