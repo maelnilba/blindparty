@@ -222,7 +222,7 @@ const Party: NextPage<
     };
   }, [ready, game]);
 
-  const { send, bind, members, unbind_all } = prpc.game.useConnect(
+  const { send, bind, members, unbind_all, isSubscribe } = prpc.game.useConnect(
     party.id,
     {
       subscribeOnMount: true,
@@ -230,100 +230,195 @@ const Party: NextPage<
         isHost: isHost,
       },
     },
-    () => {
-      let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
+    () => {}
+    //   let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
 
-      bind("pusher:member_removed", (member) => {
-        if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
-          setJoineds((joineds) => {
-            if (joineds.has(member.info.id)) {
-              joineds.delete(member.info.id);
-            }
-            return new Set(joineds);
-          });
-          send("leave", { id: member.info.id });
-        }
-      });
+    //   bind("pusher:member_removed", (member) => {
+    //     if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
+    //       setJoineds((joineds) => {
+    //         if (joineds.has(member.info.id)) {
+    //           joineds.delete(member.info.id);
+    //         }
+    //         return new Set(joineds);
+    //       });
+    //       send("leave", { id: member.info.id });
+    //     }
+    //   });
 
-      bind("join", ({ joined, user }) => {
+    //   bind("join", ({ joined, user }) => {
+    //     setJoineds((joineds) => {
+    //       if (joined) {
+    //         joineds.add(user.info.id);
+    //       } else {
+    //         joineds.delete(user.info.id);
+    //       }
+    //       return new Set(joineds);
+    //     });
+    //   });
+
+    //   let ok = true; // avoid calling round multiple time
+    //   bind("guess", async (data) => {
+    //     if (!data) return;
+    //     if (!ok) return;
+    //     const { players, name } = data;
+
+    //     if (timer.current) {
+    //       clearInterval(timer.current);
+    //       timer.current = null;
+    //     }
+
+    //     setView("SCORE");
+    //     setWinner(data.winner);
+    //     setScores(players);
+    //     setItwas(name);
+    //     ok = false;
+    //     await sleep(VIEW_SCORE_MS);
+    //     ok = true;
+    //     setRoundCount((c) => c + 1);
+    //     round([..._tracks]);
+    //   });
+
+    //   bind("next", async ({ name, track }) => {
+    //     if (timer.current) {
+    //       clearInterval(timer.current);
+    //       timer.current = null;
+    //     }
+    //     _tracks.add(track.id);
+
+    //     setTracks([..._tracks]);
+    //     setView("SCORE");
+    //     setWinner(null);
+    //     setItwas(name);
+
+    //     await sleep(VIEW_SCORE_MS);
+    //     setRoundCount((c) => c + 1);
+    //     round([..._tracks]);
+    //   });
+
+    //   bind("round", ({ track }) => {
+    //     if (!track) {
+    //       return;
+    //     }
+
+    //     setView("GUESS");
+    //     setItwas(null);
+
+    //     _tracks.add(track.id);
+    //     setTracks([..._tracks]);
+    //     setTrack({ track });
+
+    //     timer.current = setTimeout(
+    //       () => send("next"),
+    //       GUESS_MS + TRACK_TIMER_MS + ONE_SECOND_IN_MS
+    //     );
+    //   });
+
+    //   bind("over", () => {
+    //     setView("NONE");
+    //     setGame("ENDED");
+    //   });
+
+    //   return () => {
+    //     unbind_all();
+    //   };
+    // },
+    // [game]
+  );
+
+  useEffect(() => {
+    if (!isSubscribe) return;
+
+    let _tracks: Set<string> = new Set(); // Handle useEffect so state is not updated here
+
+    bind("pusher:member_removed", (member) => {
+      if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
         setJoineds((joineds) => {
-          if (joined) {
-            joineds.add(user.info.id);
-          } else {
-            joineds.delete(user.info.id);
+          if (joineds.has(member.info.id)) {
+            joineds.delete(member.info.id);
           }
           return new Set(joineds);
         });
-      });
+        send("leave", { id: member.info.id });
+      }
+    });
 
-      let ok = true; // avoid calling round multiple time
-      bind("guess", async (data) => {
-        if (!data) return;
-        if (!ok) return;
-        const { players, name } = data;
-
-        if (timer.current) {
-          clearInterval(timer.current);
-          timer.current = null;
+    bind("join", ({ joined, user }) => {
+      setJoineds((joineds) => {
+        if (joined) {
+          joineds.add(user.info.id);
+        } else {
+          joineds.delete(user.info.id);
         }
-
-        setView("SCORE");
-        setWinner(data.winner);
-        setScores(players);
-        setItwas(name);
-        ok = false;
-        await sleep(VIEW_SCORE_MS);
-        ok = true;
-        setRoundCount((c) => c + 1);
-        round([..._tracks]);
+        return new Set(joineds);
       });
+    });
 
-      bind("next", async ({ name, track }) => {
-        if (timer.current) {
-          clearInterval(timer.current);
-          timer.current = null;
-        }
-        _tracks.add(track.id);
+    let ok = true; // avoid calling round multiple time
+    bind("guess", async (data) => {
+      if (!data) return;
+      if (!ok) return;
+      const { players, name } = data;
 
-        setTracks([..._tracks]);
-        setView("SCORE");
-        setWinner(null);
-        setItwas(name);
+      if (timer.current) {
+        clearInterval(timer.current);
+        timer.current = null;
+      }
 
-        await sleep(VIEW_SCORE_MS);
-        setRoundCount((c) => c + 1);
-        round([..._tracks]);
-      });
+      setView("SCORE");
+      setWinner(data.winner);
+      setScores(players);
+      setItwas(name);
+      ok = false;
+      await sleep(VIEW_SCORE_MS);
+      ok = true;
+      setRoundCount((c) => c + 1);
+      round([..._tracks]);
+    });
 
-      bind("round", ({ track }) => {
-        if (!track) {
-          return;
-        }
+    bind("next", async ({ name, track }) => {
+      if (timer.current) {
+        clearInterval(timer.current);
+        timer.current = null;
+      }
+      _tracks.add(track.id);
 
-        setView("GUESS");
-        setItwas(null);
+      setTracks([..._tracks]);
+      setView("SCORE");
+      setWinner(null);
+      setItwas(name);
 
-        _tracks.add(track.id);
-        setTracks([..._tracks]);
-        setTrack({ track });
+      await sleep(VIEW_SCORE_MS);
+      setRoundCount((c) => c + 1);
+      round([..._tracks]);
+    });
 
-        timer.current = setTimeout(
-          () => send("next"),
-          GUESS_MS + TRACK_TIMER_MS + ONE_SECOND_IN_MS
-        );
-      });
+    bind("round", ({ track }) => {
+      if (!track) {
+        return;
+      }
 
-      bind("over", () => {
-        setView("NONE");
-        setGame("ENDED");
-      });
+      setView("GUESS");
+      setItwas(null);
 
-      return () => {
-        unbind_all();
-      };
-    },
-    [game]
-  );
+      _tracks.add(track.id);
+      setTracks([..._tracks]);
+      setTrack({ track });
+
+      timer.current = setTimeout(
+        () => send("next"),
+        GUESS_MS + TRACK_TIMER_MS + ONE_SECOND_IN_MS
+      );
+    });
+
+    bind("over", () => {
+      setView("NONE");
+      setGame("ENDED");
+    });
+
+    return () => {
+      unbind_all();
+    };
+  }, [isSubscribe]);
 
   const location = useWindowLocation();
   // @TODO: Fix connected UI ?
