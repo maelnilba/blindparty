@@ -27,6 +27,12 @@ const config = {
       {
         hostname: "localhost",
       },
+      {
+        protocol: "https",
+        hostname: "blind.nib.gg",
+        port: "",
+        pathname: "/party/desktop/**",
+      },
     ],
   },
   eslint: {

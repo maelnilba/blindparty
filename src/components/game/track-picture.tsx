@@ -12,6 +12,12 @@ const validator = createQueryValidator(
   })
 );
 
+const getBaseUrl = () => {
+  if (typeof window !== "undefined") return window.origin; // browser should use relative url
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
+  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
+};
+
 export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
   const image = track?.album.images.filter((i) => i.url).at(0) ?? { url: "" };
   const url = validator.createSearchURL({
@@ -19,7 +25,7 @@ export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
     blur: 36,
   });
 
-  const apiUrl = `http://localhost:3000/api/og/blur${url}`;
+  const apiUrl = `${getBaseUrl()}/api/og/blur${url}`;
 
   return (
     <Image
