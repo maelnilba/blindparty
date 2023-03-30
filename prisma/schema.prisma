@@ -137,33 +137,12 @@ model Track {
     name           String
     picture        String?
     preview_url    String?
-    album          Album      @relation(fields: [albumId], references: [id])
-    albumId        String
-    artists        Artist[]
+    album          String
+    artists        String[]
+    images         String[]
     playlist       Playlist[]
     playingInParty Party[]    @relation(name: "current")
     party          Party[]
-}
-
-model Album {
-    id     String       @id
-    name   String
-    images AlbumImage[]
-    tracks Track[]
-}
-
-model Artist {
-    id     String  @id
-    name   String
-    tracks Track[]
-}
-
-model AlbumImage {
-    url     String  @id
-    width   Int
-    height  Int
-    album   Album?  @relation(fields: [albumId], references: [id])
-    albumId String?
 }
 
 //

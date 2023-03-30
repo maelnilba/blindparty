@@ -144,16 +144,12 @@ const PlaylistEdit = () => {
         name: track.name,
         preview_url: track.preview_url!,
         album: {
-          id: track.album.id,
           name: track.album.name,
           images: track.album.images.map((image) => ({
             url: image.url,
-            height: image.height || 1,
-            width: image.width || 1,
           })),
         },
         artists: track.artists.map((artist) => ({
-          id: artist.id,
           name: artist.name,
         })),
       }));

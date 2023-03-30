@@ -126,14 +126,13 @@ export const PlaylistTrackInfoCard = ({
         </div>
       </div>
       <div className="col-span-4 flex items-center gap-4">
-        <Picture identifier={track.album.images?.[0]?.url}>
+        <Picture identifier={image?.url}>
           <picture
             aria-label={`track picture of ${track.album.name}`}
             className="flex h-12 w-12 select-none items-center justify-center rounded border-gray-800 transition-all duration-75 group-hover/item:scale-105"
             style={{
               cursor: onPlay && "pointer",
-              backgroundImage:
-                image?.url && `url('${track.album.images?.[0]?.url}')`,
+              backgroundImage: image?.url && `url('${image?.url}')`,
               backgroundRepeat: "no-repeat",
               backgroundSize: "contain",
             }}

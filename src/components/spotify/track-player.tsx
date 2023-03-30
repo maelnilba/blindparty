@@ -220,6 +220,8 @@ export const TrackPlayer = ({
     };
   }, [playing]);
 
+  const image = track?.album.images[0];
+
   return (
     <TrackPlayerContext.Provider value={value}>
       {children}
@@ -230,13 +232,10 @@ export const TrackPlayer = ({
       >
         <div className="grid w-full grid-cols-12 border-t-2 border-gray-800 p-2">
           <div className="col-span-3 flex items-center justify-center gap-4 px-[1.75rem]">
-            <Picture
-              className="group/image relative"
-              identifier={track?.album.images[0]?.url}
-            >
+            <Picture className="group/image relative" identifier={image?.url}>
               <img
                 alt={`track picture of ${track?.name}`}
-                src={track?.album.images[0]?.url}
+                src={image?.url}
                 className="h-12 w-12 rounded border-gray-800 object-cover transition-all duration-75 group-hover/item:scale-105 group-hover/image:opacity-75"
               />
             </Picture>
