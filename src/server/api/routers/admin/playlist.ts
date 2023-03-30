@@ -1,5 +1,6 @@
 import { protectedAdminProcedure } from "@server/api/trpc";
 import { pictureLink } from "@server/s3";
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter } from "../../trpc";
 
@@ -18,19 +19,15 @@ export const playlistRouter = createTRPCRouter({
               name: z.string(),
               preview_url: z.string().url().nullable(),
               album: z.object({
-                id: z.string(),
                 name: z.string(),
                 images: z.array(
                   z.object({
                     url: z.string().url(),
-                    width: z.number().positive(),
-                    height: z.number().positive(),
                   })
                 ),
               }),
               artists: z.array(
                 z.object({
-                  id: z.string(),
                   name: z.string(),
                 })
               ),
@@ -59,41 +56,9 @@ export const playlistRouter = createTRPCRouter({
                 id: track.id,
                 name: track.name,
                 preview_url: track.preview_url ?? undefined,
-                album: {
-                  connectOrCreate: {
-                    where: {
-                      id: track.album.id,
-                    },
-                    create: {
-                      id: track.album.id,
-                      name: track.album.name,
-                      images: {
-                        connectOrCreate: track.album.images.map((image) => ({
-                          create: {
-                            url: image.url,
-                            width: image.width,
-                            height: image.height,
-                          },
-                          where: {
-                            url: image.url,
-                          },
-                        })),
-                      },
-                    },
-                  },
-                },
-                artists: {
-                  connectOrCreate:
-                    track.artists.map((artist) => ({
-                      create: {
-                        id: artist.id,
-                        name: artist.name,
-                      },
-                      where: {
-                        id: artist.id,
-                      },
-                    })) ?? [],
-                },
+                album: track.album.name,
+                artists: track.artists.map((artist) => artist.name),
+                images: track.album.images.map((image) => image.url),
               },
             })),
           },
@@ -115,19 +80,15 @@ export const playlistRouter = createTRPCRouter({
               name: z.string(),
               preview_url: z.string().url().nullable(),
               album: z.object({
-                id: z.string(),
                 name: z.string(),
                 images: z.array(
                   z.object({
                     url: z.string().url(),
-                    width: z.number().positive(),
-                    height: z.number().positive(),
                   })
                 ),
               }),
               artists: z.array(
                 z.object({
-                  id: z.string(),
                   name: z.string(),
                 })
               ),
@@ -162,41 +123,9 @@ export const playlistRouter = createTRPCRouter({
                 id: track.id,
                 name: track.name,
                 preview_url: track.preview_url ?? undefined,
-                album: {
-                  connectOrCreate: {
-                    where: {
-                      id: track.album.id,
-                    },
-                    create: {
-                      id: track.album.id,
-                      name: track.album.name,
-                      images: {
-                        connectOrCreate: track.album.images.map((image) => ({
-                          create: {
-                            url: image.url,
-                            width: image.width,
-                            height: image.height,
-                          },
-                          where: {
-                            url: image.url,
-                          },
-                        })),
-                      },
-                    },
-                  },
-                },
-                artists: {
-                  connectOrCreate:
-                    track.artists.map((artist) => ({
-                      create: {
-                        id: artist.id,
-                        name: artist.name,
-                      },
-                      where: {
-                        id: artist.id,
-                      },
-                    })) ?? [],
-                },
+                album: track.album.name,
+                artists: track.artists.map((artist) => artist.name),
+                images: track.album.images.map((image) => image.url),
               },
             })),
           },
@@ -218,49 +147,79 @@ export const playlistRouter = createTRPCRouter({
       });
     }),
   get_all: protectedAdminProcedure.query(async ({ ctx }) => {
-    return ctx.prisma.playlist.findMany({
-      where: {
-        public: true,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        _count: true,
-        tracks: {
-          take: 10,
-          include: {
-            album: {
-              include: {
-                images: true,
-              },
+    return (
+      await ctx.prisma.playlist.findMany({
+        where: {
+          public: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        include: {
+          _count: true,
+          tracks: {
+            take: 10,
+            select: {
+              id: true,
+              name: true,
+              preview_url: true,
+              album: true,
+              images: true,
+              artists: true,
             },
-            artists: true,
           },
         },
-      },
-    });
+      })
+    ).map((playlist) => ({
+      ...playlist,
+      tracks: playlist.tracks.map((track) => ({
+        ...track,
+        album: {
+          name: track.album,
+          images: track.images.map((image) => ({
+            url: image,
+          })),
+        },
+        artists: track.artists.map((artist) => ({ name: artist })),
+      })),
+    }));
   }),
   get_playlist: protectedAdminProcedure
     .input(z.object({ id: z.string().cuid() }))
     .query(async ({ ctx, input }) => {
-      return ctx.prisma.playlist.findFirst({
+      const playlist = await ctx.prisma.playlist.findFirst({
         where: {
           id: input.id,
           public: true,
         },
         include: {
           tracks: {
-            include: {
-              album: {
-                include: {
-                  images: true,
-                },
-              },
+            select: {
+              id: true,
+              name: true,
+              preview_url: true,
+              album: true,
+              images: true,
               artists: true,
             },
           },
         },
       });
+
+      if (!playlist) throw new TRPCError({ code: "NOT_FOUND" });
+
+      return {
+        ...playlist,
+        tracks: playlist?.tracks.map((track) => ({
+          ...track,
+          album: {
+            name: track.album,
+            images: track.images.map((image) => ({
+              url: image,
+            })),
+          },
+          artists: track.artists.map((artist) => ({ name: artist })),
+        })),
+      };
     }),
 });

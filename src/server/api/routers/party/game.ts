@@ -159,16 +159,8 @@ export const gameRouter = createTRPCRouter({
         track: {
           select: {
             id: true,
-            album: {
-              select: {
-                name: true,
-              },
-            },
-            artists: {
-              select: {
-                name: true,
-              },
-            },
+            album: true,
+            artists: true,
             name: true,
           },
         },
@@ -179,8 +171,8 @@ export const gameRouter = createTRPCRouter({
 
     const trackname = [
       track.track.name,
-      track.track.artists[0]?.name,
-      track.track.album.name,
+      track.track.artists[0],
+      track.track.album,
     ]
       .filter((v) => Boolean(v))
       .join(" - ");
@@ -219,17 +211,7 @@ export const gameRouter = createTRPCRouter({
           round: true,
           tracks: {
             select: {
-              album: {
-                select: {
-                  images: {
-                    select: {
-                      url: true,
-                      width: true,
-                      height: true,
-                    },
-                  },
-                },
-              },
+              images: true,
               preview_url: true,
               id: true,
             },
@@ -267,7 +249,12 @@ export const gameRouter = createTRPCRouter({
         },
       });
 
-      return await ctx.pusher.trigger({ track: track });
+      return await ctx.pusher.trigger({
+        track: {
+          ...track,
+          images: track.images.map((image) => ({ url: image })),
+        },
+      });
     }),
   guess: prpc.game
     .data(z.object({ guess: z.string() }))
@@ -281,16 +268,9 @@ export const gameRouter = createTRPCRouter({
           view: true,
           track: {
             select: {
-              album: {
-                select: {
-                  name: true,
-                },
-              },
-              artists: {
-                select: {
-                  name: true,
-                },
-              },
+              album: true,
+              images: true,
+              artists: true,
               name: true,
             },
           },
@@ -305,16 +285,14 @@ export const gameRouter = createTRPCRouter({
 
       const trackname = [
         party.track.name,
-        party.track.artists[0]?.name,
-        party.track.album.name,
+        party.track.artists[0],
+        party.track.album,
       ]
         .filter((v) => Boolean(v))
         .join(" - ");
 
-      const album = party.track.album.name.toLocaleLowerCase();
-      const artists = party.track.artists.map((a) =>
-        a.name.toLocaleLowerCase()
-      );
+      const album = party.track.album.toLocaleLowerCase();
+      const artists = party.track.artists.map((a) => a.toLocaleLowerCase());
       const name = party.track.name.toLocaleLowerCase();
 
       const toGuessA = [

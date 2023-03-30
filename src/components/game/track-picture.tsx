@@ -19,7 +19,7 @@ const getBaseUrl = () => {
 };
 
 export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
-  const image = track?.album.images.filter((i) => i.url).at(0) ?? { url: "" };
+  const image = track?.images.filter((i) => i.url).at(0) ?? { url: "" };
   const url = validator.createSearchURL({
     src: image.url.split("").reverse().join(""),
     blur: 36,
@@ -43,7 +43,7 @@ export const TrackPicture = ({
   track,
   ...props
 }: TrackPictureProps & Omit<ComponentProps<"img">, "src" | "srcSet">) => {
-  const image = track?.album.images.filter((i) => i.url).at(0);
+  const image = track?.images.filter((i) => i.url).at(0);
 
   return <img {...props} src={image?.url} />;
 };

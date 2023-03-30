@@ -88,12 +88,12 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
       tracks: {
         take: 10,
-        include: {
-          album: {
-            include: {
-              images: true,
-            },
-          },
+        select: {
+          id: true,
+          name: true,
+          preview_url: true,
+          album: true,
+          images: true,
           artists: true,
         },
       },
