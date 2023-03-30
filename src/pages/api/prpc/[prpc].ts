@@ -7,7 +7,14 @@ import { env } from "../../../env/server.mjs";
 
 const webhooks = createNextWehbookApiHandler<typeof prpc>({
   existence: async (data, ctx) => {
-    console.log("exists");
+    if (data.name === "channel_vacated") {
+      await ctx.prisma.party.update({
+        where: { id: data.channel.id },
+        data: {
+          status: "CANCELED",
+        },
+      });
+    }
   },
 });
 
