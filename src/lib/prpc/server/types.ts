@@ -210,7 +210,7 @@ export type NextApiWebhookHandler<
       channel: Channel;
     },
     ctx: PRPCRouterContext<PRPCRouter> & { pusher: Pusher }
-  ) => void;
+  ) => void | Promise<void>;
   presence?: (
     data: {
       name: "member_added" | "member_removed";
@@ -218,7 +218,7 @@ export type NextApiWebhookHandler<
       user_id: string;
     },
     ctx: PRPCRouterContext<PRPCRouter> & { pusher: Pusher }
-  ) => void;
+  ) => void | Promise<void>;
   events?: (
     data: {
       name: string;
@@ -228,9 +228,9 @@ export type NextApiWebhookHandler<
       socket_id: string;
     },
     ctx: PRPCRouterContext<PRPCRouter> & { pusher: Pusher }
-  ) => void;
+  ) => void | Promise<void>;
   cache?: (
     data: { name: "cache_miss"; channel: Channel<"cache"> },
     ctx: PRPCRouterContext<PRPCRouter> & { pusher: Pusher }
-  ) => void;
+  ) => void | Promise<void>;
 };

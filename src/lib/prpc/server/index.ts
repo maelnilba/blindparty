@@ -96,7 +96,10 @@ export const createNextApiHandler: NextApiHandler = ({
         return;
 
       case "webhook":
-        if (!webhooks) return;
+        if (!webhooks) {
+          res.status(400).end();
+          return;
+        }
         const webhook = router._defs.pusher.webhook({
           headers: req.headers as any,
           rawBody: req.body,
@@ -108,6 +111,7 @@ export const createNextApiHandler: NextApiHandler = ({
               message: "The webhook headers are not valid",
               channel_name: "",
             });
+          res.status(400).end();
           return;
         }
 
@@ -124,7 +128,7 @@ export const createNextApiHandler: NextApiHandler = ({
                 event.name === "channel_vacated") &&
               webhooks.existence
             ) {
-              webhooks.existence({ ...event, channel: channel } as any, {
+              await webhooks.existence({ ...event, channel: channel } as any, {
                 ...ctx,
                 pusher: router._defs.pusher,
               });
@@ -136,7 +140,7 @@ export const createNextApiHandler: NextApiHandler = ({
                 event.name === "member_removed") &&
               webhooks.presence
             ) {
-              webhooks.presence({ ...event, channel: channel } as any, {
+              await webhooks.presence({ ...event, channel: channel } as any, {
                 ...ctx,
                 pusher: router._defs.pusher,
               });
@@ -144,7 +148,7 @@ export const createNextApiHandler: NextApiHandler = ({
             }
 
             if (event.name === "cache_miss" && webhooks.cache) {
-              webhooks.cache({ ...event, channel: channel } as any, {
+              await webhooks.cache({ ...event, channel: channel } as any, {
                 ...ctx,
                 pusher: router._defs.pusher,
               });
@@ -153,7 +157,7 @@ export const createNextApiHandler: NextApiHandler = ({
             }
 
             if (webhooks.events) {
-              webhooks.events({ ...event, channel: channel } as any, {
+              await webhooks.events({ ...event, channel: channel } as any, {
                 ...ctx,
                 pusher: router._defs.pusher,
               });
@@ -165,6 +169,7 @@ export const createNextApiHandler: NextApiHandler = ({
               message: "Error with webhook",
               channel_name: "",
             });
+          res.status(400).end();
         }
 
         return;
@@ -172,6 +177,7 @@ export const createNextApiHandler: NextApiHandler = ({
         res.status(400).end();
         break;
     }
+    res.status(400).end();
   };
 };
 

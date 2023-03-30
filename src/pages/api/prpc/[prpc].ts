@@ -6,7 +6,7 @@ import { prpc } from "@server/api/prpc";
 import { env } from "../../../env/server.mjs";
 
 const webhooks = createNextWehbookApiHandler<typeof prpc>({
-  existence: (data, ctx) => {
+  existence: async (data, ctx) => {
     console.log("exists");
   },
 });
