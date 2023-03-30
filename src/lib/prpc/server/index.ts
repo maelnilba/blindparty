@@ -163,6 +163,8 @@ export const createNextApiHandler: NextApiHandler = ({
               });
             }
           }
+
+          res.status(200).end();
         } catch (error) {
           onError &&
             onError({
@@ -177,7 +179,6 @@ export const createNextApiHandler: NextApiHandler = ({
         res.status(405).end();
         break;
     }
-    res.status(400).end();
   };
 };
 
