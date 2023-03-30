@@ -102,7 +102,7 @@ export const createNextApiHandler: NextApiHandler = ({
         }
         const webhook = router._defs.pusher.webhook({
           headers: req.headers as any,
-          rawBody: req.body,
+          rawBody: JSON.stringify(req.body),
         });
 
         if (!webhook.isValid()) {
