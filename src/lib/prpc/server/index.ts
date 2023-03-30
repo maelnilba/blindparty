@@ -97,7 +97,7 @@ export const createNextApiHandler: NextApiHandler = ({
 
       case "webhook":
         if (!webhooks) {
-          res.status(400).end();
+          res.status(401).end();
           return;
         }
         const webhook = router._defs.pusher.webhook({
@@ -111,7 +111,7 @@ export const createNextApiHandler: NextApiHandler = ({
               message: "The webhook headers are not valid",
               channel_name: "",
             });
-          res.status(400).end();
+          res.status(402).end();
           return;
         }
 
@@ -169,12 +169,12 @@ export const createNextApiHandler: NextApiHandler = ({
               message: "Error with webhook",
               channel_name: "",
             });
-          res.status(400).end();
+          res.status(403).end();
         }
 
         return;
       default:
-        res.status(400).end();
+        res.status(405).end();
         break;
     }
     res.status(400).end();
