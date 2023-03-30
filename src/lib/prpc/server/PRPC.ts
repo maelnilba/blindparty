@@ -21,7 +21,7 @@ export class PRPC<TConfig extends BuilderCreateParameters> {
     this.context = context;
   }
 
-  router<T extends PRPCRouter>(config: T) {
+  createPRPCRouter<T extends PRPCRouter>(config: T) {
     for (const name in config) {
       if (isChannelWithMember(config[name]!._defs.type)) {
         config[name] = new PRPCPresenceRouteTRPC(

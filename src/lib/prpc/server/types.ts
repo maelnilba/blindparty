@@ -7,7 +7,7 @@ import type {
 import type { NextApiRequest, NextApiResponse } from "next";
 import type Pusher from "pusher";
 import { z, type ZodObject, type ZodSchema } from "zod";
-import { ChannelType, ChannelWithMember } from "../shared/types";
+import { Channel, ChannelType, ChannelWithMember } from "../shared/types";
 import { PRPCPusher } from "./PRPCPusher";
 import { PRPCRouteBuilder } from "./PRPCRouteBuilder";
 import { PRPCPresenceRouteTRPC, PRPCPublicRouteTRPC } from "./PRPCRouteTRPC";
@@ -78,6 +78,17 @@ export type PRPCRouterProcedures<
       : never
     : never;
 };
+
+type PRPCRouterContext<TRouter extends PRPCRouterProcedures<any, any>> =
+  TRouter extends PRPCRouterProcedures<infer TBuilder, any>
+    ? {
+        [P in keyof TBuilder]: TBuilder[P] extends PRPCRouteBuilder<any, any>
+          ? TBuilder[P]["_defs"]["procedure"] extends ProcedureBuilder<any>
+            ? InferTRPCProcedureContext<TBuilder[P]["_defs"]["procedure"]>
+            : never
+          : never;
+      }[keyof TBuilder]
+    : never;
 
 export type PRPCPusherContext<
   TPresence extends boolean,
@@ -179,7 +190,47 @@ export type PRPCInternalRouter = {
     ctx: (opts: any) => Promise<any>;
   };
 };
-export type NextApiHandler = (args: {
-  router: PRPCRouterProcedures<any, any>;
+export type NextApiHandler = <
+  PRPCRouter extends PRPCRouterProcedures<any, any>
+>(args: {
+  router: PRPCRouter;
+  webhooks?: NextApiWebhookHandler<PRPCRouter>;
   onError?: (error: { message: string; channel_name: string }) => void;
 }) => void;
+
+export type NextApiWebhookHandler<
+  PRPCRouter extends PRPCRouterProcedures<any, any> = PRPCRouterProcedures<
+    any,
+    any
+  >
+> = {
+  existence?: (
+    data: {
+      name: "channel_occupied" | "channel_vacated";
+      channel: Channel;
+    },
+    ctx: PRPCRouterContext<PRPCRouter> & { pusher: Pusher }
+  ) => void;
+  presence?: (
+    data: {
+      name: "member_added" | "member_removed";
+      channel: Channel<"presence">;
+      user_id: string;
+    },
+    ctx: PRPCRouterContext<PRPCRouter> & { pusher: Pusher }
+  ) => void;
+  events?: (
+    data: {
+      name: string;
+      channel: Channel;
+      user_id: string;
+      data: unknown;
+      socket_id: string;
+    },
+    ctx: PRPCRouterContext<PRPCRouter> & { pusher: Pusher }
+  ) => void;
+  cache?: (
+    data: { name: "cache_miss"; channel: Channel<"cache"> },
+    ctx: PRPCRouterContext<PRPCRouter> & { pusher: Pusher }
+  ) => void;
+};

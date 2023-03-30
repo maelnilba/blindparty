@@ -18,7 +18,7 @@ const p = initPRPC.context().create({
   context: createTRPCContext,
 });
 
-export const prpc = p.router({
+export const prpc = p.createPRPCRouter({
   game: p
     .presenceRoute({
       procedure: protectedProcedure,

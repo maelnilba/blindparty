@@ -22,6 +22,12 @@ export type PusherEvent =
   | "pusher:presence_diff"
   | "pusher:client-event";
 
+export type Channel<T extends ChannelType = any> = {
+  id?: string;
+  channel: string;
+  type: T extends ChannelType ? T : string;
+};
+
 export type ResponseFrom = {
   channel?: {
     id?: string;

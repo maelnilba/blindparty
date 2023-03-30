@@ -183,3 +183,17 @@ export class PRPCResponse<T> {
     }
   }
 }
+
+export const querySchema = z.object({
+  prpc: z.enum(["auth", "webhook"]),
+});
+
+export const webhookSchema = z.object({
+  time_ms: z.number(),
+  events: z.array(
+    z.object({
+      name: z.string(),
+      channel: z.string(),
+    })
+  ),
+});
