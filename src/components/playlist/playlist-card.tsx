@@ -49,7 +49,7 @@ export const PlaylistCard = ({
           title={full_playlist?.name}
           options={{ titleCenter: true }}
         >
-          <button>
+          <button type="button">
             <ExpandIcon className="h-6 w-6 hover:scale-125" />
           </button>
           <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
