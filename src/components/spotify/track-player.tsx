@@ -1,3 +1,4 @@
+import { Slider } from "@components/elements/slider";
 import { PauseIcon } from "@components/icons/pause";
 import { PlayIcon } from "@components/icons/play";
 import { SpeakerIcon } from "@components/icons/speaker";
@@ -79,25 +80,24 @@ export const TrackPlayer = ({
   const volumewas = usePrevious(volume);
 
   const audio = useRef<HTMLAudioElement | null>(null);
-  const range = useRef<HTMLDivElement | null>(null);
+  const [range, setRange] = useState(0);
+  const moving = useRef(false);
   const currentTime = useRef<HTMLDivElement | null>(null);
   const trackTime = useRef<HTMLDivElement | null>(null);
 
   const timeupdate = useCallback(
     (e: Event) => {
-      const target = e.target as HTMLAudioElement;
-      const percent = 100 / (target.duration / target.currentTime);
+      if (moving.current) return;
 
-      if (range.current) {
-        range.current.style.width = percent.toFixed() + "%";
-      }
+      const target = e.target as HTMLAudioElement;
+      setRange(target.currentTime);
       if (!currentTime.current) return;
       currentTime.current.innerText = secondIntl(
         Math.floor(target.currentTime) + 1,
         "mm:ss"
       );
     },
-    [currentTime]
+    [currentTime, moving]
   );
 
   const ended = (e: Event) => {
@@ -146,6 +146,7 @@ export const TrackPlayer = ({
   const goto = (seconds: number) => {
     if (!audio.current) return;
     audio.current.currentTime = seconds;
+    setRange(seconds);
   };
 
   const value: TrackPlayerContext = {
@@ -289,24 +290,29 @@ export const TrackPlayer = ({
               <div className="min-w-[2rem] text-xs" ref={currentTime}>
                  
               </div>
-              <div className="relative h-2 flex-1 cursor-pointer rounded-lg border border-gray-800 bg-black">
-                <div className="flex">
-                  {Array(60)
-                    .fill(null)
-                    .map((_, i) => (
-                      <span
-                        key={i}
-                        onClick={() => goto(i / 2)}
-                        className="h-2 flex-1"
-                      ></span>
-                    ))}
-                </div>
-                <div
-                  ref={range}
-                  style={{ width: "0%" }}
-                  className={`pointer-events-none absolute top-0 left-0 h-2 rounded-lg bg-white transition-all`}
-                ></div>
-              </div>
+              <Slider
+                disabled={!track}
+                value={[range]}
+                min={0}
+                max={30}
+                onValueChange={(e) => {
+                  const [value] = e;
+                  if (value === undefined) return;
+                  setRange(value);
+                  moving.current = true;
+                  if (currentTime.current)
+                    currentTime.current.innerText = secondIntl(
+                      Math.floor(value) + 1,
+                      "mm:ss"
+                    );
+                }}
+                onValueCommit={(e) => {
+                  const [value] = e;
+                  if (value !== undefined) goto(value);
+                  moving.current = false;
+                }}
+                preview
+              />
               <div className="min-w-[2rem] text-xs" ref={trackTime}>
                  
               </div>

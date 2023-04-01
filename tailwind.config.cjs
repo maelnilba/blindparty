@@ -6,6 +6,12 @@ module.exports = {
       maxHeight: {
         contain: "calc(100vh - 8rem)",
       },
+      transitionProperty: {
+        width: "width",
+        "width-opacity": "opacity, width",
+        "colors-padding":
+          "color, background-color, border-color, text-decoration-color, fill, stroke, padding",
+      },
       zIndex: {
         100: "100",
         200: "200",
