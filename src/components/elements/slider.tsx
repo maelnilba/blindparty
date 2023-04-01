@@ -4,7 +4,7 @@ import { forwardRef, useEffect, useRef } from "react";
 export const Slider = forwardRef<
   HTMLSpanElement,
   RadixSlider.SliderProps & { preview?: boolean }
->(({ preview: _preview = false, ...props }, forwardRef) => {
+>(({ preview: _preview = false, className, ...props }, forwardRef) => {
   // Preview tracking
   const preview = useRef<HTMLDivElement>(null);
   const area = useRef<HTMLDivElement>(null);
@@ -43,7 +43,7 @@ export const Slider = forwardRef<
   }, [area, preview, _preview]);
 
   return (
-    <div className="relative w-full">
+    <div className={`relative ${className}`}>
       {_preview && (
         <div
           ref={area}
@@ -52,7 +52,7 @@ export const Slider = forwardRef<
       )}
       <RadixSlider.Root
         ref={forwardRef}
-        className="group relative flex h-10 w-full cursor-pointer touch-none select-none items-center"
+        className={`group relative flex h-10 w-full cursor-pointer touch-none select-none items-center ${className}`}
         {...props}
       >
         <RadixSlider.Track className="relative h-2 grow rounded-full border border-gray-800 bg-black">

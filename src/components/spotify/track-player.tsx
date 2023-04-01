@@ -4,6 +4,7 @@ import { PlayIcon } from "@components/icons/play";
 import { SpeakerIcon } from "@components/icons/speaker";
 import { Picture } from "@components/images/picture";
 import { Track } from "@components/playlist/types";
+import { useClient } from "@hooks/useClient";
 import { usePrevious } from "@hooks/usePrevious";
 import { secondIntl } from "lib/helpers/date";
 import { useRouter } from "next/router";
@@ -26,7 +27,7 @@ export const usePlayerVolumeStore = create(
     setVolume: (volume: number) => void;
   }>(
     (set) => ({
-      volume: 100,
+      volume: 0,
       setVolume: (volume) => set({ volume }),
     }),
     {
@@ -80,6 +81,7 @@ export const TrackPlayer = ({
   const volumewas = usePrevious(volume);
 
   const audio = useRef<HTMLAudioElement | null>(null);
+
   const [range, setRange] = useState(0);
   const moving = useRef(false);
   const currentTime = useRef<HTMLDivElement | null>(null);
@@ -122,7 +124,7 @@ export const TrackPlayer = ({
     audio.current.muted = true;
   };
   const unmute = () => {
-    setVolume(volumewas ?? 100);
+    setVolume(volumewas || 1);
     if (!audio.current) return;
     audio.current.muted = false;
   };
@@ -223,6 +225,8 @@ export const TrackPlayer = ({
 
   const image = track?.album.images[0];
 
+  const isClient = useClient();
+
   return (
     <TrackPlayerContext.Provider value={value}>
       {children}
@@ -291,6 +295,7 @@ export const TrackPlayer = ({
                  
               </div>
               <Slider
+                className="w-full"
                 disabled={!track}
                 value={[range]}
                 min={0}
@@ -319,21 +324,28 @@ export const TrackPlayer = ({
             </div>
           </div>
           <div className="col-span-3 flex items-center justify-center gap-2">
-            <SpeakerIcon
-              className="h-6 w-6 cursor-pointer transition-transform duration-75 hover:scale-105"
-              onClick={() => {
-                volume === 0 ? unmute() : mute();
-              }}
-              active={!muted}
-            />
-            <input
-              value={volume}
-              type="range"
-              className="no-thumb-range bg-black accent-gray-100"
-              min={0}
-              max={100}
-              onChange={(e) => speaker(e.target.valueAsNumber)}
-            />
+            {isClient && (
+              <>
+                <SpeakerIcon
+                  className="h-6 w-6 cursor-pointer transition-transform duration-75 hover:scale-105"
+                  onClick={() => {
+                    volume === 0 ? unmute() : mute();
+                  }}
+                  active={!muted}
+                />
+                <Slider
+                  className="w-40"
+                  defaultValue={[volume]}
+                  value={[volume]}
+                  min={0}
+                  max={100}
+                  onValueChange={(e) => {
+                    const [value] = e;
+                    if (value !== undefined) speaker(value);
+                  }}
+                />
+              </>
+            )}
           </div>
         </div>
       </div>
