@@ -10,7 +10,7 @@ export const config = {
 const validator = createQueryValidator(
   z.object({
     src: z.string(),
-    blur: z.number().min(1),
+    blur: z.number().min(30),
   })
 );
 
