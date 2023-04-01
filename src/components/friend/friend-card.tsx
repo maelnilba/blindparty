@@ -1,5 +1,6 @@
 import { UserMinusIcon } from "@components/icons/user-minus";
 import { Picture } from "@components/images/picture";
+import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { RouterOutputs } from "@utils/api";
 
 export type Friend = RouterOutputs["friend"]["get_all"][number];
@@ -23,10 +24,16 @@ export const FriendCard = ({ friend, onRemove }: FriendCardProps) => {
         </span>
       </div>
       {onRemove && (
-        <UserMinusIcon
-          onClick={() => onRemove(friend)}
-          className="h-6 w-6 cursor-pointer group-hover:scale-125"
-        />
+        <ConfirmationModal
+          title={`Retirer ${friend.name}`}
+          message={`Êtes vous certain de vouloir retirer ${friend.name} de vos amis ?`}
+          action="Retirer"
+          onSuccess={() => {
+            onRemove(friend);
+          }}
+        >
+          <UserMinusIcon className="h-6 w-6 cursor-pointer group-hover:scale-125" />
+        </ConfirmationModal>
       )}
     </div>
   );
