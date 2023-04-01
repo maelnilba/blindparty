@@ -88,7 +88,8 @@ const PartyCreate: NextPage = () => {
     },
   });
 
-  const evRound = useZormTrigger(zo, zo.fields.mode());
+  const evMode = useZormTrigger(zo, zo.fields.mode());
+  const evRound = useZormTrigger(zo, zo.fields.round());
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 p-4">
@@ -166,7 +167,7 @@ const PartyCreate: NextPage = () => {
         <div className="flex flex-1 flex-col gap-10">
           <div className="">
             <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto">
-              <Tab.Group defaultIndex={0} onChange={evRound}>
+              <Tab.Group defaultIndex={0} onChange={evMode}>
                 <Tab.List className="absolute top-0 flex w-full gap-2 bg-black/10 px-6 py-2 backdrop-blur-sm">
                   {({ selectedIndex }) => (
                     <div className="flex flex-1 justify-evenly gap-2 rounded-full ring-2 ring-white ring-opacity-5">
@@ -250,6 +251,7 @@ const PartyCreate: NextPage = () => {
                 </label>
 
                 <InputSelect
+                  onChange={evRound}
                   id={zo.fields.round()}
                   name={zo.fields.round()}
                   type="number"
@@ -268,24 +270,28 @@ const PartyCreate: NextPage = () => {
               </div>
               <Value zorm={zo} name={zo.fields.mode()} event="change">
                 {(random) => (
-                  <>
-                    {Boolean(
-                      selectedsPlaylist.size &&
-                        selectedsPlaylistCount < 20 &&
-                        !Number(random)
-                    ) && (
-                      <div>
-                        <div className="float-left px-2">
-                          <ExclamationIcon className="mt-4 h-6 w-6" />
-                        </div>
-                        <p>
-                          Les playlists sélectionnées contiennent moins de
-                          tracks que de round. Le nombre de round sera de{" "}
-                          {selectedsPlaylistCount}
-                        </p>
-                      </div>
+                  <Value zorm={zo} name={zo.fields.round()} event="change">
+                    {(round) => (
+                      <>
+                        {Boolean(
+                          selectedsPlaylist.size &&
+                            selectedsPlaylistCount < Number(round) &&
+                            !Number(random)
+                        ) && (
+                          <div>
+                            <div className="float-left px-2">
+                              <ExclamationIcon className="mt-4 h-6 w-6" />
+                            </div>
+                            <p>
+                              Les playlists sélectionnées contiennent moins de
+                              tracks que de round. Le nombre de round sera de{" "}
+                              {selectedsPlaylistCount}
+                            </p>
+                          </div>
+                        )}
+                      </>
                     )}
-                  </>
+                  </Value>
                 )}
               </Value>
             </div>
