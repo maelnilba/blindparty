@@ -221,7 +221,7 @@ export const gameRouter = createTRPCRouter({
 
       if (!party) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-      if (party.round + 1 > party.max_round) {
+      if (party.round > party.max_round) {
         await ctx.pusher.trigger({}, "over");
         throw new TRPCError({ code: "CONFLICT" });
       }
