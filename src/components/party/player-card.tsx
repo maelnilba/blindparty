@@ -8,7 +8,10 @@ type PlayerCardProps = {
 };
 export const PlayerCard = ({ player, joined, connected }: PlayerCardProps) => {
   return (
-    <div className={`${!joined && "opacity-50"} ${!connected && "blur-sm"}`}>
+    <div
+      title={player.name ?? ""}
+      className={`${!joined && "opacity-50"} ${!connected && "blur-sm"}`}
+    >
       <Picture identifier={player.image}>
         <img
           alt={`playlist picture of ${player.name}`}
