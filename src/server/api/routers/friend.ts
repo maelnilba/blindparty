@@ -225,7 +225,7 @@ export const friendRouter = createTRPCRouter({
       });
     }),
   search: protectedProcedure
-    .input(z.object({ field: z.string() }))
+    .input(z.object({ field: z.string().min(1) }))
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.user.findMany({
         where: {
