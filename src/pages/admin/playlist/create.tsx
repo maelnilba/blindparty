@@ -131,17 +131,14 @@ const PlaylistCreate = () => {
       if (
         imageUpload.current &&
         mockAlbumsPicture &&
-        !imageUpload.current.changed
+        !imageUpload.current.changed &&
+        !imageUpload.current.local
       ) {
         const img = await fetchMergeAlbum(mockAlbumsPicture);
         await imageUpload.current.set(img, true);
       }
 
-      if (
-        imageUpload.current &&
-        imageUpload.current.changed &&
-        imageUpload.current.local
-      ) {
+      if (imageUpload.current && imageUpload.current.local) {
         await imageUpload.current.upload();
       }
 

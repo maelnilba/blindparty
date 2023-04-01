@@ -63,7 +63,7 @@ const Settings: NextPage<
       e.preventDefault();
 
       let s3key = __user?.s3key ?? getS3key(_user.image);
-      if (imageUpload.current && imageUpload.current.changed) {
+      if (imageUpload.current && imageUpload.current.local) {
         await imageUpload.current.upload(s3key);
       }
 

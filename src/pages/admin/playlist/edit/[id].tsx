@@ -161,17 +161,14 @@ const PlaylistEdit = () => {
       if (
         imageUpload.current &&
         mockAlbumsPicture &&
-        !imageUpload.current.changed
+        !imageUpload.current.changed &&
+        !imageUpload.current.local
       ) {
         const img = await fetchMergeAlbum(mockAlbumsPicture);
         await imageUpload.current.set(img, true, s3key.current);
       }
 
-      if (
-        imageUpload.current &&
-        imageUpload.current.changed &&
-        imageUpload.current.local
-      ) {
+      if (imageUpload.current && imageUpload.current.local) {
         await imageUpload.current.upload(s3key.current);
       }
 
