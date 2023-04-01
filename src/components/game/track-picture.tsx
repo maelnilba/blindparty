@@ -30,6 +30,9 @@ export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
   return (
     <Image
       loader={() => apiUrl}
+      onError={(e) => {
+        (e.target as HTMLImageElement).style.display = "none";
+      }}
       className="object-cover"
       width={600}
       height={600}

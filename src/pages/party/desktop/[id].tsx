@@ -170,7 +170,7 @@ const Party: NextPage<
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
 
-  const [scores, setScores] = useState<Score[]>([]);
+  const [_, setScores] = useState<Score[]>([]);
   const [winner, setWinner] = useState<Score | null | undefined>();
   const [roundCount, setRoundCount] = useState(1);
   const [itwas, setItwas] = useState<string | null>(null);
@@ -446,9 +446,7 @@ const Party: NextPage<
                       message="Certains amis invités n'ont pas encore rejoint la partie, êtes vous sur de vouloir commencer la partie ? Une fois une partie lancée, il n'est plus possible de la rejoindre."
                       action="Commencer"
                       className="flex w-full items-center justify-center"
-                      onSuccess={() => {
-                        start();
-                      }}
+                      onSuccess={start}
                     >
                       <button className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                         Commencer la partie
@@ -456,7 +454,7 @@ const Party: NextPage<
                     </ConfirmationModal>
                   ) : (
                     <button
-                      onClick={() => start()}
+                      onClick={start}
                       className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
                     >
                       Commencer la partie
@@ -470,8 +468,6 @@ const Party: NextPage<
               )}
             </div>
             <div className="flex flex-1 flex-col gap-6 p-2">
-              <Divider />
-              <div>{/* <PlaylistCard playlist={party.playlist} /> */}</div>
               <Divider />
               <div className="text-center text-lg font-semibold">
                 <p>{party.max_round} rounds</p>
@@ -539,10 +535,6 @@ const Party: NextPage<
                 </div>
                 <p className="text-center">{itwas}</p>
               </div>
-              {/* <div className="mt-10 mb-20">
-                <Divider />
-              </div>
-              <ScoreBoard scores={scores} /> */}
             </div>
           )}
         </div>
