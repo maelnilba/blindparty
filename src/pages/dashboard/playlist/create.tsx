@@ -1,5 +1,6 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { GetLayoutThrough } from "@components/layout/layout";
+import { Modal, ModalRef } from "@components/modals/modal";
 import {
   AlbumsPicture,
   useAlbumsPictureStore,
@@ -9,6 +10,7 @@ import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useAsyncEffect } from "@hooks/useAsyncEffect";
+import { useCountCallback } from "@hooks/useCountCallback";
 import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
 import { api } from "@utils/api";
@@ -31,6 +33,7 @@ const PlaylistCreate = () => {
     remove: removeTrack,
     adds: addTracks,
     removes: removeTracks,
+    reset: resetTracks,
   } = useMap<Track>();
 
   const { data } = api.spotify.playlists.useQuery();
@@ -40,6 +43,26 @@ const PlaylistCreate = () => {
       router.push("/dashboard/playlist");
     },
   });
+
+  const modal = useRef<ModalRef>(null);
+  const currentRemoveTrack = useRef<Track>();
+  const openModal = () => {
+    if (modal.current) modal.current.open();
+  };
+  const closeModal = () => {
+    if (modal.current) modal.current.close();
+    currentRemoveTrack.current = undefined;
+  };
+
+  const handleRemoveTrack = useCountCallback(
+    { at: 15, reset: 60000 },
+    removeTrack,
+    (track) => {
+      currentRemoveTrack.current = track;
+      openModal();
+    },
+    [tracks]
+  );
 
   const [mockAlbumsPicture, setMockAlbumsPicture] = useState<
     string[] | undefined
@@ -264,12 +287,43 @@ const PlaylistCreate = () => {
             </form>
           </div>
         </div>
+        <Modal
+          ref={modal}
+          title="Retirer tout"
+          className="w-full"
+          closeOnOutside={false}
+        >
+          <p>Souhaitez vous retirer toutes les tracks de la playlist ?</p>
+          <div className="mt-4 flex flex-row justify-end gap-2">
+            <button
+              type="button"
+              className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+              onClick={() => {
+                if (currentRemoveTrack.current)
+                  removeTrack(currentRemoveTrack.current);
+                closeModal();
+              }}
+            >
+              Retirer
+            </button>
+            <button
+              type="button"
+              className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+              onClick={() => {
+                resetTracks();
+                closeModal();
+              }}
+            >
+              Retirer tout
+            </button>
+          </div>
+        </Modal>
         <div className="p-4">
           {[...tracksMap].map(([_, track]) => (
             <PlaylistTrackCard
               key={track.id}
               track={track}
-              onRemove={removeTrack}
+              onRemove={handleRemoveTrack}
               onPlay={playTrack}
               playing={
                 Boolean(currentTrack) &&

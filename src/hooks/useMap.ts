@@ -37,11 +37,18 @@ export function useMap<T extends MapObject>() {
     });
   };
 
+  const reset = () => {
+    setMap((m) => {
+      return new Map();
+    });
+  };
+
   return {
     map,
     add,
     remove,
     adds,
     removes,
+    reset,
   };
 }

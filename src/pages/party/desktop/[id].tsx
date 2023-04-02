@@ -444,7 +444,7 @@ const Party: NextPage<
                     <ConfirmationModal
                       title="Commencer la partie"
                       message="Certains amis invités n'ont pas encore rejoint la partie, êtes vous sur de vouloir commencer la partie ? Une fois une partie lancée, il n'est plus possible de la rejoindre."
-                      action="Commencer"
+                      actions={["Commencer"]}
                       className="flex w-full items-center justify-center"
                       onSuccess={start}
                     >

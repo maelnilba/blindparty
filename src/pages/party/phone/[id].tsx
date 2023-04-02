@@ -7,6 +7,7 @@ import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useMicroPermission } from "@hooks/useMicroPermission";
 import { useVoiceDetector } from "@hooks/useVoiceDetector";
 import { near, parse } from "@lib/helpers/accept-language";
+import { nothing } from "@lib/helpers/nothing";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
@@ -306,9 +307,9 @@ const Party: NextPage<
     return () => {
       SpeechRecognition.stopListening();
       vad({
-        onVoiceStart: () => {},
-        onVoiceStop: () => {},
-        onUpdate: () => {},
+        onVoiceStart: nothing,
+        onVoiceStop: nothing,
+        onUpdate: nothing,
       });
     };
   }, [game]);

@@ -183,7 +183,7 @@ const PlaylistCard = ({
             <ConfirmationModal
               title={`Retirer la playlist`}
               message={`Êtes vous certain de vouloir retirer la playlist ${playlist.name} de vos playlist ?`}
-              action="Retirer"
+              actions={["Retirer"]}
               className="flex-1"
               onSuccess={() => {
                 onDisconnect(playlist);
@@ -206,7 +206,7 @@ const PlaylistCard = ({
             <ConfirmationModal
               title={`Supprimer la playlist`}
               message={`Êtes vous certain de vouloir supprimer votre playlist ${playlist.name} ? Cette action est irreversible, votre playlist sera effacée.`}
-              action="Supprimer"
+              actions={["Supprimer"]}
               onSuccess={() => {
                 onDelete(playlist);
               }}

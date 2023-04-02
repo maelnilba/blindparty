@@ -6,6 +6,7 @@ import { Picture } from "@components/images/picture";
 import { Track } from "@components/playlist/types";
 import { useClient } from "@hooks/useClient";
 import { usePrevious } from "@hooks/usePrevious";
+import { nothing } from "@lib/helpers/nothing";
 import { secondIntl } from "lib/helpers/date";
 import { useRouter } from "next/router";
 import {
@@ -53,12 +54,12 @@ const TrackPlayerContext = createContext<TrackPlayerContext>({
   currentTrack: null,
   playing: false,
   load: (t) => {},
-  unload: () => {},
-  start: () => {},
-  pause: () => {},
-  unpause: () => {},
-  mute: () => {},
-  unmute: () => {},
+  unload: nothing,
+  start: nothing,
+  pause: nothing,
+  unpause: nothing,
+  mute: nothing,
+  unmute: nothing,
 });
 
 export const usePlayer = () => {

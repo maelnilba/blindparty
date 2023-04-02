@@ -195,7 +195,7 @@ const InvitationCard = ({
           <ConfirmationModal
             title="Bloquer l'utilisateur"
             message={`Êtes vous sur de vouloir bloqué ${friendUser.name} ?`}
-            action="Bloquer"
+            actions={["Bloquer"]}
             onSuccess={() => onBlock(invitation)}
           >
             <LockClosedIcon className="h-6 w-6 cursor-pointer hover:scale-125" />

@@ -75,7 +75,7 @@ const PlaylistCard = ({ playlist, onDelete }: PlaylistCardProps) => {
         <ConfirmationModal
           title={`Supprimer la playlist`}
           message={`Êtes vous certain de vouloir supprimer votre playlist ${playlist.name} ? Cette action est irreversible.`}
-          action="Supprimer"
+          actions={["Supprimer"]}
           onSuccess={() => {
             onDelete(playlist);
           }}

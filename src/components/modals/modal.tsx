@@ -1,5 +1,14 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Children, Fragment, isValidElement, ReactNode, useState } from "react";
+import { nothing } from "@lib/helpers/nothing";
+import {
+  Children,
+  forwardRef,
+  Fragment,
+  isValidElement,
+  ReactNode,
+  useImperativeHandle,
+  useState,
+} from "react";
 import type { Element } from "./types";
 
 type ModalProps = {
@@ -7,10 +16,16 @@ type ModalProps = {
   children: ReactNode;
   title?: string;
   className?: string;
+  closeOnOutside?: boolean;
 };
 
-export function Modal(props: ModalProps) {
-  const { defaultOpen = false, title } = props;
+export type ModalRef = {
+  open: () => void;
+  close: () => void;
+};
+
+export const Modal = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
+  const { defaultOpen = false, title, closeOnOutside = true } = props;
   let [isOpen, setIsOpen] = useState(defaultOpen);
 
   const [button, content] = Children.toArray(props.children).reduce<
@@ -36,20 +51,35 @@ export function Modal(props: ModalProps) {
     setIsOpen(true);
   }
 
+  useImperativeHandle(
+    forwardRef,
+    () => ({
+      open: openModal,
+      close: closeModal,
+    }),
+    []
+  );
+
   return (
     <>
-      <div
-        onClickCapture={(e) => {
-          e.stopPropagation();
-          openModal();
-        }}
-        className={props.className}
-      >
-        {button}
-      </div>
+      {button && (
+        <div
+          onClickCapture={(e) => {
+            e.stopPropagation();
+            openModal();
+          }}
+          className={props.className}
+        >
+          {button}
+        </div>
+      )}
 
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={closeOnOutside ? closeModal : nothing}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -89,4 +119,4 @@ export function Modal(props: ModalProps) {
       </Transition>
     </>
   );
-}
+});

@@ -118,7 +118,7 @@ const Item = ({ subscriber, user, close, active, onBan }: ItemProps) => {
     <ConfirmationModal
       title={`Exclure ${user.name}`}
       message={`Êtes vous certain de vouloir exclure ${user.name} de la partie ? Une fois exclu, il n'est plus possible de rejoindre la partie en cours`}
-      action="Exclure"
+      actions={["Exclure"]}
       className="flex w-full items-center justify-center"
       onSuccess={() => {
         if (onBan) {
