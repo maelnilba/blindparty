@@ -8,7 +8,6 @@ export const Auth = ({
   auth,
 }: PropsWithChildren<{ auth?: NextPageWithAuth["auth"] }>) => {
   const { push, pathname, ...r } = useRouter();
-  console.log(pathname, r);
   const { status, data: session } = useSession({ required: !!auth?.role });
   if (!auth) return <></>;
   const redirect = () => {

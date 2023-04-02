@@ -73,7 +73,10 @@ export const s3Router = createTRPCRouter({
           Key: input.key,
         },
         (err) => {
-          console.log(err);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: err.message,
+          });
         }
       );
     }),
