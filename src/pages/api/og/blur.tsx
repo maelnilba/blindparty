@@ -4,7 +4,7 @@ import { z } from "zod";
 import { createQueryValidator } from "@lib/helpers/query-validator";
 
 export const config = {
-  runtime: "experimental-edge",
+  runtime: "edge",
 };
 
 const validator = createQueryValidator(
