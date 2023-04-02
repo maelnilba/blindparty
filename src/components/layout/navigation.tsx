@@ -1,3 +1,4 @@
+import { Picture } from "@components/images/picture";
 import { Menu, Transition } from "@headlessui/react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
@@ -41,7 +42,10 @@ const Navigation = ({ through = false }: { through?: boolean }) => {
                   leaveFrom="opacity-100"
                   leaveTo="opacity-0"
                 >
-                  <picture className="cursor-pointer hover:ring-gray-300">
+                  <Picture
+                    identifier={session.user.image}
+                    className="cursor-pointer hover:ring-gray-300"
+                  >
                     <img
                       alt={`profile picture of ${
                         session.user.name || "unknown"
@@ -49,7 +53,7 @@ const Navigation = ({ through = false }: { through?: boolean }) => {
                       src={session.user.image || ""}
                       className="aspect-square h-12 w-12 rounded border-gray-800 object-cover"
                     />
-                  </picture>
+                  </Picture>
                 </Transition>
               </Menu.Button>
               <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-black/80 ring-4 ring-white ring-opacity-5 backdrop-blur-sm focus:outline-none">
