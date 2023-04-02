@@ -1,4 +1,5 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
+import { AuthGuard } from "@components/layout/auth";
 import { GetLayoutThrough } from "@components/layout/layout";
 import {
   ConfirmationModal,
@@ -20,7 +21,7 @@ import { useMap } from "@hooks/useMap";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
-import type { NextPageWithLayout } from "next";
+import type { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
@@ -388,7 +389,7 @@ const PlaylistEdit = () => {
   );
 };
 
-const PlaylistEditWrapper: NextPageWithLayout = () => {
+const PlaylistEditWrapper: NextPageWithLayout & NextPageWithAuth = () => {
   return (
     <TrackPlayer>
       <PlaylistEdit />
@@ -399,3 +400,4 @@ const PlaylistEditWrapper: NextPageWithLayout = () => {
 export default PlaylistEditWrapper;
 
 PlaylistEditWrapper.getLayout = GetLayoutThrough;
+PlaylistEditWrapper.auth = AuthGuard;

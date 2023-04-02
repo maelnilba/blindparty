@@ -1,6 +1,7 @@
 import { Divider } from "@components/elements/divider";
 import { MicroIcon } from "@components/icons/micro";
 import { Picture } from "@components/images/picture";
+import { AuthGuard } from "@components/layout/auth";
 import { Modal } from "@components/modals/modal";
 import { TRACK_TIMER_MS } from "@components/party/constants";
 import { PlaylistCard } from "@components/playlist/playlist-card";
@@ -19,6 +20,7 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
+  NextPageWithAuth,
 } from "next";
 import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
@@ -490,7 +492,7 @@ const PlayerCard = ({ player, joined, connected }: PlayerCardProps) => {
   );
 };
 
-const PartyWrapper: NextPage<
+const PartyWrapper: NextPageWithAuth<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ party, language }) => {
   return (
@@ -499,4 +501,6 @@ const PartyWrapper: NextPage<
     </prpc.withPRPC>
   );
 };
+
 export default PartyWrapper;
+PartyWrapper.auth = AuthGuard;

@@ -3,6 +3,7 @@ import { RouterOutputs } from "@utils/api";
 import { z } from "zod";
 import Image from "next/image";
 import { ComponentProps } from "react";
+import { getBaseUrl } from "@lib/helpers/base-url";
 type TrackPictureProps = RouterOutputs["party"]["game"]["round"];
 
 const validator = createQueryValidator(
@@ -11,12 +12,6 @@ const validator = createQueryValidator(
     blur: z.number().min(1),
   })
 );
-
-const getBaseUrl = () => {
-  if (typeof window !== "undefined") return window.origin; // browser should use relative url
-  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
-  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
-};
 
 export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
   const image = track?.images.filter((i) => i.url).at(0) ?? { url: "" };

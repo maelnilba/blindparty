@@ -1,4 +1,5 @@
 import { Picture } from "@components/images/picture";
+import { AuthGuard } from "@components/layout/auth";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { TrackCard } from "@components/playlist/playlist-track-card";
 import { Tooltip } from "@components/popovers/tooltip";
@@ -6,11 +7,11 @@ import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { Socials } from "@server/types";
 import { api, RouterOutputs } from "@utils/api";
+import { NextPageWithAuth } from "next";
 import Link from "next/link";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
-  NextPage,
 } from "next/types";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -58,7 +59,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-const Playlists: NextPage<
+const Playlists: NextPageWithAuth<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ hasSpotify }) => {
   const { data: playlists, refetch } = api.playlist.get_all.useQuery();
@@ -223,3 +224,4 @@ const PlaylistCard = ({
 };
 
 export default Playlists;
+Playlists.auth = AuthGuard;

@@ -1,5 +1,6 @@
 import { ClockIcon } from "@components/icons/clock";
 import { Picture } from "@components/images/picture";
+import { AuthGuard } from "@components/layout/auth";
 import { BlackScreen } from "@components/layout/blackscreen";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { Track } from "@components/playlist/types";
@@ -8,7 +9,7 @@ import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useRelativeTime } from "@hooks/useRelativeTime";
 import { api, RouterOutputs } from "@utils/api";
 import { getQuery } from "@utils/next-router";
-import type { NextPageWithLayout } from "next";
+import type { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
 
 const PlaylistDiscover = ({
@@ -76,7 +77,7 @@ const PlaylistDiscover = ({
   );
 };
 
-const PlaylistDiscoverWrapper: NextPageWithLayout = () => {
+const PlaylistDiscoverWrapper: NextPageWithLayout & NextPageWithAuth = () => {
   const { query, push } = useRouter();
   const id = getQuery(query.id);
   const { data: playlist } = api.playlist.discover.useQuery(
@@ -103,3 +104,4 @@ const PlaylistDiscoverWrapper: NextPageWithLayout = () => {
 export default PlaylistDiscoverWrapper;
 
 PlaylistDiscoverWrapper.getLayout = GetLayoutThrough;
+PlaylistDiscoverWrapper.auth = AuthGuard;

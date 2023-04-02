@@ -1,4 +1,5 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
+import { AuthGuard } from "@components/layout/auth";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { Modal, ModalRef } from "@components/modals/modal";
 import {
@@ -15,7 +16,7 @@ import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { api } from "@utils/api";
-import { NextPageWithLayout } from "next";
+import { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
@@ -344,7 +345,7 @@ const PlaylistCreate = () => {
   );
 };
 
-const PlaylistCreateWrapper: NextPageWithLayout = () => {
+const PlaylistCreateWrapper: NextPageWithLayout & NextPageWithAuth = () => {
   return (
     <TrackPlayer>
       <PlaylistCreate />
@@ -355,3 +356,4 @@ const PlaylistCreateWrapper: NextPageWithLayout = () => {
 export default PlaylistCreateWrapper;
 
 PlaylistCreateWrapper.getLayout = GetLayoutThrough;
+PlaylistCreateWrapper.auth = AuthGuard;

@@ -6,14 +6,15 @@ import { PlusIcon } from "@components/icons/plus";
 import { UserPlusIcon } from "@components/icons/user-plus";
 import { XMarkIcon } from "@components/icons/x-mark";
 import { Picture } from "@components/images/picture";
+import { AuthGuard } from "@components/layout/auth";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
 import { useDebounce } from "@hooks/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
+import type { NextPageWithAuth } from "next";
 import { useSession } from "next-auth/react";
-import type { NextPage } from "next/types";
 
-const Friends: NextPage = () => {
+const Friends: NextPageWithAuth = () => {
   const { data: session } = useSession();
   const { data: friends, refetch: refetch_friends } =
     api.friend.get_all.useQuery();
@@ -207,3 +208,4 @@ const InvitationCard = ({
 };
 
 export default Friends;
+Friends.auth = AuthGuard;

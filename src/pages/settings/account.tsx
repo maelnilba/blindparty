@@ -1,6 +1,7 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { PlusIcon } from "@components/icons/plus";
 import { ensureProvider, SocialIcon } from "@components/icons/socials";
+import { AuthGuard } from "@components/layout/auth";
 import { Modal } from "@components/modals/modal";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { getServerAuthSession } from "@server/auth";
@@ -10,6 +11,7 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
+  NextPageWithAuth,
 } from "next";
 import { getProviders, signIn } from "next-auth/react";
 import { useRef } from "react";
@@ -40,7 +42,7 @@ const editSchema = z.object({
   name: z.string().min(1),
 });
 
-const Settings: NextPage<
+const Settings: NextPageWithAuth<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ user: _user }) => {
   const { data: providers } = api.user.provider.useQuery();
@@ -194,6 +196,7 @@ const ProviderCard = ({ provider, onClick }: ProviderCardProps) => {
 };
 
 export default Settings;
+Settings.auth = AuthGuard;
 
 const getS3key = (url: string | null | undefined) => {
   if (!url) return undefined;

@@ -1,8 +1,11 @@
+import { getBaseUrl } from "@lib/helpers/base-url";
 import { getServerAuthSession } from "@server/auth";
 import type { GetServerSidePropsContext, NextPage } from "next";
 import type { BuiltInProviderType } from "next-auth/providers";
 import type { ClientSafeProvider, LiteralUnion } from "next-auth/react";
 import { getProviders, signIn } from "next-auth/react";
+import { useRouter } from "next/router";
+import { z } from "zod";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const providers = await getProviders();
@@ -25,12 +28,34 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
+const querySchema = z.object({
+  callbackUrl: z.string().url().optional(),
+  error: z
+    .enum([
+      "OAuthSignin",
+      "OAuthCallback",
+      "OAuthCreateAccount",
+      "EmailCreateAccount",
+      "Callback",
+      "OAuthAccountNotLinked",
+      "EmailSignin",
+      "CredentialsSignin",
+      "SessionRequired",
+      "Default",
+    ])
+    .optional(),
+  redirect_to: z.string().optional(),
+});
+
 const Index: NextPage<{
   providers: Record<
     LiteralUnion<BuiltInProviderType, string>,
     ClientSafeProvider
   > | null;
 }> = ({ providers }) => {
+  const { query: qu } = useRouter();
+  const query = querySchema.parse(qu);
+
   if (!providers) return <div>No provider found!</div>;
   return (
     <>
@@ -46,7 +71,9 @@ const Index: NextPage<{
                   className="w-full cursor-pointer items-center justify-center p-2 font-bold ring-2 ring-white ring-opacity-5"
                   onClick={() =>
                     signIn(provider.id, {
-                      // callbackUrl: "http://localhost:3000/dashboard",
+                      callbackUrl: query.redirect_to
+                        ? `${getBaseUrl()}${query.redirect_to}`
+                        : query.callbackUrl,
                     })
                   }
                 >

@@ -1,12 +1,13 @@
 import { Picture } from "@components/images/picture";
+import { AuthGuard } from "@components/layout/auth";
 import { TrackCard } from "@components/playlist/playlist-track-card";
 import { useDebounce } from "@hooks/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
-import type { NextPage } from "next";
+import type { NextPageWithAuth } from "next";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 
-const PlaylistSearch: NextPage = () => {
+const PlaylistSearch: NextPageWithAuth = () => {
   const searchRef = useRef<HTMLInputElement | null>(null);
   const { data: playlists, mutate: search } =
     api.playlist.get_public.useMutation();
@@ -65,7 +66,9 @@ const PlaylistSearch: NextPage = () => {
     </div>
   );
 };
+
 export default PlaylistSearch;
+PlaylistSearch.auth = AuthGuard;
 
 type PlaylistCardProps = {
   playlist: RouterOutputs["playlist"]["get_public"][number];

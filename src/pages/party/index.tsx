@@ -1,9 +1,11 @@
+import { AuthGuard } from "@components/layout/auth";
 import { PartyCard } from "@components/party/party-card";
 import { api } from "@utils/api";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
+  NextPageWithAuth,
 } from "next";
 import Link from "next/link";
 import { z } from "zod";
@@ -55,7 +57,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-const PartyHome: NextPage<
+const PartyHome: NextPageWithAuth<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ reason }) => {
   const { data: partys } = api.party.get_all_invite.useQuery();
@@ -100,3 +102,4 @@ const PartyHome: NextPage<
 };
 
 export default PartyHome;
+PartyHome.auth = AuthGuard;

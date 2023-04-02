@@ -1,7 +1,10 @@
-import type { NextPage } from "next";
+import { AuthGuardAdmin } from "@components/layout/auth";
+import type { NextPageWithAuth } from "next";
 
-const AdminHome: NextPage = () => {
+const AdminHome: NextPageWithAuth = () => {
   return <div></div>;
 };
+
+AdminHome.auth = AuthGuardAdmin;
 
 export default AdminHome;

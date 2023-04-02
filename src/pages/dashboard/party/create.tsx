@@ -3,12 +3,13 @@ import { InputSelect } from "@components/elements/input-select";
 import { Friend, FriendCard } from "@components/friend/friend-card";
 import { ExclamationIcon } from "@components/icons/exclamation";
 import { Picture } from "@components/images/picture";
+import { AuthGuard } from "@components/layout/auth";
 import { Playlist, PlaylistCard } from "@components/playlist/playlist-card";
 import { Tab } from "@headlessui/react";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { useTrigger } from "@hooks/zorm/useTrigger";
 import { api } from "@utils/api";
-import type { NextPage } from "next";
+import type { NextPageWithAuth } from "next";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { useZorm, Value } from "react-zorm";
@@ -35,7 +36,7 @@ const createSchema = z.object({
   round: z.coerce.number().min(10),
 });
 
-const PartyCreate: NextPage = () => {
+const PartyCreate: NextPageWithAuth = () => {
   const router = useRouter();
   const { data: playlists } = api.playlist.get_all.useQuery();
   const { data: allfriends } = api.friend.get_all.useQuery();
@@ -311,4 +312,6 @@ const PartyCreate: NextPage = () => {
     </div>
   );
 };
+
 export default PartyCreate;
+PartyCreate.auth = AuthGuard;

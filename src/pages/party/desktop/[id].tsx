@@ -23,6 +23,7 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
+  NextPageWithAuth,
   NextPageWithLayout,
 } from "next";
 import { useRouter } from "next/router";
@@ -38,6 +39,7 @@ import {
   GUESS_MS,
   TRACK_TIMER_MS,
 } from "@components/party/constants";
+import { AuthGuard } from "@components/layout/auth";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -543,9 +545,12 @@ const Party: NextPage<
   );
 };
 
-const PartyWrapper: NextPageWithLayout<
+const PartyWrapper: NextPageWithAuth<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ party, isHost, host }) => {
+> &
+  NextPageWithLayout<
+    InferGetServerSidePropsType<typeof getServerSideProps>
+  > = ({ party, isHost, host }) => {
   return (
     <prpc.withPRPC {...prpc.context}>
       <Party party={party} isHost={isHost} host={host} />
@@ -555,3 +560,4 @@ const PartyWrapper: NextPageWithLayout<
 
 export default PartyWrapper;
 PartyWrapper.getLayout = GetLayoutThrough;
+PartyWrapper.auth = AuthGuard;

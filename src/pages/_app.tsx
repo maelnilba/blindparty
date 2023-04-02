@@ -1,6 +1,7 @@
 import { FaviconLoader } from "@components/elements/favicon-loader";
+import { Auth } from "@components/layout/auth";
 import { Layout } from "@components/layout/layout";
-import type { NextPageWithLayout } from "next";
+import type { NextPageWithAuth, NextPageWithLayout } from "next";
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppProps, type AppType } from "next/app";
@@ -8,7 +9,7 @@ import "../styles/globals.css";
 import { api } from "../utils/api";
 
 type AppPropsWithLayout = AppProps & {
-  Component: NextPageWithLayout;
+  Component: NextPageWithLayout & NextPageWithAuth;
 };
 
 const MyApp: AppType<{ session: Session | null }> = ({
@@ -19,7 +20,8 @@ const MyApp: AppType<{ session: Session | null }> = ({
   const layout = getLayout(<Component {...pageProps} />);
   return (
     <SessionProvider session={session}>
-      {layout} <FaviconLoader />
+      {Component.auth ? <Auth auth={Component.auth}>{layout}</Auth> : layout}
+      <FaviconLoader />
     </SessionProvider>
   );
 };
