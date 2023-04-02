@@ -41,12 +41,15 @@ const PlaylistCreate = () => {
     api.spotify.search_playlist.useMutation();
 
   const { mutate, data: tracks } = api.spotify.playlist.useMutation();
-  const { mutateAsync: create, isLoading } =
-    api.admin.playlist.create.useMutation({
-      onSuccess: () => {
-        router.push("/admin/playlist");
-      },
-    });
+  const {
+    mutateAsync: create,
+    isLoading,
+    isSuccess,
+  } = api.admin.playlist.create.useMutation({
+    onSuccess: () => {
+      router.push("/admin/playlist");
+    },
+  });
 
   const modal = useRef<ModalRef>(null);
   const currentRemoveTrack = useRef<Track>();
@@ -256,7 +259,7 @@ const PlaylistCreate = () => {
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm ">
           <div className="px-4 pb-2">
             <button
-              disabled={isSubmitting || isLoading}
+              disabled={isSubmitting || isLoading || isSuccess}
               type="submit"
               form="create-playlist"
               className="w-full rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"

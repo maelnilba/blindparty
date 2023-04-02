@@ -61,7 +61,11 @@ const PartyCreate: NextPage = () => {
   const [playlistField, setPlaylistField] = useState<string | undefined>();
   const [friendField, setFriendField] = useState<string | undefined>();
 
-  const { mutateAsync: create, isLoading } = api.party.create.useMutation({
+  const {
+    mutateAsync: create,
+    isLoading,
+    isSuccess,
+  } = api.party.create.useMutation({
     onSuccess: (data) => {
       router.push(`/party/${data.id}`);
     },
@@ -163,7 +167,7 @@ const PartyCreate: NextPage = () => {
       >
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <button
-            disabled={isSubmitting || isLoading}
+            disabled={isSubmitting || isLoading || isSuccess}
             type="submit"
             className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"
           >
