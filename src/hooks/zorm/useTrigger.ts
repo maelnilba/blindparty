@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function useZormTrigger<T extends HTMLElement>(
+export function useTrigger(
   zorm: {
     refObject: React.MutableRefObject<HTMLFormElement | undefined>;
   },

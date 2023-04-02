@@ -13,6 +13,7 @@ import { useAsyncEffect } from "@hooks/useAsyncEffect";
 import { useCountCallback } from "@hooks/useCountCallback";
 import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
+import { useSubmit } from "@hooks/zorm/useSubmit";
 import { api } from "@utils/api";
 import { NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
@@ -38,7 +39,7 @@ const PlaylistCreate = () => {
 
   const { data } = api.spotify.playlists.useQuery();
   const { mutate, data: tracks } = api.spotify.playlist.useMutation();
-  const { mutate: create } = api.playlist.create.useMutation({
+  const { mutateAsync: create } = api.playlist.create.useMutation({
     onSuccess: () => {
       router.push("/dashboard/playlist");
     },
@@ -122,51 +123,51 @@ const PlaylistCreate = () => {
   };
 
   const imageUpload = useRef<ImageUploadRef | null>(null);
-  const zo = useZorm("create", createSchema, {
-    async onValidSubmit(e) {
-      e.preventDefault();
-
-      const tracks = [...tracksMap].map(([_, track]) => ({
-        id: track.id,
-        name: track.name,
-        preview_url: track.preview_url!,
-        album: {
-          name: track.album.name,
-          images: track.album.images.map((image) => ({
-            url: image.url,
-          })),
-        },
-        artists: track.artists.map((artist) => ({
-          name: artist.name,
+  const { submitPreventDefault, isSubmitting } = useSubmit(async (e) => {
+    const tracks = [...tracksMap].map(([_, track]) => ({
+      id: track.id,
+      name: track.name,
+      preview_url: track.preview_url!,
+      album: {
+        name: track.album.name,
+        images: track.album.images.map((image) => ({
+          url: image.url,
         })),
-      }));
+      },
+      artists: track.artists.map((artist) => ({
+        name: artist.name,
+      })),
+    }));
 
-      if (tracks.length < 1) {
-        return;
-      }
+    if (tracks.length < 1) {
+      return;
+    }
 
-      if (
-        imageUpload.current &&
-        mockAlbumsPicture &&
-        !imageUpload.current.changed &&
-        !imageUpload.current.local
-      ) {
-        const img = await fetchMergeAlbum(mockAlbumsPicture);
-        await imageUpload.current.set(img, true);
-      }
+    if (
+      imageUpload.current &&
+      mockAlbumsPicture &&
+      !imageUpload.current.changed &&
+      !imageUpload.current.local
+    ) {
+      const img = await fetchMergeAlbum(mockAlbumsPicture);
+      await imageUpload.current.set(img, true);
+    }
 
-      if (imageUpload.current && imageUpload.current.local) {
-        await imageUpload.current.upload();
-      }
+    if (imageUpload.current && imageUpload.current.local) {
+      await imageUpload.current.upload();
+    }
 
-      create({
-        name: e.data.name,
-        description: e.data.description,
-        s3key: imageUpload.current ? imageUpload.current.key : undefined,
-        tracks: tracks,
-        generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
-      });
-    },
+    await create({
+      name: e.data.name,
+      description: e.data.description,
+      s3key: imageUpload.current ? imageUpload.current.key : undefined,
+      tracks: tracks,
+      generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
+    });
+  });
+
+  const zo = useZorm("create", createSchema, {
+    onValidSubmit: submitPreventDefault,
   });
 
   return (
@@ -234,9 +235,10 @@ const PlaylistCreate = () => {
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <div className="px-4 pb-2">
             <button
+              disabled={isSubmitting}
               type="submit"
               form="create-playlist"
-              className="w-full rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+              className="w-full rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"
             >
               Créer
             </button>

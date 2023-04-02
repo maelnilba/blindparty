@@ -2,6 +2,7 @@ import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { PlusIcon } from "@components/icons/plus";
 import { ensureProvider, SocialIcon } from "@components/icons/socials";
 import { Modal } from "@components/modals/modal";
+import { useSubmit } from "@hooks/zorm/useSubmit";
 import { getServerAuthSession } from "@server/auth";
 import { useQuery } from "@tanstack/react-query";
 import { api, RouterOutputs } from "@utils/api";
@@ -47,7 +48,7 @@ const Settings: NextPage<
     getProviders()
   );
   const { data: __user, refetch } = api.user.me.useQuery();
-  const { mutate: edit } = api.user.edit.useMutation({
+  const { mutateAsync: edit } = api.user.edit.useMutation({
     onSuccess: () => {
       refetch();
 
@@ -58,20 +59,22 @@ const Settings: NextPage<
   });
 
   const imageUpload = useRef<ImageUploadRef | null>(null);
-  const zo = useZorm("edit", editSchema, {
-    async onValidSubmit(e) {
-      e.preventDefault();
-
+  const { submitPreventDefault, isSubmitting } = useSubmit<typeof editSchema>(
+    async (e) => {
       let s3key = __user?.s3key ?? getS3key(_user.image);
       if (imageUpload.current && imageUpload.current.local) {
         await imageUpload.current.upload(s3key);
       }
 
-      edit({
+      await edit({
         name: e.data.name,
         s3key: imageUpload.current ? imageUpload.current.key : undefined,
       });
-    },
+    }
+  );
+
+  const zo = useZorm("edit", editSchema, {
+    onValidSubmit: submitPreventDefault,
   });
 
   const user = __user ? __user : _user;
@@ -128,9 +131,10 @@ const Settings: NextPage<
       <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <button
+            disabled={isSubmitting}
             type="submit"
             form="edit-user"
-            className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"
           >
             Sauvegarder
           </button>

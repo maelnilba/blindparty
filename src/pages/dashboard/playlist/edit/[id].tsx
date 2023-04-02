@@ -17,6 +17,7 @@ import { useAsyncEffect } from "@hooks/useAsyncEffect";
 import { useCountCallback } from "@hooks/useCountCallback";
 import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
+import { useSubmit } from "@hooks/zorm/useSubmit";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import type { NextPageWithLayout } from "next";
@@ -45,7 +46,7 @@ const PlaylistEdit = () => {
 
   const { data } = api.spotify.playlists.useQuery();
   const { mutate, data: tracks } = api.spotify.playlist.useMutation();
-  const { mutate: edit } = api.playlist.edit.useMutation({
+  const { mutateAsync: edit } = api.playlist.edit.useMutation({
     onSuccess: () => {
       push("/dashboard/playlist");
     },
@@ -150,9 +151,8 @@ const PlaylistEdit = () => {
   );
 
   const imageUpload = useRef<ImageUploadRef | null>(null);
-  const zo = useZorm("create", editSchema, {
-    async onValidSubmit(e) {
-      e.preventDefault();
+  const { submitPreventDefault, isSubmitting } = useSubmit<typeof editSchema>(
+    async (e) => {
       if (!id || !playlist) {
         return;
       }
@@ -193,7 +193,7 @@ const PlaylistEdit = () => {
         await imageUpload.current.upload(s3key.current);
       }
 
-      edit({
+      await edit({
         id: id,
         name: e.data.name,
         description: e.data.description,
@@ -202,7 +202,10 @@ const PlaylistEdit = () => {
         removed_tracks: removed_tracks,
         generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
       });
-    },
+    }
+  );
+  const zo = useZorm("create", editSchema, {
+    onValidSubmit: submitPreventDefault,
   });
 
   const getPlaylistTrack = (id: string) => {
@@ -274,9 +277,10 @@ const PlaylistEdit = () => {
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <div className="px-4 pb-2">
             <button
+              disabled={isSubmitting}
               type="submit"
               form="create-playlist"
-              className="w-full rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+              className="w-full rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"
             >
               Sauvegarder
             </button>

@@ -5,7 +5,8 @@ import { ExclamationIcon } from "@components/icons/exclamation";
 import { Picture } from "@components/images/picture";
 import { Playlist, PlaylistCard } from "@components/playlist/playlist-card";
 import { Tab } from "@headlessui/react";
-import { useZormTrigger } from "@hooks/useZormTrigger";
+import { useSubmit } from "@hooks/zorm/useSubmit";
+import { useTrigger } from "@hooks/zorm/useTrigger";
 import { api } from "@utils/api";
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
@@ -60,15 +61,14 @@ const PartyCreate: NextPage = () => {
   const [playlistField, setPlaylistField] = useState<string | undefined>();
   const [friendField, setFriendField] = useState<string | undefined>();
 
-  const { mutate: create } = api.party.create.useMutation({
+  const { mutateAsync: create } = api.party.create.useMutation({
     onSuccess: (data) => {
       router.push(`/party/${data.id}`);
     },
   });
 
-  const zo = useZorm("create", createSchema, {
-    async onValidSubmit(e) {
-      e.preventDefault();
+  const { submitPreventDefault, isSubmitting } = useSubmit<typeof createSchema>(
+    async (e) => {
       if (!friends.size || !playlists) return;
       let playlist: Playlist | undefined;
       if (e.data.mode === "RANDOM") {
@@ -78,18 +78,23 @@ const PartyCreate: NextPage = () => {
         e.data.mode === "RANDOM" && playlist
           ? playlist._count.tracks
           : selectedsPlaylistCount;
-      create({
+
+      await create({
         max_round: Math.min(max_round, e.data.round),
         playlists_id: playlist
           ? [playlist.id]
           : e.data.playlists.map(({ id }) => id),
         inviteds: e.data.friends.map(({ id }) => id),
       });
-    },
+    }
+  );
+
+  const zo = useZorm("create", createSchema, {
+    onValidSubmit: submitPreventDefault,
   });
 
-  const evMode = useZormTrigger(zo, zo.fields.mode());
-  const evRound = useZormTrigger(zo, zo.fields.round());
+  const evMode = useTrigger(zo, zo.fields.mode());
+  const evRound = useTrigger(zo, zo.fields.round());
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 p-4">
@@ -158,8 +163,9 @@ const PartyCreate: NextPage = () => {
       >
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <button
+            disabled={isSubmitting}
             type="submit"
-            className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"
           >
             Créer la partie
           </button>
