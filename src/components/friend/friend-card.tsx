@@ -27,7 +27,7 @@ export const FriendCard = ({ friend, onRemove }: FriendCardProps) => {
         <ConfirmationModal
           title={`Retirer ${friend.name}`}
           message={`Êtes vous certain de vouloir retirer ${friend.name} de vos amis ?`}
-          action="Retirer"
+          actions={["Retirer"]}
           onSuccess={() => {
             onRemove(friend);
           }}
