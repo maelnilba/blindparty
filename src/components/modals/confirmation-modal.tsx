@@ -109,6 +109,7 @@ export const ConfirmationModal = forwardRef<ModalRef, ConfirmationModalProps>(
                     <div className="mt-4 flex flex-row justify-end gap-4">
                       {actions?.map((action, index, self) => (
                         <button
+                          key={index}
                           type="button"
                           className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
                           onClick={() => {
