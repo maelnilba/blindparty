@@ -15,6 +15,7 @@ const validator = createQueryValidator(
 );
 
 export default async function (req: NextRequest) {
+  console.log(req.referrer);
   const { searchParams } = new URL(req.url);
   const { src, blur } = validator.validate(searchParams);
 

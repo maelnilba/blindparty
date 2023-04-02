@@ -114,7 +114,6 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
           isPresigned.current = false;
         },
         upload: async (_key?: string) => {
-          console.log("ici");
           if (!presigned || !file)
             throw new Error("No file present or presigned url failed");
           if (expiresAt.current.valueOf() < Date.now()) {
@@ -124,7 +123,6 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
               throw new Error("The presigned url has expired");
             }
           }
-          console.log("ici");
           return await post(presigned, file, _key);
         },
         key: key,
