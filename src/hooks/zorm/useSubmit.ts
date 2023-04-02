@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { ValidSubmitEvent } from "react-zorm/dist/use-zorm";
 import { z, ZodObject } from "zod";
 
@@ -8,9 +8,10 @@ export function useSubmit<TData extends ZodObject<any>>(
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isError, setIsError] = useState(false);
 
+  const submitting = useRef(false);
   const handleFunc = async (e: ValidSubmitEvent<any>) => {
-    if (isSubmitting) return;
-
+    if (submitting.current) return;
+    submitting.current = true;
     try {
       setIsSubmitting(true);
       setIsError(false);
@@ -19,11 +20,13 @@ export function useSubmit<TData extends ZodObject<any>>(
       setIsError(true);
     } finally {
       setIsSubmitting(false);
+      submitting.current = false;
     }
   };
 
   const handleFuncPreventDefault = async (e: ValidSubmitEvent<any>) => {
-    if (isSubmitting) return;
+    if (submitting.current) return;
+    submitting.current = true;
     try {
       setIsSubmitting(true);
       setIsError(false);
@@ -33,6 +36,7 @@ export function useSubmit<TData extends ZodObject<any>>(
       setIsError(true);
     } finally {
       setIsSubmitting(false);
+      submitting.current = false;
     }
   };
 

@@ -48,7 +48,7 @@ const Settings: NextPage<
     getProviders()
   );
   const { data: __user, refetch } = api.user.me.useQuery();
-  const { mutateAsync: edit } = api.user.edit.useMutation({
+  const { mutateAsync: edit, isLoading } = api.user.edit.useMutation({
     onSuccess: () => {
       refetch();
 
@@ -131,7 +131,7 @@ const Settings: NextPage<
       <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <button
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoading}
             type="submit"
             form="edit-user"
             className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"
