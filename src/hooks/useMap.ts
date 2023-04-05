@@ -8,31 +8,31 @@ type MapObject = {
 export function useMap<T extends MapObject>() {
   const [map, setMap] = useState<Map<MapObject["id"], T>>(new Map());
 
-  const adds = (tracks: T[]) => {
+  const adds = (items: T[]) => {
     setMap((m) => {
-      tracks.forEach((track) => {
-        m.set(track.id, track);
+      items.forEach((item) => {
+        m.set(item.id, item);
       });
       return new Map(m);
     });
   };
 
-  const removes = (tracks: T[]) => {
+  const removes = (items: T[]) => {
     setMap((m) => {
-      tracks.forEach((track) => {
-        m.delete(track.id);
+      items.forEach((item) => {
+        m.delete(item.id);
       });
       return new Map(m);
     });
   };
 
-  function add(track: T) {
-    setMap((m) => new Map(m.set(track.id, track)));
+  function add(item: T) {
+    setMap((m) => new Map(m.set(item.id, item)));
   }
 
-  const remove = (track: T) => {
+  const remove = (item: T) => {
     setMap((m) => {
-      m.delete(track.id);
+      m.delete(item.id);
       return new Map(m);
     });
   };
