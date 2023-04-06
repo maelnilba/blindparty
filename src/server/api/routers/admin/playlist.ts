@@ -57,8 +57,8 @@ export const playlistRouter = createTRPCRouter({
                 name: track.name,
                 preview_url: track.preview_url ?? undefined,
                 album: track.album.name,
-                artists: track.artists.map((artist) => artist.name),
-                images: track.album.images.map((image) => image.url),
+                artists: track.artists.map((artist) => artist.name).join("|"),
+                images: track.album.images.map((image) => image.url).join("|"),
               },
             })),
           },
@@ -124,8 +124,8 @@ export const playlistRouter = createTRPCRouter({
                 name: track.name,
                 preview_url: track.preview_url ?? undefined,
                 album: track.album.name,
-                artists: track.artists.map((artist) => artist.name),
-                images: track.album.images.map((image) => image.url),
+                artists: track.artists.map((artist) => artist.name).join("|"),
+                images: track.album.images.map((image) => image.url).join("|"),
               },
             })),
           },
@@ -176,11 +176,11 @@ export const playlistRouter = createTRPCRouter({
         ...track,
         album: {
           name: track.album,
-          images: track.images.map((image) => ({
+          images: track.images.split("|").map((image) => ({
             url: image,
           })),
         },
-        artists: track.artists.map((artist) => ({ name: artist })),
+        artists: track.artists.split("|").map((artist) => ({ name: artist })),
       })),
     }));
   }),
@@ -214,11 +214,11 @@ export const playlistRouter = createTRPCRouter({
           ...track,
           album: {
             name: track.album,
-            images: track.images.map((image) => ({
+            images: track.images.split("|").map((image) => ({
               url: image,
             })),
           },
-          artists: track.artists.map((artist) => ({ name: artist })),
+          artists: track.artists.split("|").map((artist) => ({ name: artist })),
         })),
       };
     }),
