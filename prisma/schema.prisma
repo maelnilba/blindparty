@@ -6,12 +6,13 @@ generator client {
 }
 
 datasource db {
-    provider = "postgresql"
+    provider     = "mysql"
     // NOTE: When using postgresql, mysql or sqlserver, uncomment the @db.Text annotations in model Account below
     // Further reading:
     // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
     // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+    url          = env("DATABASE_URL")
+    relationMode = "prisma"
 }
 
 model Example {
@@ -37,6 +38,7 @@ model Account {
     user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerAccountId])
+    @@index([userId])
 }
 
 model Session {
@@ -45,6 +47,8 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId])
 }
 
 model VerificationToken {
@@ -88,10 +92,11 @@ model Friend {
     name      String?
     image     String?
     createdAt DateTime @default(now())
-    User      User?    @relation(fields: [userId], references: [id])
+    user      User?    @relation(fields: [userId], references: [id])
     userId    String?
 
     @@unique([friendId])
+    @@index([userId])
 }
 
 model FriendInvitation {
@@ -105,6 +110,7 @@ model FriendInvitation {
     status       InvitationStatus @default(PENDING)
 
     @@unique([userSentId, userInviteId])
+    @@index([userInviteId])
 }
 
 enum InvitationStatus {
@@ -120,7 +126,7 @@ model Playlist {
     id          String   @id @default(cuid())
     user        User[]
     name        String
-    description String?
+    description String?  @db.Text
     picture     String?
     s3key       String?
     generated   Boolean  @default(false)
@@ -138,8 +144,8 @@ model Track {
     picture        String?
     preview_url    String?
     album          String
-    artists        String[]
-    images         String[]
+    artists        String     @db.Text
+    images         String     @db.Text
     playlist       Playlist[]
     playingInParty Party[]    @relation(name: "current")
     party          Party[]
@@ -151,11 +157,12 @@ model Player {
     id      String  @unique @default(cuid())
     user    User    @relation(fields: [userId], references: [id])
     userId  String
-    Party   Party?  @relation(fields: [partyId], references: [id])
+    party   Party?  @relation(fields: [partyId], references: [id])
     partyId String?
     points  Int     @default(0)
 
     @@unique([userId, partyId])
+    @@index([partyId])
 }
 
 model Party {
@@ -175,6 +182,9 @@ model Party {
     track     Track?          @relation(name: "current", fields: [trackId], references: [id])
     trackId   String?
     link      PartyLink?
+
+    @@index([trackId])
+    @@index([hostId])
 }
 
 enum PartyStatus {
@@ -195,5 +205,5 @@ model PartyLink {
     url      String   @unique
     party    Party    @relation(fields: [partyId], references: [id], onDelete: Cascade)
     partyId  String   @unique
-    expireIn DateTime @default(dbgenerated("NOW() + interval '1 day'"))
+    expireIn DateTime @default(now())
 }

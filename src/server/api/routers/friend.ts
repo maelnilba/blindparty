@@ -231,7 +231,6 @@ export const friendRouter = createTRPCRouter({
         where: {
           name: {
             contains: input.field,
-            mode: "insensitive",
           },
           AND: {
             NOT: {

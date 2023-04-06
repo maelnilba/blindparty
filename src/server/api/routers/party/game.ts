@@ -252,7 +252,7 @@ export const gameRouter = createTRPCRouter({
       return await ctx.pusher.trigger({
         track: {
           ...track,
-          images: track.images.map((image) => ({ url: image })),
+          images: track.images.split("|").map((image) => ({ url: image })),
         },
       });
     }),
@@ -292,7 +292,9 @@ export const gameRouter = createTRPCRouter({
         .join(" - ");
 
       const album = party.track.album.toLocaleLowerCase();
-      const artists = party.track.artists.map((a) => a.toLocaleLowerCase());
+      const artists = party.track.artists
+        .split("|")
+        .map((a) => a.toLocaleLowerCase());
       const name = party.track.name.toLocaleLowerCase();
 
       const toGuessA = [
