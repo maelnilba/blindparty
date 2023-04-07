@@ -1,4 +1,4 @@
-import { Nothing } from "@lib/helpers/nothing";
+import { Noop } from "@lib/helpers/noop";
 import { type NextPageWithAuth } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
@@ -16,22 +16,22 @@ export const Auth = ({
       push({ pathname: auth.redirect, query: { redirect_to: pathname } });
     else push({ pathname: auth.redirect });
   };
-  if (status === "loading") return <Nothing />;
+  if (status === "loading") return <Noop />;
   if (status === "unauthenticated") {
     redirect();
-    return <Nothing />;
+    return <Noop />;
   }
   if (!session) {
     redirect();
-    return <Nothing />;
+    return <Noop />;
   }
   if (!session?.user) {
     redirect();
-    return <Nothing />;
+    return <Noop />;
   }
   if (auth.role && !auth.role.includes(session!.user!.role)) {
     redirect();
-    return <Nothing />;
+    return <Noop />;
   }
   return <>{children}</>;
 };

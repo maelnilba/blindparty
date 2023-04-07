@@ -2,7 +2,7 @@ import { PauseIcon } from "@components/icons/pause";
 import { PlayIcon } from "@components/icons/play";
 import { Picture } from "@components/images/picture";
 import { Track } from "@components/playlist/types";
-import { nothing } from "@lib/helpers/nothing";
+import { noop } from "@lib/helpers/noop";
 
 type PlaylistTrackCardProps = {
   track: Track;
@@ -53,7 +53,7 @@ export const PlaylistTrackCard = ({
       {(onAdd || onRemove) && (
         <button
           onClick={() =>
-            onAdd ? onAdd(track) : onRemove ? onRemove(track) : nothing
+            onAdd ? onAdd(track) : onRemove ? onRemove(track) : noop
           }
           className="rounded-full bg-white px-6 py-1 text-sm font-normal text-black no-underline transition-transform hover:scale-105"
         >

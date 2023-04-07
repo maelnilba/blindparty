@@ -7,7 +7,7 @@ import { TRACK_TIMER_MS } from "@components/party/constants";
 import { useMicroPermission } from "@hooks/useMicroPermission";
 import { useVoiceDetector } from "@hooks/useVoiceDetector";
 import { nearest, parse } from "@lib/helpers/accept-language";
-import { nothing } from "@lib/helpers/nothing";
+import { noop } from "@lib/helpers/noop";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
@@ -308,9 +308,9 @@ const Party: NextPage<
     return () => {
       SpeechRecognition.stopListening();
       vad({
-        onVoiceStart: nothing,
-        onVoiceStop: nothing,
-        onUpdate: nothing,
+        onVoiceStart: noop,
+        onVoiceStop: noop,
+        onUpdate: noop,
       });
     };
   }, [game]);

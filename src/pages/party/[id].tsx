@@ -1,4 +1,4 @@
-import { Nothing } from "@lib/helpers/nothing";
+import { Noop } from "@lib/helpers/noop";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { getQuery, getUA } from "@utils/next-router";
@@ -7,7 +7,6 @@ import {
   InferGetServerSidePropsType,
   NextPage,
 } from "next";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
 
@@ -95,7 +94,7 @@ const Party: NextPage<
   const ua = getUA(userAgent);
   const { replace } = useRouter();
 
-  if (typeof window === "undefined") return <Nothing />;
+  if (typeof window === "undefined") return <Noop />;
 
   if (ua.isDesktop()) {
     replace(
@@ -105,14 +104,14 @@ const Party: NextPage<
         shallow: false,
       }
     );
-    return <Nothing />;
+    return <Noop />;
   }
 
   replace({ pathname: "/party/phone/[id]", query: { id } }, "/party/" + id, {
     shallow: false,
   });
 
-  return <Nothing />;
+  return <Noop />;
 };
 
 export default Party;

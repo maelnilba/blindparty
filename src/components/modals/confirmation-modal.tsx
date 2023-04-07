@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { nothing } from "@lib/helpers/nothing";
+import { noop } from "@lib/helpers/noop";
 import {
   forwardRef,
   Fragment,
@@ -71,7 +71,7 @@ export const ConfirmationModal = forwardRef<ModalRef, ConfirmationModalProps>(
           <Dialog
             as="div"
             className="relative z-10"
-            onClose={closeOnOutside ? closeModal : nothing}
+            onClose={closeOnOutside ? closeModal : noop}
           >
             <Transition.Child
               as={Fragment}
