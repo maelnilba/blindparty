@@ -1,7 +1,14 @@
+import { Nothing } from "@lib/helpers/nothing";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { getQuery, getUA } from "@utils/next-router";
-import { GetServerSidePropsContext, NextPage } from "next";
+import {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+  NextPage,
+} from "next";
+import Link from "next/link";
+import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
@@ -60,24 +67,52 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const user_agent = userAgentFromString(context.req.headers["user-agent"]);
 
-  if (getUA(user_agent).isDesktop()) {
-    return {
-      redirect: {
-        destination: "/party/desktop/" + id,
-        permanent: false,
-      },
-    };
-  } else {
-    return {
-      redirect: {
-        destination: "/party/phone/" + id,
-        permanent: false,
-      },
-    };
-  }
+  return {
+    props: {
+      userAgent: user_agent,
+      id: id,
+    },
+  };
+  // if (getUA(user_agent).isDesktop()) {
+  //   return {
+  //     redirect: {
+  //       destination: "/party/desktop/" + id,
+  //       permanent: false,
+  //     },
+  //   };
+  // } else {
+  //   return {
+  //     redirect: {
+  //       destination: "/party/phone/" + id,
+  //       permanent: false,
+  //     },
+  //   };
+  // }
 }
-const Party: NextPage = () => {
-  return <div></div>;
+const Party: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ userAgent, id }) => {
+  const ua = getUA(userAgent);
+  const { replace } = useRouter();
+
+  if (typeof window === "undefined") return <Nothing />;
+
+  if (ua.isDesktop()) {
+    replace(
+      { pathname: "/party/desktop/[id]", query: { id } },
+      "/party/" + id,
+      {
+        shallow: false,
+      }
+    );
+    return <Nothing />;
+  }
+
+  replace({ pathname: "/party/phone/[id]", query: { id } }, "/party/" + id, {
+    shallow: false,
+  });
+
+  return <Nothing />;
 };
 
 export default Party;

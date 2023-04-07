@@ -93,7 +93,7 @@ export const parse = (acceptLanguage: string) =>
     })
     .sort((a, b) => b.priority - a.priority);
 
-export const near = (
+export const nearest = (
   languages: ReturnType<typeof parse>,
   fallback: SpeechLanguage
 ): SpeechLanguage => {

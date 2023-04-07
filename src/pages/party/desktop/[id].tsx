@@ -32,7 +32,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
 import { Winner } from "@components/game/round/winner";
-import { Square } from "@components/elements/square-loader";
 import { Round } from "@components/game/round/round";
 import {
   VIEW_SCORE_MS,

@@ -4,10 +4,9 @@ import { Picture } from "@components/images/picture";
 import { AuthGuard } from "@components/layout/auth";
 import { Modal } from "@components/modals/modal";
 import { TRACK_TIMER_MS } from "@components/party/constants";
-import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useMicroPermission } from "@hooks/useMicroPermission";
 import { useVoiceDetector } from "@hooks/useVoiceDetector";
-import { near, parse } from "@lib/helpers/accept-language";
+import { nearest, parse } from "@lib/helpers/accept-language";
 import { nothing } from "@lib/helpers/nothing";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
@@ -146,7 +145,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       party: party,
-      language: near(
+      language: nearest(
         parse(context.req.headers["accept-language"] ?? "en-GB"),
         "en - GB"
       ),
