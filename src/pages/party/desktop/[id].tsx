@@ -39,6 +39,7 @@ import {
   TRACK_TIMER_MS,
 } from "@components/party/constants";
 import { AuthGuard } from "@components/layout/auth";
+import { Volume, useVolumeAudio } from "@components/spotify/volume";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -504,6 +505,18 @@ const Party: NextPage<
               <Round round={roundCount} />
               <Divider />
               <p className="text-4xl font-extrabold">{party.max_round}</p>
+              <Volume
+                className="h-40"
+                orientation="vertical"
+                inverted
+                onValueChange={(vol, prev) => {
+                  if (audio.current) audio.current.speaker(vol, prev);
+                }}
+                onClick={(state) => {
+                  if (!audio.current) return;
+                  state ? audio.current.unmute() : audio.current.mute();
+                }}
+              />
             </div>
           </div>
           {view === "GUESS" && (

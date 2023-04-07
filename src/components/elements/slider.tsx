@@ -1,10 +1,9 @@
 import * as RadixSlider from "@radix-ui/react-slider";
 import { forwardRef, useEffect, useRef } from "react";
 
-export const Slider = forwardRef<
-  HTMLSpanElement,
-  RadixSlider.SliderProps & { preview?: boolean }
->(
+export type SliderProps = RadixSlider.SliderProps & { preview?: boolean };
+
+export const Slider = forwardRef<HTMLSpanElement, SliderProps>(
   (
     {
       preview: _preview = false,

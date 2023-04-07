@@ -19,24 +19,7 @@ import {
   useState,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-
-export const usePlayerVolumeStore = create(
-  persist<{
-    volume: number;
-    setVolume: (volume: number) => void;
-  }>(
-    (set) => ({
-      volume: 0,
-      setVolume: (volume) => set({ volume }),
-    }),
-    {
-      name: "settings-player",
-      storage: createJSONStorage(() => localStorage),
-    }
-  )
-);
+import { Volume, usePlayerVolumeStore, useVolumeAudio } from "./volume";
 
 type TrackPlayerContext = {
   currentTrack: Track | null;
@@ -78,8 +61,6 @@ export const TrackPlayer = ({
   const [playing, setPlaying] = useState(false);
   const volume = usePlayerVolumeStore((state) => state.volume);
   const setVolume = usePlayerVolumeStore((state) => state.setVolume);
-  const muted = !volume;
-  const volumewas = usePrevious(volume);
 
   const audio = useRef<HTMLAudioElement | null>(null);
 
@@ -119,23 +100,9 @@ export const TrackPlayer = ({
     audio.current.play();
     setPlaying(true);
   };
-  const mute = () => {
-    setVolume(0);
-    if (!audio.current) return;
-    audio.current.muted = true;
-  };
-  const unmute = () => {
-    setVolume(volumewas || 1);
-    if (!audio.current) return;
-    audio.current.muted = false;
-  };
-  const speaker = (spk: number) => {
-    setVolume(spk);
-    if (!audio.current) return;
-    if (spk === 0 && !muted) mute();
-    if (spk !== 0 && muted) unmute();
-    audio.current.volume = spk / 100;
-  };
+
+  const { mute, unmute, speaker } = useVolumeAudio(audio);
+
   const toggle = () => {
     if (playing) pause();
     else unpause();
@@ -225,8 +192,6 @@ export const TrackPlayer = ({
   }, [playing]);
 
   const image = track?.album.images[0];
-
-  const isClient = useClient();
 
   return (
     <TrackPlayerContext.Provider value={value}>
@@ -325,28 +290,11 @@ export const TrackPlayer = ({
             </div>
           </div>
           <div className="col-span-3 flex items-center justify-center gap-2">
-            {isClient && (
-              <>
-                <SpeakerIcon
-                  className="h-6 w-6 cursor-pointer transition-transform duration-75 hover:scale-105"
-                  onClick={() => {
-                    volume === 0 ? unmute() : mute();
-                  }}
-                  active={!muted}
-                />
-                <Slider
-                  className="w-40"
-                  defaultValue={[volume]}
-                  value={[volume]}
-                  min={0}
-                  max={100}
-                  onValueChange={(e) => {
-                    const [value] = e;
-                    if (value !== undefined) speaker(value);
-                  }}
-                />
-              </>
-            )}
+            <Volume
+              className="w-40"
+              onValueChange={(vol, prev) => speaker(vol, prev)}
+              onClick={(state) => (state ? unmute() : mute())}
+            />
           </div>
         </div>
       </div>
