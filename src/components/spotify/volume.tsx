@@ -2,6 +2,7 @@ import { Slider, SliderProps } from "@components/elements/slider";
 import { SpeakerIcon } from "@components/icons/speaker";
 import { useClient } from "@hooks/useClient";
 import { usePrevious } from "@hooks/usePrevious";
+import { percent } from "@lib/helpers/math";
 import { Noop } from "@lib/helpers/noop";
 import { MutableRefObject } from "react";
 import { create } from "zustand";
@@ -43,6 +44,7 @@ export const Volume = ({ onClick, onValueChange, ...props }: VolumeProps) => {
   return (
     <>
       <SpeakerIcon
+        percent={percent(volume, [0, 100])}
         className="h-6 w-6 cursor-pointer transition-transform duration-75 hover:scale-105"
         onClick={() => {
           if (volume === 0) setVolume(volumewas || 1);
