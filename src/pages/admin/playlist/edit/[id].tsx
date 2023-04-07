@@ -167,22 +167,25 @@ const PlaylistEdit = () => {
         .filter((track) => !tracksMap.has(track.id))
         .map((track) => track.id);
 
-      const tracks = [...tracksMap].map(([_, track]) => ({
-        id: track.id,
-        name: track.name,
-        preview_url: track.preview_url!,
-        album: {
-          name: track.album.name,
-          images: track.album.images.map((image) => ({
-            url: image.url,
+      const tracks = [...tracksMap]
+        .map(([_, track]) => ({
+          id: track.id,
+          name: track.name,
+          preview_url: track.preview_url!,
+          album: {
+            name: track.album.name,
+            images: track.album.images.map((image) => ({
+              url: image.url,
+            })),
+          },
+          artists: track.artists.map((artist) => ({
+            name: artist.name,
           })),
-        },
-        artists: track.artists.map((artist) => ({
-          name: artist.name,
-        })),
-      }));
+        }))
+        .filter((t) => !playlist.tracks.find((pt) => pt.id === t.id));
 
-      if (tracks.length < 1) {
+      if (tracks.length < 1 && removed_tracks.length < 1) {
+        push("/dashboard/playlist");
         return;
       }
 

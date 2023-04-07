@@ -73,28 +73,26 @@ export const playlistRouter = createTRPCRouter({
         description: z.string().optional(),
         s3key: z.string().optional(),
         generated: z.boolean(),
-        tracks: z
-          .array(
-            z.object({
-              id: z.string(),
+        tracks: z.array(
+          z.object({
+            id: z.string(),
+            name: z.string(),
+            preview_url: z.string().url().nullable(),
+            album: z.object({
               name: z.string(),
-              preview_url: z.string().url().nullable(),
-              album: z.object({
-                name: z.string(),
-                images: z.array(
-                  z.object({
-                    url: z.string().url(),
-                  })
-                ),
-              }),
-              artists: z.array(
+              images: z.array(
                 z.object({
-                  name: z.string(),
+                  url: z.string().url(),
                 })
               ),
-            })
-          )
-          .min(1),
+            }),
+            artists: z.array(
+              z.object({
+                name: z.string(),
+              })
+            ),
+          })
+        ),
         removed_tracks: z.array(z.string()),
       })
     )
