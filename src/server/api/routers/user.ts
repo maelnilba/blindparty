@@ -1,7 +1,11 @@
-import { pictureLink } from "@server/s3";
 import { Socials } from "@server/types";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
+
+export const pictureLink = (key: string | undefined) =>
+  key
+    ? `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
+    : undefined;
 
 export const userRouter = createTRPCRouter({
   provider: protectedProcedure.query(async ({ ctx }) => {

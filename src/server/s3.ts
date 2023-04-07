@@ -25,8 +25,3 @@ export const s3 =
 if (env.NODE_ENV !== "production") {
   global.s3 = s3;
 }
-
-export const pictureLink = (key: string | undefined) =>
-  key
-    ? `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
-    : undefined;
