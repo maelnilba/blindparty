@@ -140,10 +140,10 @@ model Playlist {
 
 model Track {
     id             String     @id
-    name           String
+    name           String     @db.VarChar(500)
     picture        String?
     preview_url    String?
-    album          String
+    album          String     @db.VarChar(500)
     artists        String     @db.Text
     images         String     @db.Text
     playlist       Playlist[]
