@@ -1,3 +1,4 @@
+import { noop } from "@lib/helpers/noop";
 import { TRPCError } from "@trpc/server";
 import { nanoid } from "nanoid";
 import { createTRPCRouter, protectedProcedure } from "server/api/trpc";
@@ -67,16 +68,12 @@ export const s3Router = createTRPCRouter({
         if (!user) throw new TRPCError({ code: "PRECONDITION_FAILED" });
       }
 
-      await ctx.s3.deleteObject(
+      ctx.s3.deleteObject(
         {
           Bucket: process.env.AWS_S3_BUCKET_NAME!,
           Key: input.key,
         },
-        () => {
-          throw new TRPCError({
-            code: "INTERNAL_SERVER_ERROR",
-          });
-        }
+        noop
       );
     }),
 });
