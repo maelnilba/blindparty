@@ -9,6 +9,8 @@ module.exports = {
       transitionProperty: {
         width: "width",
         "width-opacity": "opacity, width",
+        "height-opacity": "opacity, height",
+        "size-opacity": "opacity, width, height",
         "colors-padding":
           "color, background-color, border-color, text-decoration-color, fill, stroke, padding",
       },
