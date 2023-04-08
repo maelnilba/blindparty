@@ -141,6 +141,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
+  if (party.status === "ENDED") {
+    return {
+      redirect: {
+        destination: exclude("PARTY_ENDED", "/party"),
+
+        permanent: false,
+      },
+    };
+  }
+
   const user_agent = userAgentFromString(context.req.headers["user-agent"]);
 
   if (!getUA(user_agent).isDesktop()) {

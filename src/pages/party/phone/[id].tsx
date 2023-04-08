@@ -111,6 +111,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
+  if (party.status === "ENDED") {
+    return {
+      redirect: {
+        destination: exclude("PARTY_ENDED", "/party"),
+
+        permanent: false,
+      },
+    };
+  }
+
   if (!party.inviteds.map((invited) => invited.id).includes(session.user.id)) {
     return {
       redirect: {

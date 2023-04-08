@@ -18,6 +18,7 @@ const excludeReasons = z.enum([
   "NOT_HOST",
   "PARTY_NOT_EXISTS",
   "HOST_LEAVE",
+  "PARTY_ENDED",
 ]);
 export const exclude = (
   reason: z.infer<typeof excludeReasons>,
@@ -84,6 +85,7 @@ const PartyHome: NextPageWithAuth<
           )}
           {reason === "PARTY_NOT_EXISTS" && <p>La partie est introuvable</p>}
           {reason === "HOST_LEAVE" && <p>L'Hôte a quitté la partie en cours</p>}
+          {reason === "PARTY_ENDED" && <p>La partie est terminée</p>}
           <Link
             href="/dashboard/party/create"
             className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
