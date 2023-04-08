@@ -1,5 +1,8 @@
 import { useRef } from "react";
 
+/**
+ * Hacky react things, should use better composition rather than need trigger a event for re-run a function
+ */
 export function useEventDispatch<TElement extends HTMLElement>() {
   const ref = useRef<TElement>(null);
   const dispatch = (event: keyof HTMLElementEventMap) => {

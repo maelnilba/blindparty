@@ -14,6 +14,7 @@ import { useAsyncEffect } from "@hooks/helpers/useAsyncEffect";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
+import { spotify } from "@hooks/spotify/useSpotify";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { Noop } from "@lib/helpers/noop";
 import { api } from "@utils/api";
@@ -39,8 +40,9 @@ const PlaylistCreate = () => {
     reset: resetTracks,
   } = useMap<Track>();
 
-  const { data } = api.spotify.playlists.useQuery();
-  const { mutate, data: tracks } = api.spotify.playlist.useMutation();
+  const { data } = spotify.getUserPlaylists();
+  const { refetch: mutate, data: tracks } = spotify.getPlaylistTracks();
+
   const {
     mutateAsync: create,
     isLoading,

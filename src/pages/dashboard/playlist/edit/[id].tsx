@@ -1,10 +1,7 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { AuthGuard } from "@components/layout/auth";
 import { GetLayoutThrough } from "@components/layout/layout";
-import {
-  ConfirmationModal,
-  ModalRef,
-} from "@components/modals/confirmation-modal";
+import { ModalRef } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
 import {
   AlbumsPicture,
@@ -18,6 +15,7 @@ import { useAsyncEffect } from "@hooks/helpers/useAsyncEffect";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
+import { spotify } from "@hooks/spotify/useSpotify";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { Noop } from "@lib/helpers/noop";
 import { api } from "@utils/api";
@@ -46,8 +44,9 @@ const PlaylistEdit = () => {
     reset: resetTracks,
   } = useMap<Track>();
 
-  const { data } = api.spotify.playlists.useQuery();
-  const { mutate, data: tracks } = api.spotify.playlist.useMutation();
+  const { data } = spotify.getUserPlaylists();
+  const { refetch: mutate, data: tracks } = spotify.getPlaylistTracks();
+
   const {
     mutateAsync: edit,
     isLoading,

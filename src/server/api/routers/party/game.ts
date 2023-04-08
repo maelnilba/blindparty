@@ -1,10 +1,6 @@
 import { TRPCError } from "@trpc/server";
 import { prpc } from "server/api/prpc";
-import {
-  createTRPCRouter,
-  enforceSpotifyUserAuthed,
-  enforceUserIsHost,
-} from "server/api/trpc";
+import { createTRPCRouter, enforceUserIsHost } from "server/api/trpc";
 import { z } from "zod";
 
 export const gameRouter = createTRPCRouter({
