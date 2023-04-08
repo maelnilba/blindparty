@@ -90,8 +90,8 @@ const Settings: NextPageWithAuth<
               Lié un compte
             </button>
             <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
-              <div className="sticky top-0 flex flex-col gap-2 bg-black/10 font-semibold backdrop-blur-sm">
-                <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5">
+              <div className="sticky top-0 flex flex-col gap-2 font-semibold">
+                <div className="w-full rounded-full px-6 py-1 text-center text-lg font-semibold no-underline">
                   Liste des providers
                 </div>
               </div>
