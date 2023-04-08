@@ -9,7 +9,8 @@ import { Picture } from "@components/images/picture";
 import { AuthGuard } from "@components/layout/auth";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
-import { useDebounce } from "@hooks/useDebounce";
+import { useDebounce } from "@hooks/helpers/useDebounce";
+import { useEventDispatch } from "@hooks/itsfine/useEventDispatch";
 import { api, RouterOutputs } from "@utils/api";
 import type { NextPageWithAuth } from "next";
 import { useSession } from "next-auth/react";
@@ -18,7 +19,11 @@ const Friends: NextPageWithAuth = () => {
   const { data: session } = useSession();
   const { data: friends, refetch: refetch_friends } =
     api.friend.get_all.useQuery();
-  const { data: users, mutate: search } = api.friend.search.useMutation();
+  const {
+    data: users,
+    mutate: search,
+    reset: reset_users,
+  } = api.friend.search.useMutation();
   const onSearch = useDebounce((field: string) => {
     search({ field: field });
   });
@@ -32,7 +37,10 @@ const Friends: NextPageWithAuth = () => {
     send(
       { id: user.id },
       {
-        onSuccess: () => refetch_invitation(),
+        onSuccess: () => {
+          reset_users();
+          refetch_invitation();
+        },
       }
     );
   };
