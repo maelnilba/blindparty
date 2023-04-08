@@ -1,15 +1,12 @@
 import { Square } from "@components/elements/square-loader";
+import {
+  usePlayerVolumeStore,
+  useVolumeAudio,
+} from "@components/spotify/volume";
 import { useCountdown } from "@hooks/helpers/useCountdown";
 import { RouterOutputs } from "@utils/api";
-import {
-  type MutableRefObject,
-  forwardRef,
-  useImperativeHandle,
-  useRef,
-  useState,
-} from "react";
+import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { TrackBluredPicture } from "./track-picture";
-import { useVolumeAudio } from "@components/spotify/volume";
 
 export type TrackPlayerProps = RouterOutputs["party"]["game"]["round"] & {
   tracktimer: number;
@@ -29,6 +26,7 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
     const { count, start, stop } = useCountdown(tracktimer);
     const audio = useRef<HTMLAudioElement | null>(null);
     const range = useRef<HTMLDivElement | null>(null);
+    const volume = usePlayerVolumeStore((state) => state.volume);
 
     const volumeAudio = useVolumeAudio(audio);
 
@@ -38,6 +36,8 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
         await start();
         setState("RUNNING");
         if (audio.current) {
+          audio.current.volume = volume / 100;
+          audio.current.muted = !volume;
           await audio.current.play();
           // @ts-ignore
           audio.current.addEventListener("timeupdate", (e) => {

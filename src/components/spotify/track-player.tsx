@@ -1,11 +1,8 @@
 import { Slider } from "@components/elements/slider";
 import { PauseIcon } from "@components/icons/pause";
 import { PlayIcon } from "@components/icons/play";
-import { SpeakerIcon } from "@components/icons/speaker";
 import { Picture } from "@components/images/picture";
 import { Track } from "@components/playlist/types";
-import { useClient } from "@hooks/next/useClient";
-import { usePrevious } from "@hooks/helpers/usePrevious";
 import { noop } from "@lib/helpers/noop";
 import { secondIntl } from "lib/helpers/date";
 import { useRouter } from "next/router";
@@ -60,7 +57,6 @@ export const TrackPlayer = ({
   const [track, setTrack] = useState<Track | null>(null);
   const [playing, setPlaying] = useState(false);
   const volume = usePlayerVolumeStore((state) => state.volume);
-  const setVolume = usePlayerVolumeStore((state) => state.setVolume);
 
   const audio = useRef<HTMLAudioElement | null>(null);
 
