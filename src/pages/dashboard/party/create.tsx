@@ -6,21 +6,25 @@ import { Picture } from "@components/images/picture";
 import { AuthGuard } from "@components/layout/auth";
 import { Playlist, PlaylistCard } from "@components/playlist/playlist-card";
 import { Tab } from "@headlessui/react";
+import { useDebug } from "@hooks/itsfine/useDebug";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { useTrigger } from "@hooks/zorm/useTrigger";
 import { api } from "@utils/api";
 import type { NextPageWithAuth } from "next";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
-import { useZorm, Value } from "react-zorm";
+import { Value, useZorm } from "react-zorm";
 import { z } from "zod";
 
 const createSchema = z.object({
-  playlists: z.array(
-    z.object({
-      id: z.string(),
-    })
-  ),
+  playlists: z
+    .array(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .optional()
+    .default([]),
   mode: z.coerce
     .number()
     .min(0)
@@ -40,7 +44,7 @@ const PartyCreate: NextPageWithAuth = () => {
   const router = useRouter();
   const { data: playlists } = api.playlist.get_all.useQuery();
   const { data: allfriends } = api.friend.get_all.useQuery();
-  // const [playlist, setPlaylist] = useState<Playlist | null>(null);
+
   const [selectedsPlaylist, setSelectedsPlaylist] = useState<
     Map<string, Playlist>
   >(new Map());
@@ -97,6 +101,8 @@ const PartyCreate: NextPageWithAuth = () => {
   const zo = useZorm("create", createSchema, {
     onValidSubmit: submitPreventDefault,
   });
+
+  useDebug(zo, "form");
 
   const evMode = useTrigger(zo, zo.fields.mode());
   const evRound = useTrigger(zo, zo.fields.round());

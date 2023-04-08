@@ -9,7 +9,7 @@ export const partyRouter = createTRPCRouter({
   create: protectedProcedure
     .input(
       z.object({
-        playlists_id: z.array(z.string().cuid()),
+        playlists_id: z.array(z.string().cuid()).min(1),
         inviteds: z.array(z.string().cuid()),
         max_round: z.number().min(10),
       })
