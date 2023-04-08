@@ -163,7 +163,7 @@ export const TrackPlayer = ({
     const handleRouteChange = (url: string, opts: { shallow: boolean }) => {
       if (done) return true;
       if (!audio.current) return true;
-      if (!playing) return;
+      if (!playing) return true;
       // Might find a way to descrease volume in inscreasing way
       let count = 0;
       slow = setInterval(() => {

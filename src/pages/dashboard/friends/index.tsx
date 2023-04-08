@@ -10,7 +10,6 @@ import { AuthGuard } from "@components/layout/auth";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
 import { useDebounce } from "@hooks/helpers/useDebounce";
-import { useEventDispatch } from "@hooks/itsfine/useEventDispatch";
 import { api, RouterOutputs } from "@utils/api";
 import type { NextPageWithAuth } from "next";
 import { useSession } from "next-auth/react";
