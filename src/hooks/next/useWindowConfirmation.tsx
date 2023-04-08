@@ -5,6 +5,17 @@ import {
 import { noop } from "@lib/helpers/noop";
 import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";
+import { create } from "zustand";
+
+export const useWindowConfirmationStore = create<{
+  active: boolean;
+  subscribe: () => void;
+  unsubscribe: () => void;
+}>((set) => ({
+  active: false,
+  subscribe: () => set({ active: true }),
+  unsubscribe: () => set({ active: false }),
+}));
 
 export function useWindowConfirmation(
   warning: string,
@@ -14,10 +25,11 @@ export function useWindowConfirmation(
   const modal = useRef<ModalRef>(null);
   const path = useRef<{ url: string; options: { shallow: boolean } }>();
   const success = useRef(false);
+  const active = useWindowConfirmationStore((state) => state.active);
 
   useEffect(() => {
     if (!isSubscribe) return noop;
-
+    if (!active) return noop;
     const handleBrowseAway = (url: string, options: { shallow: boolean }) => {
       if (success.current) return true;
 
@@ -32,7 +44,7 @@ export function useWindowConfirmation(
     return () => {
       router.events.off("routeChangeStart", handleBrowseAway);
     };
-  }, [isSubscribe]);
+  }, [isSubscribe, active]);
 
   return (
     <ConfirmationModal

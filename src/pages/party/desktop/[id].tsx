@@ -40,6 +40,7 @@ import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
+import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -171,6 +172,14 @@ const Party: NextPage<
   const [joineds, setJoineds] = useState<Set<string>>(new Set());
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
+
+  const subscribeConfirm = useWindowConfirmationStore(
+    (state) => state.subscribe
+  );
+
+  const unsubscribeConfirm = useWindowConfirmationStore(
+    (state) => state.unsubscribe
+  );
 
   const [_, setScores] = useState<Score[]>([]);
   const [winner, setWinner] = useState<Score | null | undefined>();
@@ -322,6 +331,7 @@ const Party: NextPage<
       bind("over", () => {
         setView("NONE");
         setGame("ENDED");
+        unsubscribeConfirm();
       });
 
       return () => {
@@ -370,6 +380,7 @@ const Party: NextPage<
     send("start", undefined, ({ error, result }) => {
       if (!error && result?.running) {
         setGame("RUNNING");
+        subscribeConfirm();
         message("start", true);
       }
     });
