@@ -1,4 +1,4 @@
-import { useStatePromise } from "@hooks/itsfine/useStateAsync";
+import { useStateAsync } from "@hooks/itsfine/useStateAsync";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@utils/api";
 import { useEffect } from "react";
@@ -80,7 +80,7 @@ const useGetUserPlaylists = () => {
 
 const useGetPlaylistTracks = () => {
   const { success, renew } = useSpotify();
-  const [id, setId] = useStatePromise<string | null>(null);
+  const [id, setId] = useStateAsync<string | null>(null);
   const { refetch, ...query } = useQuery(
     ["spotify", "playlist-tracks", id],
     async () => {
@@ -100,15 +100,16 @@ const useGetPlaylistTracks = () => {
 
   return {
     ...query,
-    refetch: ({ id }: { id: string }) => {
-      setId(id).then(() => refetch());
+    refetch: async ({ id }: { id: string }) => {
+      await setId(id);
+      refetch();
     },
   };
 };
 
 const useSearchPlaylists = () => {
   const { success, renew } = useSpotify();
-  const [field, setField] = useStatePromise<string | null>(null);
+  const [field, setField] = useStateAsync<string | null>(null);
   const { refetch, ...query } = useQuery(
     ["spotify", "search-playlist", field],
     async () => {
@@ -126,8 +127,9 @@ const useSearchPlaylists = () => {
 
   return {
     ...query,
-    refetch: ({ field }: { field: string }) => {
-      setField(field).then(() => refetch());
+    refetch: async ({ field }: { field: string }) => {
+      await setField(field);
+      refetch();
     },
   };
 };
