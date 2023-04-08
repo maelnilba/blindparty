@@ -9,6 +9,7 @@ type PlaylistTrackCardProps = {
   onAdd?: (track: Track) => void;
   onRemove?: (track: Track) => void;
   onPlay?: (track: Track) => void;
+  on?: "REMOVE" | "ADD";
   playing?: boolean;
 };
 
@@ -18,6 +19,7 @@ export const PlaylistTrackCard = ({
   onRemove,
   onPlay,
   playing,
+  on,
 }: PlaylistTrackCardProps) => {
   const image = track.album.images[0];
   return (
@@ -50,15 +52,24 @@ export const PlaylistTrackCard = ({
           {track.name}
         </span>
       </div>
-      {(onAdd || onRemove) && (
+      {(onAdd || onRemove) && !(onAdd && onRemove && on) && (
         <button
           onClick={() =>
             onAdd ? onAdd(track) : onRemove ? onRemove(track) : noop
           }
-          className="rounded-full bg-white px-6 py-1 text-sm font-normal text-black no-underline transition-transform hover:scale-105"
+          className="w-1/4 rounded-full bg-white px-6 py-1 text-sm font-normal text-black no-underline transition-transform hover:scale-105"
         >
           {onAdd && "Ajouter"}
           {onRemove && "Retirer"}
+        </button>
+      )}
+      {onAdd && onRemove && on && (
+        <button
+          onClick={() => (on === "ADD" ? onAdd(track) : onRemove(track))}
+          className="w-1/4 rounded-full bg-white px-6 py-1 text-sm font-normal text-black no-underline transition-transform hover:scale-105"
+        >
+          {on === "ADD" && "Ajouter"}
+          {on === "REMOVE" && "Retirer"}
         </button>
       )}
     </div>

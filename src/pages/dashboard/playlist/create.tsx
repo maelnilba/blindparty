@@ -15,6 +15,7 @@ import { useCountCallback } from "@hooks/useCountCallback";
 import { useDebounce } from "@hooks/useDebounce";
 import { useMap } from "@hooks/useMap";
 import { useSubmit } from "@hooks/zorm/useSubmit";
+import { Noop } from "@lib/helpers/noop";
 import { api } from "@utils/api";
 import { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
@@ -186,19 +187,26 @@ const PlaylistCreate = () => {
           />
         ))}
       </div>
-      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24">
+      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24 pt-0.5">
         {tracks && (
           <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">
-            <button
-              onClick={() =>
-                addTracks(tracks.filter((t) => t.track).map((t) => t.track!))
-              }
-              className="rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-            >
-              Ajouter tout
-            </button>
+            {!(
+              tracks.length &&
+              tracks.every(
+                (track) => track.track && tracksMap.has(track.track.id)
+              )
+            ) && (
+              <button
+                onClick={() =>
+                  addTracks(tracks.filter((t) => t.track).map((t) => t.track!))
+                }
+                className="rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+              >
+                Ajouter tout
+              </button>
+            )}
             {tracks.some(
-              (track) => track.track && tracksMap.has(track.track?.id)
+              (track) => track.track && tracksMap.has(track.track.id)
             ) && (
               <button
                 onClick={() =>
@@ -218,13 +226,15 @@ const PlaylistCreate = () => {
             ?.filter((t) => t.track)
             .map((track) => {
               if (!track.track) {
-                return null;
+                return <Noop />;
               }
               return (
                 <PlaylistTrackCard
                   key={track.track.id}
                   track={track.track}
                   onAdd={addTrack}
+                  onRemove={removeTrack}
+                  on={tracksMap.has(track.track.id) ? "REMOVE" : "ADD"}
                   onPlay={playTrack}
                   playing={
                     Boolean(currentTrack) &&
@@ -236,7 +246,7 @@ const PlaylistCreate = () => {
             })}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24">
+      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24 pt-0.5">
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <div className="px-4 pb-2">
             <button
