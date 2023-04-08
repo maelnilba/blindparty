@@ -1,10 +1,24 @@
 import { Picture } from "@components/images/picture";
 import { Menu, Transition } from "@headlessui/react";
+import { useWindowConfirmation } from "@hooks/next/useWindowConfirmation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 
-const Navigation = ({ through = false }: { through?: boolean }) => {
+type NavigationProps = {
+  through?: boolean;
+  confirm?: string;
+};
+
+const Navigation = ({
+  through = false,
+  confirm: confirmText,
+}: NavigationProps) => {
   const { data: session, status } = useSession();
+
+  const windowConfirm = useWindowConfirmation(
+    confirmText ?? "noop",
+    typeof confirmText === "string"
+  );
 
   if (status === "loading") {
     return (
@@ -18,6 +32,7 @@ const Navigation = ({ through = false }: { through?: boolean }) => {
   if (session && session.user) {
     return (
       <>
+        {confirmText && <>{windowConfirm}</>}
         <div className="fixed top-0 z-navigation flex h-20 w-full flex-row items-center justify-around bg-black/5 p-6 backdrop-blur-sm">
           <Link
             href="/dashboard"

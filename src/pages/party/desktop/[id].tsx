@@ -1,14 +1,23 @@
 import { Divider } from "@components/elements/divider";
 import { Url } from "@components/elements/url";
+import { PlayerStack } from "@components/game/players-stack";
+import { Round } from "@components/game/round/round";
+import { Winner } from "@components/game/round/winner";
 import { Score } from "@components/game/score-board";
 import { TrackPicture } from "@components/game/track-picture";
 import { TrackPlayer, TrackPlayerRef } from "@components/game/track-player";
 import { DesktopIcon } from "@components/icons/desktop";
 import { PhoneIcon } from "@components/icons/phone";
-import { GetLayoutThrough } from "@components/layout/layout";
+import { AuthGuard } from "@components/layout/auth";
+import { GetLayoutThroughConfirm } from "@components/layout/layout";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
+import {
+  GUESS_MS,
+  TRACK_TIMER_MS,
+  VIEW_SCORE_MS,
+} from "@components/party/constants";
 import { PlayerCard } from "@components/party/player-card";
-import { PlayerStack } from "@components/game/players-stack";
+import { Volume } from "@components/spotify/volume";
 import { useMessagesBus } from "@hooks/libs/useMessagesBus";
 import { useWindowLocation } from "@hooks/next/useWindowLocation";
 import { PartyStatus, PartyViewStatus } from "@prisma/client";
@@ -31,15 +40,6 @@ import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
-import { Winner } from "@components/game/round/winner";
-import { Round } from "@components/game/round/round";
-import {
-  VIEW_SCORE_MS,
-  GUESS_MS,
-  TRACK_TIMER_MS,
-} from "@components/party/constants";
-import { AuthGuard } from "@components/layout/auth";
-import { Volume, useVolumeAudio } from "@components/spotify/volume";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -571,5 +571,7 @@ const PartyWrapper: NextPageWithAuth<
 };
 
 export default PartyWrapper;
-PartyWrapper.getLayout = GetLayoutThrough;
+PartyWrapper.getLayout = GetLayoutThroughConfirm(
+  "Êtes vous sur de vouloir quitter la page ? Cela signifira la fin de la partie"
+);
 PartyWrapper.auth = AuthGuard;
