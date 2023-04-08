@@ -43,7 +43,7 @@ const Navigation = ({
           <div className="flex-1"></div>
           <div className="flex flex-row items-center gap-4">
             <Link href="/help" className="font-bold hover:opacity-75">
-              Help
+              Aide
             </Link>
             <Menu as="div" className="relative z-50 inline-block">
               <Menu.Button>
@@ -80,7 +80,7 @@ const Navigation = ({
                       } group flex w-full items-center rounded-md p-4 text-sm ring-2 ring-white ring-opacity-5`}
                       href="/settings/account"
                     >
-                      Settings
+                      Profil
                     </Link>
                   )}
                 </Menu.Item>
@@ -96,7 +96,7 @@ const Navigation = ({
                         })
                       }
                     >
-                      Sign Out
+                      Se déconnecter
                     </button>
                   )}
                 </Menu.Item>
@@ -119,7 +119,7 @@ const Navigation = ({
             className="rounded-full bg-white px-10 py-3 font-semibold text-black no-underline transition-transform hover:scale-105"
             onClick={() => void signIn()}
           >
-            Sign in
+            Se connecter
           </button>
         </div>
       </div>
