@@ -6,7 +6,7 @@ import { GetLayoutThrough } from "@components/layout/layout";
 import { Track } from "@components/playlist/types";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
-import { useRelativeTime } from "@hooks/useRelativeTime";
+import { useRelativeTime } from "@hooks/helpers/useRelativeTime";
 import { api, RouterOutputs } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import type { NextPageWithAuth, NextPageWithLayout } from "next";

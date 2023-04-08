@@ -1,4 +1,4 @@
-import { useClickOutside } from "@hooks/useClickOutside";
+import { useClickOutside } from "@hooks/helpers/useClickOutside";
 import { InputHTMLAttributes, ReactNode, useRef, useState } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {

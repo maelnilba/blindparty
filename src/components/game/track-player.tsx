@@ -1,5 +1,5 @@
 import { Square } from "@components/elements/square-loader";
-import { useCountdown } from "@hooks/useCountdown";
+import { useCountdown } from "@hooks/helpers/useCountdown";
 import { RouterOutputs } from "@utils/api";
 import {
   type MutableRefObject,

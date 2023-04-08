@@ -1,7 +1,7 @@
 import { ClockIcon } from "@components/icons/clock";
 import { SendIcon } from "@components/icons/send";
 import { Picture } from "@components/images/picture";
-import { useRelativeTime } from "@hooks/useRelativeTime";
+import { useRelativeTime } from "@hooks/helpers/useRelativeTime";
 import { RouterOutputs } from "@utils/api";
 import Link from "next/link";
 

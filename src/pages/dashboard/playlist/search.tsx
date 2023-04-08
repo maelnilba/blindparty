@@ -1,7 +1,7 @@
 import { Picture } from "@components/images/picture";
 import { AuthGuard } from "@components/layout/auth";
 import { TrackCard } from "@components/playlist/playlist-track-card";
-import { useDebounce } from "@hooks/useDebounce";
+import { useDebounce } from "@hooks/helpers/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import type { NextPageWithAuth } from "next";
 import Link from "next/link";
