@@ -3,7 +3,7 @@ import { Url } from "@components/elements/url";
 import { PlayerStack } from "@components/game/players-stack";
 import { Round } from "@components/game/round/round";
 import { Winner } from "@components/game/round/winner";
-import { Score } from "@components/game/score-board";
+import { Score, ScoreBoard } from "@components/game/score-board";
 import { TrackPicture } from "@components/game/track-picture";
 import { TrackPlayer, TrackPlayerRef } from "@components/game/track-player";
 import { DesktopIcon } from "@components/icons/desktop";
@@ -23,7 +23,7 @@ import { useWindowLocation } from "@hooks/next/useWindowLocation";
 import { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
-import { RouterOutputs } from "@utils/api";
+import { RouterOutputs, api } from "@utils/api";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
 import { ONE_SECOND_IN_MS } from "lib/helpers/date";
@@ -41,6 +41,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
 import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
+import Link from "next/link";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -155,7 +156,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     props: {
       party: party,
       isHost: party.host.id === session.user.id,
-      host: party.host,
     },
   };
 }
@@ -167,7 +167,7 @@ export type Player =
 
 const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ party, isHost, host }) => {
+> = ({ party, isHost }) => {
   const router = useRouter();
   const [joineds, setJoineds] = useState<Set<string>>(new Set());
   const [game, setGame] = useState<PartyStatus>(party.status);
@@ -181,7 +181,7 @@ const Party: NextPage<
     (state) => state.unsubscribe
   );
 
-  const [_, setScores] = useState<Score[]>([]);
+  const [scores, setScores] = useState<Score[]>([]);
   const [winner, setWinner] = useState<Score | null | undefined>();
   const [roundCount, setRoundCount] = useState(1);
   const [itwas, setItwas] = useState<string | null>(null);
@@ -289,7 +289,7 @@ const Party: NextPage<
         ok = false;
         await sleep(VIEW_SCORE_MS);
         ok = true;
-        setRoundCount((c) => c + 1);
+        setRoundCount((c) => Math.min(c + 1, party.max_round));
         round([..._tracks]);
       });
 
@@ -306,7 +306,7 @@ const Party: NextPage<
         setItwas(name);
 
         await sleep(VIEW_SCORE_MS);
-        setRoundCount((c) => c + 1);
+        setRoundCount((c) => Math.min(c + 1, party.max_round));
         round([..._tracks]);
       });
 
@@ -401,6 +401,16 @@ const Party: NextPage<
       }
     }
   }, [track]);
+
+  const {
+    mutateAsync: create,
+    isLoading: createLoading,
+    isSuccess: createSuccess,
+  } = api.party.replay.useMutation({
+    onSuccess: ({ id }) => {
+      router.push({ pathname: "/party/[id]", query: { id: id } });
+    },
+  });
 
   return (
     <div className="scrollbar-hide flex flex-1 gap-4 p-4">
@@ -564,6 +574,26 @@ const Party: NextPage<
           )}
         </div>
       )}
+      {game === "ENDED" && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-2">
+          <ScoreBoard scores={scores} />
+          <div className="flex gap-2">
+            <Link
+              href="/dashboard/party/create"
+              className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            >
+              Nouvelle partie
+            </Link>
+            <button
+              onClick={() => create({ id: party.id })}
+              disabled={createLoading || createSuccess}
+              className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"
+            >
+              Rejouer
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
@@ -573,10 +603,10 @@ const PartyWrapper: NextPageWithAuth<
 > &
   NextPageWithLayout<
     InferGetServerSidePropsType<typeof getServerSideProps>
-  > = ({ party, isHost, host }) => {
+  > = ({ party, isHost }) => {
   return (
     <prpc.withPRPC {...prpc.context}>
-      <Party party={party} isHost={isHost} host={host} />
+      <Party party={party} isHost={isHost} />
     </prpc.withPRPC>
   );
 };

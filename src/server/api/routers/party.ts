@@ -26,6 +26,7 @@ export const partyRouter = createTRPCRouter({
             tracks: true,
           },
         });
+
         if (!playlists) throw new TRPCError({ code: "PRECONDITION_FAILED" });
 
         const tracks = playlists
@@ -78,8 +79,6 @@ export const partyRouter = createTRPCRouter({
         return { ...party, link: link };
       });
     }),
-
-  game: gameRouter,
   get_all_invite: protectedProcedure
     .input(z.object({ take: z.number().optional() }).optional())
     .query(async ({ ctx, input }) => {
@@ -112,4 +111,57 @@ export const partyRouter = createTRPCRouter({
         take: input?.take,
       });
     }),
+  replay: protectedProcedure
+    .input(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      return await ctx.prisma.$transaction(async (prisma) => {
+        const copy = await prisma.party.findUniqueOrThrow({
+          where: {
+            id: input.id,
+          },
+          include: {
+            tracks: true,
+            inviteds: true,
+          },
+        });
+
+        const party = await prisma.party.create({
+          data: {
+            tracks: {
+              connect: copy.tracks.map((t) => ({ id: t.id })),
+            },
+            max_round: copy.max_round,
+            host: {
+              connect: {
+                id: ctx.session.user.id,
+              },
+            },
+            inviteds: {
+              connect: copy.inviteds.map((i) => ({ id: i.id })),
+            },
+          },
+          include: {
+            link: true,
+          },
+        });
+
+        const link = await prisma.partyLink.create({
+          data: {
+            party: {
+              connect: {
+                id: party.id,
+              },
+            },
+            url: nanoid(),
+          },
+        });
+
+        return { id: party.id };
+      });
+    }),
+  game: gameRouter,
 });

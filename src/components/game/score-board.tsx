@@ -18,42 +18,48 @@ export const ScoreBoard = ({ scores }: ScoreBoardProps) => {
   const [first, second, third, ...rest] = sorted;
 
   return (
-    <div className="flex h-[32rem] flex-1 flex-col items-center justify-center gap-2">
-      <div className="grid h-60 grid-cols-12">
-        <div className="col-span-3 flex items-end justify-center">
-          {second && (
-            <ScoreCard
-              points={second.points}
-              user={second.user}
-              className="h-32 w-32"
-            />
-          )}
-        </div>
-        <div className="relative col-span-6 flex flex-col items-center justify-end gap-2">
-          {first && (
-            <>
-              <p className="absolute -top-20 text-9xl">👑</p>
+    <div className="scrollbar-hide relative flex max-h-contain flex-col gap-2 overflow-y-auto pt-8">
+      <div className="sticky top-0 z-10 flex flex-col items-start justify-center gap-2 bg-black/5 py-2 backdrop-blur-sm">
+        <div className="flex items-center justify-center px-6">
+          <div className="z-[2] translate-x-4">
+            {second && (
               <ScoreCard
-                points={first.points}
-                user={first.user}
-                className="h-48 w-48"
+                points={second.points}
+                user={second.user}
+                className="h-40 w-40"
               />
-            </>
-          )}
-        </div>
-        <div className="col-span-3 flex items-end justify-center">
-          {third && (
-            <ScoreCard
-              points={third.points}
-              user={third.user}
-              className="h-28 w-28"
-            />
-          )}
+            )}
+          </div>
+          <div className="z-[3]">
+            {first && (
+              <>
+                <ScoreCard
+                  points={first.points}
+                  user={first.user}
+                  className="h-48 w-48"
+                />
+              </>
+            )}
+          </div>
+          <div className="z-[1] -translate-x-4">
+            {third && (
+              <ScoreCard
+                points={third.points}
+                user={third.user}
+                className="h-32 w-32"
+              />
+            )}
+          </div>
         </div>
       </div>
-      <div className="flex w-full flex-wrap gap-2 p-8 ">
+      <div className="gap-2 p-4">
         {rest.map((p) => (
-          <ScoreCard points={p.points} user={p.user} className="h-12 w-12" />
+          <ScoreLine
+            key={p.user.id}
+            points={p.points}
+            user={p.user}
+            className="h-12 w-12"
+          />
         ))}
       </div>
     </div>
@@ -67,14 +73,39 @@ const ScoreCard = ({
 }: Score & { className: string }) => {
   return (
     <div className="flex flex-col gap-1 text-center">
-      <Picture identifier={user.image}>
+      <Picture identifier={user.image} className="bg-black">
         <img
           alt={`image of ${user.name}`}
           src={user.image!}
-          className={`${className} rounded border-gray-800 object-cover`}
+          className={`${className} rounded border-gray-800 bg-black object-cover`}
         />
       </Picture>
       <p className="">{user.name}</p>
+      <p className="text-xl font-extrabold">{points}</p>
+    </div>
+  );
+};
+
+const ScoreLine = ({
+  points,
+  user,
+  className,
+}: Score & { className: string }) => {
+  return (
+    <div className="flex flex-row items-center gap-2 p-2 ring-2 ring-white ring-opacity-5">
+      <Picture identifier={user.image} className="bg-black">
+        <img
+          alt={`image of ${user.name}`}
+          src={user.image!}
+          className={`${className} rounded border-gray-800 bg-black object-cover`}
+        />
+      </Picture>
+      <div className="inline-block w-3/4">
+        <span className="block overflow-hidden truncate text-ellipsis">
+          {user.name}
+        </span>
+        {/* <span className="text-sm">{playlist._count.tracks} tracks</span> */}
+      </div>
       <p className="text-xl font-extrabold">{points}</p>
     </div>
   );

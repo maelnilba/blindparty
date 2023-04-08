@@ -7,7 +7,7 @@ import { Track } from "@components/playlist/types";
 import { PlaylistTrackInfoCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useRelativeTime } from "@hooks/helpers/useRelativeTime";
-import { api, RouterOutputs } from "@utils/api";
+import { RouterOutputs, api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import type { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
@@ -78,7 +78,7 @@ const PlaylistDiscover = ({
 };
 
 const PlaylistDiscoverWrapper: NextPageWithLayout & NextPageWithAuth = () => {
-  const { query, push } = useRouter();
+  const { query } = useRouter();
   const id = getQuery(query.id);
   const { data: playlist } = api.playlist.discover.useQuery(
     { id: id! },
@@ -86,7 +86,6 @@ const PlaylistDiscoverWrapper: NextPageWithLayout & NextPageWithAuth = () => {
       enabled: id !== undefined,
       refetchOnMount: true,
       refetchOnWindowFocus: false,
-      onError: (error) => {},
     }
   );
 
