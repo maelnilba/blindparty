@@ -122,7 +122,7 @@ export class DeezerWebApi {
 
     if (options) {
       Object.entries(options).forEach(([k, v]) =>
-        url.searchParams.append(k, String(v))
+        url.searchParams.append(this.replaceOption(k), String(v))
       );
     }
 
@@ -141,5 +141,14 @@ export class DeezerWebApi {
     return fetchJsonp(url.toString()).then(function (response) {
       return response.json();
     }) as Promise<TResponse>;
+  }
+
+  private replaceOption(option: keyof DeezerApi.ListOptions | (string & {})) {
+    switch (option) {
+      case "offset":
+        return "index";
+      default:
+        return option;
+    }
   }
 }

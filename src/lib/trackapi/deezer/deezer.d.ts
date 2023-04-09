@@ -42,7 +42,7 @@ declare namespace DeezerApi {
   };
 
   type ListOptions = {
-    index?: number;
+    offset?: number;
     limit?: number;
   };
 

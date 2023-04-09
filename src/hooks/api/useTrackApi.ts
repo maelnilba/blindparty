@@ -3,7 +3,7 @@ import { TrackApi } from "@lib/trackapi";
 import type { Provider } from "@server/api/routers/user/tokens";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@utils/api";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -49,7 +49,6 @@ export function useTrackApi() {
         setAccessToken(accessToken, provider);
       },
       refetchOnWindowFocus: false,
-      refetchOnMount: false,
     }
   );
 
@@ -92,10 +91,11 @@ const useGetUserPlaylists = () => {
 const useGetPlaylistTracks = () => {
   const { success, renew } = useTrackApi();
   const [id, setId] = useStateAsync<string | null>(null);
+  const nb_tracks = useRef<string>();
   const { refetch, ...query } = useQuery(
     ["track-api", "playlist-tracks", id],
     async () => {
-      return (await trackApi.getPlaylistTracks(id!)).items.filter((track) =>
+      return (await trackApi.getPlaylistTracks(id!)).filter((track) =>
         Boolean(track?.preview_url)
       );
     },

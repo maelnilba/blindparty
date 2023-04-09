@@ -25,6 +25,7 @@ export class TrackApi {
     if (apiType === "deezer") this.webApi = new DeezerWebApi();
     if (apiType === "spotify") this.webApi = new SpotifyWebApi();
     if (apiType === null) this.webApi = null;
+    this.apiType = apiType ?? undefined;
   }
 
   /**
@@ -87,9 +88,41 @@ export class TrackApi {
    */
   async getPlaylistTracks(playlistId: string) {
     if (this.webApi === null) throw new Error("No WebApi set");
-    return this.webApi
-      .getPlaylistTracks(playlistId)
-      .then(Converter.playlistTracks);
+
+    return this.getAllPlaylistTracks(playlistId);
+  }
+
+  private get limit(): number {
+    return this.type === "deezer" ? 15 : this.type === "spotify" ? 50 : 10;
+  }
+
+  private async getAllPlaylistTracks(
+    playlistId: string,
+    options: DeezerApi.ListOptions = {
+      offset: 0,
+      limit: this.limit,
+    },
+    tracks: Array<TrackApi.Track> = []
+  ): Promise<TrackApi.Track[]> {
+    const data = await this.webApi!.getPlaylistTracks(playlistId, options).then(
+      Converter.playlistTracks
+    );
+
+    if (data.total > tracks.length + data.items.length) {
+      return await this.getAllPlaylistTracks(
+        playlistId,
+        {
+          offset: tracks.length + data.items.length,
+          limit: Math.min(
+            data.total - (tracks.length + data.items.length),
+            this.limit
+          ),
+        },
+        tracks.concat(data.items)
+      );
+    }
+
+    return tracks.concat(data.items);
   }
 
   /**
