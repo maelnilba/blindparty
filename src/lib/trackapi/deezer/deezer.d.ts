@@ -93,7 +93,7 @@ declare namespace DeezerApi {
     "creator" | "time_add" | "time_mod" | "duration" | "fans"
   > & {
     tracklist: string;
-    creation_date: "2017-10-02 10:07:26";
+    creation_date: string;
     md5_image: "8e917792796412110f79996f4ae53b09";
     picture_type: "playlist" | "cover" | unknown;
     user: {
@@ -117,7 +117,10 @@ declare namespace DeezerApi {
     rank: number;
     explicit_lyrics: boolean;
     preview: string;
-    time_add: string;
+    /**
+     * Unix timestamp
+     */
+    time_add: number;
     artist: Artist;
     album: Album;
   };

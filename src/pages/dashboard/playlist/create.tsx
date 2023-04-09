@@ -189,6 +189,7 @@ const PlaylistCreate = () => {
           />
         ))}
       </div>
+
       <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24 pt-0.5">
         {tracks && (
           <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">

@@ -89,40 +89,50 @@ export class TrackApi {
   async getPlaylistTracks(playlistId: string) {
     if (this.webApi === null) throw new Error("No WebApi set");
 
-    return this.getAllPlaylistTracks(playlistId);
+    return this.getAllPlaylistTrackss(playlistId, {
+      limit: this.limit,
+      offset: 0,
+    });
   }
 
   private get limit(): number {
-    return this.type === "deezer" ? 15 : this.type === "spotify" ? 50 : 10;
+    return this.type === "deezer" ? 500 : this.type === "spotify" ? 50 : 50;
   }
 
-  private async getAllPlaylistTracks(
+  private async getAllPlaylistTrackss(
     playlistId: string,
-    options: DeezerApi.ListOptions = {
-      offset: 0,
-      limit: this.limit,
-    },
-    tracks: Array<TrackApi.Track> = []
+    options: DeezerApi.ListOptions
   ): Promise<TrackApi.Track[]> {
+    if (this.webApi === null) throw new Error("No WebApi set");
+
     const data = await this.webApi!.getPlaylistTracks(playlistId, options).then(
       Converter.playlistTracks
     );
 
-    if (data.total > tracks.length + data.items.length) {
-      return await this.getAllPlaylistTracks(
-        playlistId,
-        {
-          offset: tracks.length + data.items.length,
-          limit: Math.min(
-            data.total - (tracks.length + data.items.length),
-            this.limit
-          ),
-        },
-        tracks.concat(data.items)
-      );
-    }
+    if (data.total <= data.items.length) return data.items;
 
-    return tracks.concat(data.items);
+    return Promise.all(
+      Array.from(
+        { length: Math.ceil(data.total / this.limit) },
+        (v, i) => i * this.limit
+      )
+        .slice(1)
+        .map((offset) =>
+          this.webApi
+            ?.getPlaylistTracks(playlistId, {
+              offset,
+              limit: this.limit,
+            })
+            .then(Converter.playlistTracks)
+        )
+    ).then((promises) =>
+      promises
+        .filter((data) => Boolean(data))
+        .map((data) => data!.items)
+        .concat(data.items)
+        .flat()
+        .sort((a, b) => a.added_at - b.added_at)
+    );
   }
 
   /**
@@ -216,9 +226,9 @@ class Converter {
       items:
         "items" in playlistTracks
           ? playlistTracks.items
-              .map((t) => t.track)
-              .filter(Boolean)
-              .map((item) => ({
+              .map((t) => ({ track: t.track, added_at: t.added_at }))
+              .filter((t) => Boolean(t.track))
+              .map(({ track: item, added_at }) => ({
                 id: item!.id,
                 name: item!.name,
                 preview_url: item!.preview_url,
@@ -229,6 +239,7 @@ class Converter {
                   })),
                 },
                 artists: item!.artists.map((artist) => ({ name: artist.name })),
+                added_at: Date.parse(added_at) / 1000,
               }))
           : playlistTracks.data.map((item) => ({
               id: String(item.id),
@@ -245,6 +256,7 @@ class Converter {
                 ].map((image) => ({ url: image })),
               },
               artists: [{ name: item.artist.name }],
+              added_at: item.time_add,
             })),
     };
   }

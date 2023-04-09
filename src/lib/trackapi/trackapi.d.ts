@@ -25,6 +25,10 @@ declare module TrackApi {
     id: string;
     name: string;
     preview_url: string | null;
+    /**
+     * Unix timestamp
+     */
+    added_at: number;
   };
 
   type Playlist = {
