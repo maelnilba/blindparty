@@ -118,21 +118,4 @@ function fetchJsonp(_url: string, options: Options = {}): Promise<Response> {
   });
 }
 
-// export as global function
-/*
-  let local;
-  if (typeof global !== 'undefined') {
-    local = global;
-  } else if (typeof self !== 'undefined') {
-    local = self;
-  } else {
-    try {
-      local = Function('return this')();
-    } catch (e) {
-      throw new Error('polyfill failed because global object is unavailable in this environment');
-    }
-  }
-  local.fetchJsonp = fetchJsonp;
-  */
-
 export default fetchJsonp;
