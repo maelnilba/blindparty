@@ -155,9 +155,11 @@ const PlaylistCard = ({
 }: PlaylistCardProps) => {
   return (
     <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
-      <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">
-        <div>
-          <p className="text-2xl">{playlist.name}</p>
+      <div className="sticky top-0 flex flex-row items-center justify-between gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">
+        <div className="inline-block w-3/4 px-2 text-end">
+          <span className="block overflow-hidden truncate text-ellipsis text-2xl">
+            {playlist.name}
+          </span>
           <p>{playlist.description}</p>
           <p>{playlist._count.tracks} tracks</p>
         </div>
