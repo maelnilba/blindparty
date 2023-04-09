@@ -1,50 +1,61 @@
 import { useStateAsync } from "@hooks/itsfine/useStateAsync";
+import { TrackApi } from "@lib/trackapi";
+import type { Provider } from "@server/api/routers/user/tokens";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@utils/api";
 import { useEffect } from "react";
-import SpotifyWebApi from "spotify-web-api-js";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-const spotifyApi = new SpotifyWebApi();
+const trackApi = new TrackApi();
 
-const useSpotifyStore = create(
+const useTrackApiStore = create(
   persist<{
     accessToken: string;
-    setAccessToken: (accessToken: string) => void;
+    provider: Provider | null;
+    setAccessToken: (accessToken: string, provider?: Provider) => void;
   }>(
-    (set) => ({
+    (set, get) => ({
       accessToken: "",
-      setAccessToken: (accessToken) => {
-        spotifyApi.setAccessToken(accessToken);
-        return set({ accessToken: accessToken });
+      provider: null,
+      setAccessToken: (accessToken, provider) => {
+        if (!trackApi.getApi()) {
+          if (get().provider) trackApi.setApi(get().provider);
+        }
+
+        if (provider && trackApi.type !== provider) {
+          trackApi.setApi(provider);
+        }
+
+        trackApi.setAccessToken(accessToken);
+        return set({ accessToken: accessToken, provider: provider });
       },
     }),
     {
-      name: "spotify",
+      name: "track-api",
       storage: createJSONStorage(() => sessionStorage),
     }
   )
 );
 
-export function useSpotify() {
-  const accessToken = useSpotifyStore((state) => state.accessToken);
-  const setAccessToken = useSpotifyStore((state) => state.setAccessToken);
+export function useTrackApi() {
+  const accessToken = useTrackApiStore((state) => state.accessToken);
+  const setAccessToken = useTrackApiStore((state) => state.setAccessToken);
 
-  const { data, isSuccess, isStale, refetch } = api.spotify.token.useQuery(
+  const { data, isSuccess, isStale, refetch } = api.user.tokens.token.useQuery(
     undefined,
     {
-      onSuccess: ({ accessToken }) => {
-        setAccessToken(accessToken);
+      onSuccess: ({ accessToken, provider }) => {
+        setAccessToken(accessToken, provider);
       },
       refetchOnWindowFocus: false,
       refetchOnMount: false,
     }
   );
 
-  const { mutateAsync: renew } = api.spotify.renew.useMutation({
-    onSuccess: ({ accessToken }) => {
-      setAccessToken(accessToken);
+  const { mutateAsync: renew } = api.user.tokens.renew.useMutation({
+    onSuccess: ({ accessToken, provider }) => {
+      setAccessToken(accessToken, provider);
     },
   });
 
@@ -59,11 +70,11 @@ export function useSpotify() {
 }
 
 const useGetUserPlaylists = () => {
-  const { success, renew } = useSpotify();
+  const { success, renew } = useTrackApi();
   const { refetch, ...query } = useQuery(
-    ["spotify", "user-playlist"],
+    ["track-api", "user-playlist"],
     async () => {
-      return (await spotifyApi.getUserPlaylists()).items;
+      return (await trackApi.getUserPlaylists()).items;
     },
     {
       enabled: success,
@@ -79,13 +90,13 @@ const useGetUserPlaylists = () => {
 };
 
 const useGetPlaylistTracks = () => {
-  const { success, renew } = useSpotify();
+  const { success, renew } = useTrackApi();
   const [id, setId] = useStateAsync<string | null>(null);
   const { refetch, ...query } = useQuery(
-    ["spotify", "playlist-tracks", id],
+    ["track-api", "playlist-tracks", id],
     async () => {
-      return (await spotifyApi.getPlaylistTracks(id!)).items.filter(
-        ({ track }) => Boolean(track?.preview_url)
+      return (await trackApi.getPlaylistTracks(id!)).items.filter((track) =>
+        Boolean(track?.preview_url)
       );
     },
     {
@@ -108,12 +119,12 @@ const useGetPlaylistTracks = () => {
 };
 
 const useSearchPlaylists = () => {
-  const { success, renew } = useSpotify();
+  const { success, renew } = useTrackApi();
   const [field, setField] = useStateAsync<string | null>(null);
   const { refetch, ...query } = useQuery(
-    ["spotify", "search-playlist", field],
+    ["track-api", "search-playlist", field],
     async () => {
-      return (await spotifyApi.searchPlaylists(field!)).playlists.items;
+      return (await trackApi.searchPlaylists(field!)).playlists.items;
     },
     {
       enabled: Boolean(success && field),

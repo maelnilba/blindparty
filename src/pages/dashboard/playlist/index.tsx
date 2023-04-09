@@ -50,7 +50,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const providers = accounts.accounts.map(
     (account) => account.provider as Socials
   );
-  const hasSpotify = providers?.includes("spotify");
+  const hasSpotify =
+    providers?.includes("spotify") || providers?.includes("deezer");
 
   return {
     props: {

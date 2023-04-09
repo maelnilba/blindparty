@@ -3,7 +3,6 @@ import { friendRouter } from "./routers/friend";
 import { s3Router } from "./routers/infra/s3";
 import { partyRouter } from "./routers/party";
 import { playlistRouter } from "./routers/playlist";
-import { spotifyRouter } from "./routers/spotify";
 import { userRouter } from "./routers/user";
 import { createTRPCRouter } from "./trpc";
 
@@ -13,7 +12,6 @@ import { createTRPCRouter } from "./trpc";
  * All routers added in /api/routers should be manually added here
  */
 export const appRouter = createTRPCRouter({
-  spotify: spotifyRouter,
   playlist: playlistRouter,
   friend: friendRouter,
   user: userRouter,

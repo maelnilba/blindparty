@@ -10,11 +10,11 @@ import { Track } from "@components/playlist/types";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
-import { useAsyncEffect } from "@hooks/helpers/useAsyncEffect";
+import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
-import { spotify } from "@hooks/spotify/useSpotify";
+import { spotify } from "@hooks/api/useTrackApi";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { Noop } from "@lib/helpers/noop";
 import { api } from "@utils/api";
@@ -193,29 +193,18 @@ const PlaylistCreate = () => {
         {tracks && (
           <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">
             {!(
-              tracks.length &&
-              tracks.every(
-                (track) => track.track && tracksMap.has(track.track.id)
-              )
+              tracks.length && tracks.every((track) => tracksMap.has(track.id))
             ) && (
               <button
-                onClick={() =>
-                  addTracks(tracks.filter((t) => t.track).map((t) => t.track!))
-                }
+                onClick={() => addTracks(tracks)}
                 className="rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
               >
                 Ajouter tout
               </button>
             )}
-            {tracks.some(
-              (track) => track.track && tracksMap.has(track.track.id)
-            ) && (
+            {tracks.some((track) => tracksMap.has(track.id)) && (
               <button
-                onClick={() =>
-                  removeTracks(
-                    tracks.filter((t) => t.track).map((t) => t.track!)
-                  )
-                }
+                onClick={() => removeTracks(tracks)}
                 className="rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
               >
                 Retirer tout
@@ -224,28 +213,21 @@ const PlaylistCreate = () => {
           </div>
         )}
         <div className="p-4">
-          {tracks
-            ?.filter((t) => t.track)
-            .map((track) => {
-              if (!track.track) {
-                return <Noop />;
+          {tracks?.map((track) => (
+            <PlaylistTrackCard
+              key={track.id}
+              track={track}
+              onAdd={addTrack}
+              onRemove={removeTrack}
+              on={tracksMap.has(track.id) ? "REMOVE" : "ADD"}
+              onPlay={playTrack}
+              playing={
+                Boolean(currentTrack) &&
+                currentTrack?.id === track.id &&
+                playing
               }
-              return (
-                <PlaylistTrackCard
-                  key={track.track.id}
-                  track={track.track}
-                  onAdd={addTrack}
-                  onRemove={removeTrack}
-                  on={tracksMap.has(track.track.id) ? "REMOVE" : "ADD"}
-                  onPlay={playTrack}
-                  playing={
-                    Boolean(currentTrack) &&
-                    currentTrack?.id === track.track.id &&
-                    playing
-                  }
-                />
-              );
-            })}
+            />
+          ))}
         </div>
       </div>
       <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24 pt-0.5">

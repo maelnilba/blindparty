@@ -25,6 +25,8 @@ export const serverSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string(),
   SPOTIFY_CLIENT_ID: z.string(),
   SPOTIFY_CLIENT_SECRET: z.string(),
+  DEEZER_CLIENT_ID: z.string(),
+  DEEZER_CLIENT_SECRET: z.string(),
   PUSHER_KEY: z.string(),
   PUSHER_SECRET: z.string(),
   PUSHER_APP_ID: z.string(),

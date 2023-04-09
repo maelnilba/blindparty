@@ -4,6 +4,7 @@ import { Icon } from "../icon";
 import { DiscordIcon } from "./discord";
 import { GoogleIcon } from "./google";
 import { SpotifyIcon } from "./spotify";
+import { DeezerIcon } from "./deezer";
 
 const providerIcons: Record<Socials, (props: Icon) => JSX.Element> = {
   discord: (props) => (
@@ -11,6 +12,7 @@ const providerIcons: Record<Socials, (props: Icon) => JSX.Element> = {
   ),
   google: (props) => <GoogleIcon className="h-10 w-10" {...props} />,
   spotify: (props) => <SpotifyIcon className="h-10 w-10" {...props} />,
+  deezer: (props) => <DeezerIcon className="h-10 w-10" {...props} />,
 } as const;
 
 export function ensureProvider(provider: ClientSafeProvider["name"]) {

@@ -4,6 +4,9 @@ type ExtractDestructor<T extends EffectCallback> = T extends EffectCallback
   ? Exclude<ReturnType<T>, void>
   : never;
 
+/**
+ * Hacky react things, should just write function in useEffect then calling it
+ */
 export function useAsyncEffect(
   effect: () => Promise<void | ExtractDestructor<EffectCallback>>,
   deps?: DependencyList

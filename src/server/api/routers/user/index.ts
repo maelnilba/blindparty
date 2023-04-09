@@ -1,6 +1,7 @@
 import { Socials } from "@server/types";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { createTRPCRouter, protectedProcedure } from "../../trpc";
+import { tokensRouter } from "./tokens";
 
 export const pictureLink = (key: string | undefined) =>
   key
@@ -8,6 +9,7 @@ export const pictureLink = (key: string | undefined) =>
     : undefined;
 
 export const userRouter = createTRPCRouter({
+  tokens: tokensRouter,
   provider: protectedProcedure.query(async ({ ctx }) => {
     const { accounts } = await ctx.prisma.user.findUniqueOrThrow({
       where: {

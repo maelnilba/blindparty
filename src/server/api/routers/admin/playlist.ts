@@ -174,11 +174,11 @@ export const playlistRouter = createTRPCRouter({
       })
     ).map((playlist) => ({
       ...playlist,
-      tracks: playlist.tracks.map((track) => ({
+      tracks: playlist.tracks.map(({ images, ...track }) => ({
         ...track,
         album: {
           name: track.album,
-          images: track.images.split("|").map((image) => ({
+          images: images.split("|").map((image) => ({
             url: image,
           })),
         },
@@ -212,11 +212,11 @@ export const playlistRouter = createTRPCRouter({
 
       return {
         ...playlist,
-        tracks: playlist?.tracks.map((track) => ({
+        tracks: playlist?.tracks.map(({ images, ...track }) => ({
           ...track,
           album: {
             name: track.album,
-            images: track.images.split("|").map((image) => ({
+            images: images.split("|").map((image) => ({
               url: image,
             })),
           },
