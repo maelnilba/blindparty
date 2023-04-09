@@ -295,13 +295,12 @@ const PartyCreate: NextPageWithAuth = () => {
                             selectedsPlaylistCount < Number(round) &&
                             !Number(random)
                         ) && (
-                          <div>
+                          <div className="mt-2 flex items-center">
                             <div className="float-left px-2">
-                              <ExclamationIcon className="mt-4 h-6 w-6" />
+                              <ExclamationIcon className="h-6 w-6" />
                             </div>
                             <p>
-                              Les playlists sélectionnées contiennent moins de
-                              tracks que de round. Le nombre de round sera de{" "}
+                              Le nombre de round de la partie sera de{" "}
                               {selectedsPlaylistCount}
                             </p>
                           </div>
