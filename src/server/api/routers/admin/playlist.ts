@@ -2,6 +2,7 @@ import { protectedAdminProcedure } from "@server/api/trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter } from "../../trpc";
+import { noop } from "@lib/helpers/noop";
 
 export const pictureLink = (key: string | undefined) =>
   key
@@ -141,12 +142,23 @@ export const playlistRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.playlist.deleteMany({
+      const playlist = await ctx.prisma.playlist.findFirstOrThrow({
         where: {
           id: input.id,
           public: true,
         },
       });
+
+      if (playlist.s3key)
+        ctx.s3.deleteObject(
+          {
+            Bucket: process.env.AWS_S3_BUCKET_NAME!,
+            Key: playlist.s3key,
+          },
+          noop
+        );
+
+      return ctx.prisma.playlist.delete({ where: { id: playlist.id } });
     }),
   get_all: protectedAdminProcedure.query(async ({ ctx }) => {
     return (
