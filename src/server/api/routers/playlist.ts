@@ -8,28 +8,26 @@ export const pictureLink = (key: string | undefined) =>
     ? `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
     : undefined;
 
-const trackSchema = z
-  .array(
-    z.object({
-      id: z.string(),
+const trackSchema = z.array(
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    preview_url: z.string().url().nullable(),
+    album: z.object({
       name: z.string(),
-      preview_url: z.string().url().nullable(),
-      album: z.object({
-        name: z.string(),
-        images: z.array(
-          z.object({
-            url: z.string().url(),
-          })
-        ),
-      }),
-      artists: z.array(
+      images: z.array(
         z.object({
-          name: z.string(),
+          url: z.string().url(),
         })
       ),
-    })
-  )
-  .min(1);
+    }),
+    artists: z.array(
+      z.object({
+        name: z.string(),
+      })
+    ),
+  })
+);
 
 const mapped = (
   tracks: {
@@ -60,7 +58,7 @@ export const playlistRouter = createTRPCRouter({
         description: z.string().optional(),
         s3key: z.string().optional(),
         generated: z.boolean(),
-        tracks: trackSchema,
+        tracks: trackSchema.min(1),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -261,7 +259,7 @@ export const playlistRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string().cuid(),
-        tracks: trackSchema.max(20),
+        tracks: trackSchema.min(1).max(20),
       })
     )
     .mutation(async ({ ctx, input }) => {
