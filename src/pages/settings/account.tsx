@@ -83,7 +83,7 @@ const Settings: NextPageWithAuth<
   return (
     <div className="flex flex-wrap gap-4 p-4 px-28">
       <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
-        <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
+        <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 backdrop-blur-sm">
           <Modal
             className="w-full"
             title="Liste des providers"
@@ -182,7 +182,7 @@ const ProviderCard = ({ provider, onClick }: ProviderCardProps) => {
     <div className="group flex cursor-pointer items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <SocialIcon provider={provider} />
       <div className="inline-block w-3/4">
-        <span className="block overflow-hidden truncate text-ellipsis capitalize">
+        <span className="block overflow-hidden truncate text-ellipsis font-bold capitalize tracking-tighter">
           {provider}
         </span>
       </div>
