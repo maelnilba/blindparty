@@ -62,7 +62,7 @@ export const Volume = ({ onClick, onValueChange, ...props }: VolumeProps) => {
         onValueChange={(e) => {
           const [value] = e;
           if (value !== undefined) {
-            const previous = value;
+            const previous = volume;
             setVolume(value);
             onValueChange(value, previous);
           }
