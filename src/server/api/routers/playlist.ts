@@ -66,54 +66,6 @@ export const playlistRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const picture = pictureLink(input.s3key);
 
-      return ctx.prisma.$transaction(async (prisma) => {
-        const playlist = await prisma.playlist.create({
-          data: {
-            user: {
-              connect: {
-                id: ctx.session.user.id,
-              },
-            },
-            name: input.name,
-            description: input.description,
-            picture: picture,
-            s3key: input.s3key,
-            generated: input.generated,
-            public: false,
-          },
-        });
-
-        await Promise.all(
-          Array.from({ length: Math.ceil(input.tracks.length / 20) }, (_, i) =>
-            input.tracks.slice(i * 20, i * 20 + 20)
-          ).map((tracks) =>
-            prisma.playlist.update({
-              where: { id: playlist.id },
-              data: {
-                tracks: {
-                  connectOrCreate: tracks.map((track) => ({
-                    where: {
-                      id: track.id,
-                    },
-                    create: {
-                      id: track.id,
-                      name: track.name,
-                      preview_url: track.preview_url ?? undefined,
-                      album: track.album.name,
-                      artists: track.artists
-                        .map((artist) => artist.name)
-                        .join("|"),
-                      images: track.album.images
-                        .map((image) => image.url)
-                        .join("|"),
-                    },
-                  })),
-                },
-              },
-            })
-          )
-        );
-      });
       return await ctx.prisma.playlist.create({
         data: {
           user: {
@@ -293,7 +245,7 @@ export const playlistRouter = createTRPCRouter({
           },
         });
 
-        await prisma.playlist.update({
+        await ctx.prisma.playlist.update({
           where: {
             id: playlist.id,
           },
