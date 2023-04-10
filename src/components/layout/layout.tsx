@@ -1,7 +1,7 @@
 import { Inter } from "next/font/google";
-import { ReactElement, ReactNode, useEffect } from "react";
+import { ReactElement, ReactNode } from "react";
 import Navigation from "./navigation";
-import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
+import { Intercept } from "./routing";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -38,23 +38,19 @@ export function GetLayoutThrough(page: ReactElement) {
 export const LayoutConfirm = ({
   children,
   confirmText,
-  subscribeOnMount = false,
+  subscribeOnMount = true,
 }: {
   children: ReactNode;
   confirmText: string;
   subscribeOnMount: boolean;
 }) => {
-  const sub = useWindowConfirmationStore((state) => state.subscribe);
-  const unsub = useWindowConfirmationStore((state) => state.unsubscribe);
-
-  useEffect(() => {
-    if (subscribeOnMount) sub();
-    return () => unsub();
-  }, [subscribeOnMount]);
-
   return (
     <Main>
-      <Navigation confirm={confirmText} />
+      <Intercept
+        confirmText={confirmText}
+        subscribeOnMount={subscribeOnMount}
+      />
+      <Navigation />
       {children}
     </Main>
   );
@@ -79,23 +75,19 @@ export function GetLayoutConfirm(
 export const LayoutThroughConfirm = ({
   children,
   confirmText,
-  subscribeOnMount = false,
+  subscribeOnMount = true,
 }: {
   children: ReactNode;
   confirmText: string;
   subscribeOnMount: boolean;
 }) => {
-  const sub = useWindowConfirmationStore((state) => state.subscribe);
-  const unsub = useWindowConfirmationStore((state) => state.unsubscribe);
-
-  useEffect(() => {
-    if (subscribeOnMount) sub();
-    return () => unsub();
-  }, [subscribeOnMount]);
-
   return (
     <Main>
-      <Navigation through confirm={confirmText} />
+      <Intercept
+        confirmText={confirmText}
+        subscribeOnMount={subscribeOnMount}
+      />
+      <Navigation through />
       {children}
     </Main>
   );
@@ -103,7 +95,7 @@ export const LayoutThroughConfirm = ({
 
 export function GetLayoutThroughConfirm(
   confirmText: string,
-  subscribeOnMount: boolean = false
+  subscribeOnMount: boolean = true
 ) {
   return function (page: ReactElement) {
     return (

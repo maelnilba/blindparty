@@ -19,6 +19,7 @@ import {
 import { PlayerCard } from "@components/party/player-card";
 import { Volume } from "@components/spotify/volume";
 import { useMessagesBus } from "@hooks/libs/useMessagesBus";
+import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
 import { useWindowLocation } from "@hooks/next/useWindowLocation";
 import { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
@@ -35,13 +36,12 @@ import type {
   NextPageWithAuth,
   NextPageWithLayout,
 } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
-import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
-import Link from "next/link";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -622,7 +622,9 @@ const PartyWrapper: NextPageWithAuth<
 };
 
 export default PartyWrapper;
+
 PartyWrapper.getLayout = GetLayoutThroughConfirm(
-  "Êtes vous sur de vouloir quitter la page ? Cela signifira la fin de la partie"
+  "Êtes vous sur de vouloir quitter la page ? Cela signifira la fin de la partie",
+  false
 );
 PartyWrapper.auth = AuthGuard;

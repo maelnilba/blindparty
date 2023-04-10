@@ -6,19 +6,10 @@ import Link from "next/link";
 
 type NavigationProps = {
   through?: boolean;
-  confirm?: string;
 };
 
-const Navigation = ({
-  through = false,
-  confirm: confirmText,
-}: NavigationProps) => {
+const Navigation = ({ through = false }: NavigationProps) => {
   const { data: session, status } = useSession();
-
-  const windowConfirm = useWindowConfirmation(
-    confirmText ?? "noop",
-    typeof confirmText === "string"
-  );
 
   if (status === "loading") {
     return (
@@ -32,7 +23,6 @@ const Navigation = ({
   if (session && session.user) {
     return (
       <>
-        {confirmText && <>{windowConfirm}</>}
         <div className="fixed top-0 z-navigation flex h-20 w-full flex-row items-center justify-around bg-black/5 p-6 backdrop-blur-sm">
           <Link
             href="/dashboard"
