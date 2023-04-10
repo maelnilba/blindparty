@@ -22,3 +22,12 @@ export const appRouter = createTRPCRouter({
 
 // export type definition of API
 export type AppRouter = typeof appRouter;
+
+/*
+ * All constants in use
+ */
+
+export const SEPARATOR = {
+  S3: ":::",
+  PRISMA: "|||",
+} as const;

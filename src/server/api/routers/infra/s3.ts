@@ -1,4 +1,5 @@
 import { noop } from "@lib/helpers/noop";
+import { SEPARATOR } from "@server/api/root";
 import { TRPCError } from "@trpc/server";
 import { nanoid } from "nanoid";
 import { createTRPCRouter, protectedProcedure } from "server/api/trpc";
@@ -6,7 +7,6 @@ import { z } from "zod";
 
 const s3prefix = ["playlist", "user"] as const;
 export type S3Prefix = (typeof s3prefix)[number];
-const seperator = ":::";
 export const s3Router = createTRPCRouter({
   presigned: protectedProcedure
     .input(
@@ -17,7 +17,7 @@ export const s3Router = createTRPCRouter({
       })
     )
     .mutation(({ ctx, input }) => {
-      const key = [input.prefix, nanoid()].join(seperator);
+      const key = [input.prefix, nanoid()].join(SEPARATOR.S3);
       const post = ctx.s3.createPresignedPost({
         Bucket: process.env.AWS_S3_BUCKET_NAME!,
         Fields: {
@@ -37,7 +37,7 @@ export const s3Router = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const [_prefix, _] = input.key.split(seperator) as [
+      const [_prefix, _] = input.key.split(SEPARATOR.S3) as [
         S3Prefix | undefined,
         string | undefined
       ];

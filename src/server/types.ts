@@ -1,4 +1,4 @@
-import { serverSchema } from "env/schema.mjs";
+import { type serverSchema } from "env/schema.mjs";
 import { z } from "zod";
 
 type ENV = z.infer<typeof serverSchema>;

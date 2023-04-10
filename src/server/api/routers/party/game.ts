@@ -1,3 +1,4 @@
+import { SEPARATOR } from "@server/api/root";
 import { TRPCError } from "@trpc/server";
 import { prpc } from "server/api/prpc";
 import { createTRPCRouter, enforceUserIsHost } from "server/api/trpc";
@@ -248,7 +249,9 @@ export const gameRouter = createTRPCRouter({
       return await ctx.pusher.trigger({
         track: {
           ...track,
-          images: track.images.split("|").map((image) => ({ url: image })),
+          images: track.images
+            .split(SEPARATOR.PRISMA)
+            .map((image) => ({ url: image })),
         },
       });
     }),
@@ -289,7 +292,7 @@ export const gameRouter = createTRPCRouter({
 
       const album = party.track.album.toLocaleLowerCase();
       const artists = party.track.artists
-        .split("|")
+        .split(SEPARATOR.PRISMA)
         .map((a) => a.toLocaleLowerCase());
       const name = party.track.name.toLocaleLowerCase();
 

@@ -3,6 +3,7 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter } from "../../trpc";
 import { noop } from "@lib/helpers/noop";
+import { SEPARATOR } from "@server/api/root";
 
 export const pictureLink = (key: string | undefined) =>
   key
@@ -44,11 +45,13 @@ const mapped = (
     ...track,
     album: {
       name: track.album,
-      images: images.split("|").map((image) => ({
+      images: images.split(SEPARATOR.PRISMA).map((image) => ({
         url: image,
       })),
     },
-    artists: track.artists.split("|").map((artist) => ({ name: artist })),
+    artists: track.artists
+      .split(SEPARATOR.PRISMA)
+      .map((artist) => ({ name: artist })),
   }));
 
 export const playlistRouter = createTRPCRouter({
@@ -83,8 +86,12 @@ export const playlistRouter = createTRPCRouter({
                 name: track.name,
                 preview_url: track.preview_url ?? undefined,
                 album: track.album.name,
-                artists: track.artists.map((artist) => artist.name).join("|"),
-                images: track.album.images.map((image) => image.url).join("|"),
+                artists: track.artists
+                  .map((artist) => artist.name)
+                  .join(SEPARATOR.PRISMA),
+                images: track.album.images
+                  .map((image) => image.url)
+                  .join(SEPARATOR.PRISMA),
               },
             })),
           },
@@ -129,8 +136,12 @@ export const playlistRouter = createTRPCRouter({
                 name: track.name,
                 preview_url: track.preview_url ?? undefined,
                 album: track.album.name,
-                artists: track.artists.map((artist) => artist.name).join("|"),
-                images: track.album.images.map((image) => image.url).join("|"),
+                artists: track.artists
+                  .map((artist) => artist.name)
+                  .join(SEPARATOR.PRISMA),
+                images: track.album.images
+                  .map((image) => image.url)
+                  .join(SEPARATOR.PRISMA),
               },
             })),
           },
@@ -232,8 +243,12 @@ export const playlistRouter = createTRPCRouter({
                 name: track.name,
                 preview_url: track.preview_url ?? undefined,
                 album: track.album.name,
-                artists: track.artists.map((artist) => artist.name).join("|"),
-                images: track.album.images.map((image) => image.url).join("|"),
+                artists: track.artists
+                  .map((artist) => artist.name)
+                  .join(SEPARATOR.PRISMA),
+                images: track.album.images
+                  .map((image) => image.url)
+                  .join(SEPARATOR.PRISMA),
               },
             })),
           },
