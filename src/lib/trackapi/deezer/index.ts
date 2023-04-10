@@ -138,9 +138,15 @@ export class DeezerWebApi {
 
     url.searchParams.append("output", "jsonp");
 
-    return fetchJsonp(url.toString()).then(function (response) {
-      return response.json();
-    }) as Promise<TResponse>;
+    return fetchJsonp(url.toString())
+      .then(function (response) {
+        return response.json().catch(function (error) {
+          throw new Error(error);
+        });
+      })
+      .catch(function (error) {
+        throw new Error(error);
+      }) as Promise<TResponse>;
   }
 
   private replaceOption(option: keyof DeezerApi.ListOptions | (string & {})) {

@@ -269,9 +269,9 @@ class Converter {
     return {
       playlists:
         "playlists" in playlistsSearch
-          ? this.userPlaylists(playlistsSearch.playlists)
+          ? Converter.userPlaylists(playlistsSearch.playlists)
           : // @ts-expect-error
-            this.userPlaylists(playlistsSearch),
+            Converter.userPlaylists(playlistsSearch),
     };
   }
 }
