@@ -14,7 +14,7 @@ const validator = createQueryValidator(
 );
 
 export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
-  const image = track?.images.filter((i) => i.url).at(0) ?? { url: "" };
+  const image = track?.images.filter((i) => i.url).at(-1) ?? { url: "" };
   const url = validator.createSearchURL({
     src: image.url.split("").reverse().join(""),
     blur: 36,
