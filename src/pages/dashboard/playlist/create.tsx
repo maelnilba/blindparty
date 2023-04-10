@@ -176,7 +176,7 @@ const PlaylistCreate = () => {
       await imageUpload.current.upload();
     }
 
-    if (tracks.length <= 20000) {
+    if (tracks.length <= 20) {
       await create({
         name: e.data.name,
         description: e.data.description,
