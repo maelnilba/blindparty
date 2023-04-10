@@ -62,7 +62,7 @@ const PlaylistCreate = () => {
     mutateAsync: insert_tracks,
     isLoading: isInsertTracksLoading,
     isSuccess: isInsertTrackSuccess,
-  } = api.playlist.insert_tracks.useMutation({});
+  } = api.playlist.insert_tracks.useMutation();
 
   const modal = useRef<ModalRef>(null);
   const currentRemoveTrack = useRef<Track>();
@@ -176,7 +176,7 @@ const PlaylistCreate = () => {
       await imageUpload.current.upload();
     }
 
-    if (tracks.length <= 20) {
+    if (tracks.length <= 20000) {
       await create({
         name: e.data.name,
         description: e.data.description,
