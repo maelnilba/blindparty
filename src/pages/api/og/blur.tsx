@@ -32,7 +32,7 @@ export default async function (req: NextRequest) {
           filter: `blur(${blur}px)`,
         }}
       >
-        <img placeholder="blur" src={_src} />
+        <img placeholder="blur" width="100%" height="100%" src={_src} />
       </div>
     ),
     {

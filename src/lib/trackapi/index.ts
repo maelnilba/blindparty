@@ -207,11 +207,11 @@ class Converter {
         "images" in playlist
           ? playlist.images.map((image) => ({ url: image.url }))
           : [
-              playlist.picture,
-              playlist.picture_small,
-              playlist.picture_medium,
               playlist.picture_big,
               playlist.picture_xl,
+              playlist.picture_medium,
+              playlist.picture_small,
+              playlist.picture,
             ].map((image) => ({ url: image })),
     };
   }
@@ -248,11 +248,11 @@ class Converter {
               album: {
                 name: item.album.title,
                 images: [
-                  item.album.cover,
-                  item.album.cover_small,
-                  item.album.cover_medium,
                   item.album.cover_big,
                   item.album.cover_xl,
+                  item.album.cover_medium,
+                  item.album.cover_small,
+                  item.album.cover,
                 ].map((image) => ({ url: image })),
               },
               artists: [{ name: item.artist.name }],

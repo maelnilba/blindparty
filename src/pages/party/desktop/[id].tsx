@@ -572,7 +572,7 @@ const Party: NextPage<
                       <TrackPicture
                         width={600}
                         height={600}
-                        className="h-full w-full object-cover"
+                        className="object-cover"
                         track={track.track}
                       />
                     </div>
