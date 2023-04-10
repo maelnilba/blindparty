@@ -9,6 +9,50 @@ export const pictureLink = (key: string | undefined) =>
     ? `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
     : undefined;
 
+const trackSchema = z
+  .array(
+    z.object({
+      id: z.string(),
+      name: z.string(),
+      preview_url: z.string().url().nullable(),
+      album: z.object({
+        name: z.string(),
+        images: z.array(
+          z.object({
+            url: z.string().url(),
+          })
+        ),
+      }),
+      artists: z.array(
+        z.object({
+          name: z.string(),
+        })
+      ),
+    })
+  )
+  .min(1);
+
+const mapped = (
+  tracks: {
+    id: string;
+    name: string;
+    preview_url: string | null;
+    album: string;
+    images: string;
+    artists: string;
+  }[]
+) =>
+  tracks.map(({ images, ...track }) => ({
+    ...track,
+    album: {
+      name: track.album,
+      images: images.split("|").map((image) => ({
+        url: image,
+      })),
+    },
+    artists: track.artists.split("|").map((artist) => ({ name: artist })),
+  }));
+
 export const playlistRouter = createTRPCRouter({
   create: protectedAdminProcedure
     .input(
@@ -17,28 +61,7 @@ export const playlistRouter = createTRPCRouter({
         description: z.string().optional(),
         s3key: z.string().optional(),
         generated: z.boolean(),
-        tracks: z
-          .array(
-            z.object({
-              id: z.string(),
-              name: z.string(),
-              preview_url: z.string().url().nullable(),
-              album: z.object({
-                name: z.string(),
-                images: z.array(
-                  z.object({
-                    url: z.string().url(),
-                  })
-                ),
-              }),
-              artists: z.array(
-                z.object({
-                  name: z.string(),
-                })
-              ),
-            })
-          )
-          .min(1),
+        tracks: trackSchema,
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -78,26 +101,7 @@ export const playlistRouter = createTRPCRouter({
         description: z.string().optional(),
         s3key: z.string().optional(),
         generated: z.boolean(),
-        tracks: z.array(
-          z.object({
-            id: z.string(),
-            name: z.string(),
-            preview_url: z.string().url().nullable(),
-            album: z.object({
-              name: z.string(),
-              images: z.array(
-                z.object({
-                  url: z.string().url(),
-                })
-              ),
-            }),
-            artists: z.array(
-              z.object({
-                name: z.string(),
-              })
-            ),
-          })
-        ),
+        tracks: trackSchema,
         removed_tracks: z.array(z.string()),
       })
     )
@@ -186,16 +190,7 @@ export const playlistRouter = createTRPCRouter({
       })
     ).map((playlist) => ({
       ...playlist,
-      tracks: playlist.tracks.map(({ images, ...track }) => ({
-        ...track,
-        album: {
-          name: track.album,
-          images: images.split("|").map((image) => ({
-            url: image,
-          })),
-        },
-        artists: track.artists.split("|").map((artist) => ({ name: artist })),
-      })),
+      tracks: mapped(playlist.tracks),
     }));
   }),
   get_playlist: protectedAdminProcedure
@@ -224,16 +219,7 @@ export const playlistRouter = createTRPCRouter({
 
       return {
         ...playlist,
-        tracks: playlist?.tracks.map(({ images, ...track }) => ({
-          ...track,
-          album: {
-            name: track.album,
-            images: images.split("|").map((image) => ({
-              url: image,
-            })),
-          },
-          artists: track.artists.split("|").map((artist) => ({ name: artist })),
-        })),
+        tracks: mapped(playlist.tracks),
       };
     }),
 });

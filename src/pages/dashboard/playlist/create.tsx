@@ -10,13 +10,12 @@ import { Track } from "@components/playlist/types";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
-import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
+import { spotify } from "@hooks/api/useTrackApi";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
-import { spotify } from "@hooks/api/useTrackApi";
+import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useSubmit } from "@hooks/zorm/useSubmit";
-import { Noop } from "@lib/helpers/noop";
 import { api } from "@utils/api";
 import { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
@@ -45,13 +44,25 @@ const PlaylistCreate = () => {
 
   const {
     mutateAsync: create,
-    isLoading,
-    isSuccess,
+    isLoading: isCreateLoading,
+    isSuccess: isCreateSuccess,
   } = api.playlist.create.useMutation({
     onSuccess: () => {
       router.push("/dashboard/playlist");
     },
   });
+
+  const {
+    mutateAsync: create_empty,
+    isLoading: isCreateEmptyLoading,
+    isSuccess: isCreateEmptySuccess,
+  } = api.playlist.create_empty.useMutation();
+
+  const {
+    mutateAsync: insert_tracks,
+    isLoading: isInsertTracksLoading,
+    isSuccess: isInsertTrackSuccess,
+  } = api.playlist.insert_tracks.useMutation({});
 
   const modal = useRef<ModalRef>(null);
   const currentRemoveTrack = useRef<Track>();
@@ -165,13 +176,30 @@ const PlaylistCreate = () => {
       await imageUpload.current.upload();
     }
 
-    await create({
-      name: e.data.name,
-      description: e.data.description,
-      s3key: imageUpload.current ? imageUpload.current.key : undefined,
-      tracks: tracks,
-      generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
-    });
+    if (tracks.length <= 20) {
+      await create({
+        name: e.data.name,
+        description: e.data.description,
+        s3key: imageUpload.current ? imageUpload.current.key : undefined,
+        tracks: tracks,
+        generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
+      });
+    } else {
+      const playlist = await create_empty({
+        name: e.data.name,
+        description: e.data.description,
+        s3key: imageUpload.current ? imageUpload.current.key : undefined,
+        generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
+      });
+
+      await Promise.all(
+        Array.from({ length: Math.ceil(tracks.length / 20) }, (_, i) =>
+          tracks.slice(i * 20, i * 20 + 20)
+        ).map((tracks) => insert_tracks({ id: playlist.id, tracks }))
+      );
+
+      router.push("/dashboard/playlist");
+    }
   });
 
   const zo = useZorm("create", createSchema, {
@@ -235,7 +263,15 @@ const PlaylistCreate = () => {
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <div className="px-4 pb-2">
             <button
-              disabled={isSubmitting || isLoading || isSuccess}
+              disabled={
+                isSubmitting ||
+                isCreateLoading ||
+                isCreateSuccess ||
+                isCreateEmptyLoading ||
+                isCreateEmptySuccess ||
+                isInsertTracksLoading ||
+                isInsertTrackSuccess
+              }
               type="submit"
               form="create-playlist"
               className="w-full rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"
