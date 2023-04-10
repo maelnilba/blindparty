@@ -26,7 +26,7 @@ export const PlaylistCard = ({
     <div className="flex items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <div
         onClick={onClick && (() => onClick(playlist))}
-        className="flex flex-1 items-center gap-4"
+        className="flex flex-1 items-center gap-4 overflow-hidden"
       >
         <Picture identifier={playlist.picture}>
           <img
@@ -36,7 +36,10 @@ export const PlaylistCard = ({
           />
         </Picture>
         <div className="inline-block w-3/4">
-          <span className="block overflow-hidden truncate text-ellipsis">
+          <span
+            title={playlist.name}
+            className="block overflow-hidden truncate text-ellipsis"
+          >
             {playlist.name}
           </span>
           <span className="text-sm">{playlist._count.tracks} tracks</span>

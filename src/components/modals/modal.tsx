@@ -17,6 +17,11 @@ type ModalProps = {
   title?: string;
   className?: string;
   closeOnOutside?: boolean;
+  options?: Options;
+};
+
+type Options = {
+  titleCenter?: boolean;
 };
 
 export type ModalRef = {
@@ -106,9 +111,13 @@ export const Modal = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
                 <Dialog.Panel className="transform overflow-hidden rounded-2xl border border-gray-800 bg-black/80 p-6 text-left align-middle shadow-xl ring-1 ring-white/5 backdrop-blur-sm transition-all">
                   <Dialog.Title
                     as="h3"
-                    className="mb-2 text-lg font-medium leading-6"
+                    className={`mb-2 inline-block w-full max-w-sm text-lg font-medium leading-6 ${
+                      props.options?.titleCenter && "text-center"
+                    }`}
                   >
-                    {title}
+                    <span className="block truncate text-ellipsis">
+                      {title}
+                    </span>{" "}
                   </Dialog.Title>
                   {content}
                 </Dialog.Panel>

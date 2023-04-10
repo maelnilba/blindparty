@@ -1,11 +1,13 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { Children, Fragment, isValidElement, ReactNode, useState } from "react";
 import type { Element } from "./types";
+import { noop } from "@lib/helpers/noop";
 
 type AsyncModalProps = {
   children: ReactNode;
   title?: string;
   beforeOpen: (...args: any) => Promise<any>;
+  closeOnOutside?: boolean;
   options?: Options;
 };
 
@@ -14,7 +16,7 @@ type Options = {
 };
 
 export function AsyncModal(props: AsyncModalProps) {
-  const { title } = props;
+  const { title, closeOnOutside = true } = props;
   let [isOpen, setIsOpen] = useState(false);
 
   const [button, content] = Children.toArray(props.children).reduce<
@@ -52,7 +54,11 @@ export function AsyncModal(props: AsyncModalProps) {
       </div>
 
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog
+          as="div"
+          className="relative z-10"
+          onClose={closeOnOutside ? closeModal : noop}
+        >
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -79,11 +85,13 @@ export function AsyncModal(props: AsyncModalProps) {
                 <Dialog.Panel className="transform overflow-hidden rounded-2xl border border-gray-800 bg-black/80 p-6 text-left align-middle shadow-xl ring-1 ring-white/5 backdrop-blur-sm transition-all">
                   <Dialog.Title
                     as="h3"
-                    className={`mb-2 text-lg font-medium leading-6 ${
+                    className={`mb-2 inline-block w-full max-w-sm text-lg font-medium leading-6 ${
                       props.options?.titleCenter && "text-center"
                     }`}
                   >
-                    {title}
+                    <span className="block truncate text-ellipsis">
+                      {title}
+                    </span>
                   </Dialog.Title>
                   {content}
                 </Dialog.Panel>
