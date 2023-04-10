@@ -245,6 +245,8 @@ const PlaylistEdit = () => {
             .map((tracks) => insert_tracks({ id: edit.id, tracks }))
             .concat([remove_tracks({ id: edit.id, removed_tracks })])
         );
+
+        push("/dashboard/playlist");
       }
     }
   );
