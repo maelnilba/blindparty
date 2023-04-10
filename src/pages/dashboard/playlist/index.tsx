@@ -2,67 +2,20 @@ import { Picture } from "@components/images/picture";
 import { AuthGuard } from "@components/layout/auth";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { TrackCard } from "@components/playlist/playlist-track-card";
-import { Tooltip } from "@components/popovers/tooltip";
-import { getServerAuthSession } from "@server/auth";
-import { prisma } from "@server/db";
-import { Socials } from "@server/types";
+import { type ProvidersCanTrackApi } from "@server/api/routers/user";
 import { api, RouterOutputs } from "@utils/api";
 import { NextPageWithAuth } from "next";
 import Link from "next/link";
-import type {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-} from "next/types";
+import { useRouter } from "next/router";
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerAuthSession({
-    req: context.req,
-    res: context.res,
-  });
+const providersCanTrackApi: ProvidersCanTrackApi = [
+  "spotify",
+  "deezer",
+] as const;
 
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/dashboard",
-        permanent: false,
-      },
-    };
-  }
-
-  const accounts = await prisma.user.findUnique({
-    where: {
-      id: session.user.id,
-    },
-    select: {
-      accounts: true,
-    },
-  });
-
-  if (!accounts) {
-    return {
-      redirect: {
-        destination: "/dashboard",
-        permanent: false,
-      },
-    };
-  }
-
-  const providers = accounts.accounts.map(
-    (account) => account.provider as Socials
-  );
-  const hasSpotify =
-    providers?.includes("spotify") || providers?.includes("deezer");
-
-  return {
-    props: {
-      hasSpotify: hasSpotify,
-    },
-  };
-}
-
-const Playlists: NextPageWithAuth<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ hasSpotify }) => {
+const Playlists: NextPageWithAuth = () => {
+  const router = useRouter();
+  const { data: canTrackApi, isLoading } = api.user.can_track_api.useQuery();
   const { data: playlists, refetch } = api.playlist.get_all.useQuery();
 
   const { mutate: erase } = api.playlist.delete.useMutation({
@@ -93,7 +46,7 @@ const Playlists: NextPageWithAuth<
     <div className="flex flex-wrap gap-4 p-4 px-28">
       <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">
         <>
-          {hasSpotify ? (
+          {canTrackApi ? (
             <Link
               href="/dashboard/playlist/create"
               className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
@@ -101,25 +54,22 @@ const Playlists: NextPageWithAuth<
               Créer une playlist
             </Link>
           ) : (
-            <Tooltip timeoutDuration={500}>
-              <button className="w-80 rounded-full bg-white/50 px-6 py-1 text-center text-lg font-semibold text-black no-underline">
+            <ConfirmationModal
+              message={`La création de playlist est disponible uniquement au utilisateur ayant lié leur compte ${providersCanTrackApi
+                .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+                .join(" ou ")}`}
+              actions={["Lié un compte"]}
+              onSuccess={() => {
+                router.push("/settings/account");
+              }}
+            >
+              <button
+                disabled={isLoading}
+                className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline"
+              >
                 Créer une playlist
               </button>
-              <div className="absolute flex -translate-y-16 flex-col gap-2 rounded border border-gray-800 bg-black/10 p-2 backdrop-blur-sm">
-                <p>
-                  La création de playlist est disponible uniquement au
-                  utilisateur ayant lié leur compte Spotify
-                  <span className="ml-2">
-                    <Link
-                      href="/settings/account"
-                      className="w-max rounded-full bg-white px-2 py-1 text-center text-sm font-semibold text-black no-underline transition-transform hover:scale-105"
-                    >
-                      Ajouter mon compte
-                    </Link>
-                  </span>
-                </p>
-              </div>
-            </Tooltip>
+            </ConfirmationModal>
           )}
         </>
         <Link

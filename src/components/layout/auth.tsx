@@ -8,14 +8,35 @@ export const Auth = ({
   children,
   auth,
 }: PropsWithChildren<{ auth?: NextPageWithAuth["auth"] }>) => {
-  const { push, pathname, ...r } = useRouter();
+  if (!auth) return <Noop />;
+
+  if (!(auth instanceof Function)) {
+    return <AuthObjectRedirect auth={auth}>{children}</AuthObjectRedirect>;
+  } else {
+    return <AuthFunctionRedirect auth={auth}>{children}</AuthFunctionRedirect>;
+  }
+};
+
+type TakeObject<TWhere> = TWhere extends infer U
+  ? U extends (...args: any) => any
+    ? never
+    : U
+  : never;
+
+const AuthObjectRedirect = ({
+  children,
+  auth,
+}: PropsWithChildren<{
+  auth: NonNullable<TakeObject<NextPageWithAuth["auth"]>>;
+}>) => {
+  const { push, pathname } = useRouter();
   const { status, data: session } = useSession({ required: !!auth?.role });
-  if (!auth) return <></>;
   const redirect = () => {
     if (auth.redirect === "/sign-in")
       push({ pathname: auth.redirect, query: { redirect_to: pathname } });
     else push({ pathname: auth.redirect });
   };
+
   if (status === "loading") return <Noop />;
   if (status === "unauthenticated") {
     redirect();
@@ -30,6 +51,35 @@ export const Auth = ({
     return <Noop />;
   }
   if (auth.role && !auth.role.includes(session!.user!.role)) {
+    redirect();
+    return <Noop />;
+  }
+  return <>{children}</>;
+};
+
+type TakeFunction<TWhere> = TWhere extends infer U
+  ? U extends (...args: any) => any
+    ? U
+    : never
+  : never;
+
+const AuthFunctionRedirect = ({
+  children,
+  auth: useAuth,
+}: PropsWithChildren<{
+  auth: NonNullable<TakeFunction<NextPageWithAuth["auth"]>>;
+}>) => {
+  const { push, pathname } = useRouter();
+  const { data: session } = useSession();
+  const { auth, isLoading, redirect: to } = useAuth(session);
+
+  const redirect = () => {
+    if (to === "/sign-in")
+      push({ pathname: to, query: { redirect_to: pathname } });
+    else push({ pathname: to });
+  };
+  if (isLoading) return <Noop />;
+  if (!auth) {
     redirect();
     return <Noop />;
   }

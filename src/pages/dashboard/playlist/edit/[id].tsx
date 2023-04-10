@@ -1,5 +1,4 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
-import { AuthGuard } from "@components/layout/auth";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { ModalRef } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
@@ -11,13 +10,12 @@ import { Track } from "@components/playlist/types";
 import { PlaylistCard } from "@components/spotify/playlist-card";
 import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
 import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
-import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
+import { spotify } from "@hooks/api/useTrackApi";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
-import { spotify } from "@hooks/api/useTrackApi";
+import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useSubmit } from "@hooks/zorm/useSubmit";
-import { Noop } from "@lib/helpers/noop";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import type { NextPageWithAuth, NextPageWithLayout } from "next";
@@ -448,4 +446,14 @@ const PlaylistEditWrapper: NextPageWithLayout & NextPageWithAuth = () => {
 export default PlaylistEditWrapper;
 
 PlaylistEditWrapper.getLayout = GetLayoutThrough;
-PlaylistEditWrapper.auth = AuthGuard;
+PlaylistEditWrapper.auth = () => {
+  const { data, isLoading } = api.user.can_track_api.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  return {
+    auth: data,
+    isLoading: isLoading,
+    redirect: "/dashboard",
+  };
+};

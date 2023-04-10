@@ -1,5 +1,4 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
-import { AuthGuard } from "@components/layout/auth";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { Modal, ModalRef } from "@components/modals/modal";
 import {
@@ -387,4 +386,14 @@ const PlaylistCreateWrapper: NextPageWithLayout & NextPageWithAuth = () => {
 export default PlaylistCreateWrapper;
 
 PlaylistCreateWrapper.getLayout = GetLayoutThrough;
-PlaylistCreateWrapper.auth = AuthGuard;
+PlaylistCreateWrapper.auth = () => {
+  const { data, isLoading } = api.user.can_track_api.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+  });
+
+  return {
+    auth: data,
+    isLoading: isLoading,
+    redirect: "/dashboard",
+  };
+};

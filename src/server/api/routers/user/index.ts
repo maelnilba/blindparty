@@ -8,6 +8,9 @@ export const pictureLink = (key: string | undefined) =>
     ? `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`
     : undefined;
 
+const providersCanTrackApi = ["spotify", "deezer"] as const;
+export type ProvidersCanTrackApi = typeof providersCanTrackApi;
+
 export const userRouter = createTRPCRouter({
   tokens: tokensRouter,
   provider: protectedProcedure.query(async ({ ctx }) => {
@@ -20,6 +23,28 @@ export const userRouter = createTRPCRouter({
       },
     });
     return accounts.map((account) => account.provider as Socials);
+  }),
+  can_track_api: protectedProcedure.query(async ({ ctx }) => {
+    const accounts = await ctx.prisma.user.findUniqueOrThrow({
+      where: {
+        id: ctx.session.user.id,
+      },
+      select: {
+        accounts: true,
+      },
+    });
+
+    const providers = accounts.accounts.map(
+      (account) => account.provider as Socials
+    );
+
+    return Boolean(
+      providers.length &&
+        providers.some((provider) =>
+          // @ts-expect-error
+          providersCanTrackApi.includes(provider)
+        )
+    );
   }),
   me: protectedProcedure.query(async ({ ctx }) => {
     return ctx.prisma.user.findUnique({

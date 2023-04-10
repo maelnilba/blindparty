@@ -91,7 +91,6 @@ const useGetUserPlaylists = () => {
 const useGetPlaylistTracks = () => {
   const { success, renew } = useTrackApi();
   const [id, setId] = useStateAsync<string | null>(null);
-  const nb_tracks = useRef<string>();
   const { refetch, ...query } = useQuery(
     ["track-api", "playlist-tracks", id],
     async () => {
