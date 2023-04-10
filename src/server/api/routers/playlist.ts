@@ -199,30 +199,28 @@ export const playlistRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const picture = pictureLink(input.s3key);
 
-      return await ctx.prisma.$transaction(async (prisma) => {
-        const playlist = await prisma.playlist.findFirstOrThrow({
-          where: {
-            id: input.id,
-            user: {
-              some: {
-                id: ctx.session.user.id,
-              },
+      const playlist = await ctx.prisma.playlist.findFirstOrThrow({
+        where: {
+          id: input.id,
+          user: {
+            some: {
+              id: ctx.session.user.id,
             },
           },
-        });
+        },
+      });
 
-        return await prisma.playlist.update({
-          where: {
-            id: playlist.id,
-          },
-          data: {
-            name: input.name,
-            description: input.description,
-            picture: picture,
-            s3key: input.s3key,
-            generated: input.generated,
-          },
-        });
+      return await ctx.prisma.playlist.update({
+        where: {
+          id: playlist.id,
+        },
+        data: {
+          name: input.name,
+          description: input.description,
+          picture: picture,
+          s3key: input.s3key,
+          generated: input.generated,
+        },
       });
     }),
   remove_tracks: protectedProcedure
@@ -233,33 +231,31 @@ export const playlistRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.$transaction(async (prisma) => {
-        const playlist = await prisma.playlist.findFirstOrThrow({
-          where: {
-            id: input.id,
-            user: {
-              some: {
-                id: ctx.session.user.id,
-              },
+      const playlist = await ctx.prisma.playlist.findFirstOrThrow({
+        where: {
+          id: input.id,
+          user: {
+            some: {
+              id: ctx.session.user.id,
             },
           },
-        });
-
-        await prisma.playlist.update({
-          where: {
-            id: playlist.id,
-          },
-          data: {
-            tracks: {
-              disconnect: input.removed_tracks.map((track_id) => ({
-                id: track_id,
-              })),
-            },
-          },
-        });
-
-        return true;
+        },
       });
+
+      await ctx.prisma.playlist.update({
+        where: {
+          id: playlist.id,
+        },
+        data: {
+          tracks: {
+            disconnect: input.removed_tracks.map((track_id) => ({
+              id: track_id,
+            })),
+          },
+        },
+      });
+
+      return true;
     }),
   insert_tracks: protectedProcedure
     .input(
@@ -269,44 +265,40 @@ export const playlistRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.prisma.$transaction(async (prisma) => {
-        const playlist = await prisma.playlist.findFirstOrThrow({
-          where: {
-            id: input.id,
-            user: {
-              some: {
-                id: ctx.session.user.id,
-              },
+      const playlist = await ctx.prisma.playlist.findFirstOrThrow({
+        where: {
+          id: input.id,
+          user: {
+            some: {
+              id: ctx.session.user.id,
             },
           },
-        });
-
-        await prisma.playlist.update({
-          where: {
-            id: playlist.id,
-          },
-          data: {
-            tracks: {
-              connectOrCreate: input.tracks.map((track) => ({
-                where: {
-                  id: track.id,
-                },
-                create: {
-                  id: track.id,
-                  name: track.name,
-                  preview_url: track.preview_url ?? undefined,
-                  album: track.album.name,
-                  artists: track.artists.map((artist) => artist.name).join("|"),
-                  images: track.album.images
-                    .map((image) => image.url)
-                    .join("|"),
-                },
-              })),
-            },
-          },
-        });
-        return true;
+        },
       });
+
+      await ctx.prisma.playlist.update({
+        where: {
+          id: playlist.id,
+        },
+        data: {
+          tracks: {
+            connectOrCreate: input.tracks.map((track) => ({
+              where: {
+                id: track.id,
+              },
+              create: {
+                id: track.id,
+                name: track.name,
+                preview_url: track.preview_url ?? undefined,
+                album: track.album.name,
+                artists: track.artists.map((artist) => artist.name).join("|"),
+                images: track.album.images.map((image) => image.url).join("|"),
+              },
+            })),
+          },
+        },
+      });
+      return true;
     }),
   delete: protectedProcedure
     .input(
