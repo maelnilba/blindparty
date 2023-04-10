@@ -312,7 +312,17 @@ const PlaylistEdit = () => {
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
           <div className="px-4 pb-2">
             <button
-              disabled={isSubmitting || isEditLoading || isEditLoading}
+              disabled={
+                isSubmitting ||
+                isEditLoading ||
+                isEditSuccess ||
+                isEditEmptyLoading ||
+                isEditEmptySuccess ||
+                isInsertTracksLoading ||
+                isInsertTrackSuccess ||
+                isRemoveTracksLoading ||
+                isRemoveTrackSuccess
+              }
               type="submit"
               form="create-playlist"
               className="w-full rounded-full bg-white px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105 disabled:opacity-75"

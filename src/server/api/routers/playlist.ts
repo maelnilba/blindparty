@@ -245,7 +245,7 @@ export const playlistRouter = createTRPCRouter({
           },
         });
 
-        await ctx.prisma.playlist.update({
+        await prisma.playlist.update({
           where: {
             id: playlist.id,
           },

@@ -139,6 +139,111 @@ export const playlistRouter = createTRPCRouter({
         },
       });
     }),
+  create_empty: protectedAdminProcedure
+    .input(
+      z.object({
+        name: z.string(),
+        description: z.string().optional(),
+        s3key: z.string().optional(),
+        generated: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const picture = pictureLink(input.s3key);
+
+      return await ctx.prisma.playlist.create({
+        data: {
+          name: input.name,
+          description: input.description,
+          picture: picture,
+          s3key: input.s3key,
+          generated: input.generated,
+          public: true,
+        },
+      });
+    }),
+  edit_empty: protectedAdminProcedure
+    .input(
+      z.object({
+        id: z.string().cuid(),
+        name: z.string(),
+        description: z.string().optional(),
+        s3key: z.string().optional(),
+        generated: z.boolean(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const picture = pictureLink(input.s3key);
+
+      return await ctx.prisma.playlist.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          name: input.name,
+          description: input.description,
+          picture: picture,
+          s3key: input.s3key,
+          generated: input.generated,
+        },
+      });
+    }),
+  remove_tracks: protectedAdminProcedure
+    .input(
+      z.object({
+        id: z.string().cuid(),
+        removed_tracks: z.array(z.string()),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.playlist.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          tracks: {
+            disconnect: input.removed_tracks.map((track_id) => ({
+              id: track_id,
+            })),
+          },
+        },
+      });
+
+      return true;
+    }),
+  insert_tracks: protectedAdminProcedure
+    .input(
+      z.object({
+        id: z.string().cuid(),
+        tracks: trackSchema.max(20),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.prisma.playlist.update({
+        where: {
+          id: input.id,
+        },
+        data: {
+          tracks: {
+            connectOrCreate: input.tracks.map((track) => ({
+              where: {
+                id: track.id,
+              },
+              create: {
+                id: track.id,
+                name: track.name,
+                preview_url: track.preview_url ?? undefined,
+                album: track.album.name,
+                artists: track.artists.map((artist) => artist.name).join("|"),
+                images: track.album.images.map((image) => image.url).join("|"),
+              },
+            })),
+          },
+        },
+      });
+
+      return true;
+    }),
   delete: protectedAdminProcedure
     .input(
       z.object({
