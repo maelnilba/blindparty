@@ -200,7 +200,13 @@ const PlaylistEdit = () => {
         }))
         .filter((t) => !playlist.tracks.find((pt) => pt.id === t.id));
 
-      if (tracks.length < 1 && removed_tracks.length < 1) {
+      if (
+        tracks.length < 1 &&
+        removed_tracks.length < 1 &&
+        e.data.name === playlist.name &&
+        (e.data.description ?? null) === playlist.description &&
+        !imageUpload.current?.local
+      ) {
         push("/dashboard/playlist");
         return;
       }
