@@ -73,7 +73,7 @@ const ScoreCard = ({
 }: Score & { className: string }) => {
   return (
     <div className="flex flex-col gap-1 text-center">
-      <Picture identifier={user.image} className="bg-black">
+      <Picture identifier={user.image} className="shrink-0 bg-black">
         <img
           alt={`image of ${user.name}`}
           src={user.image!}
@@ -93,7 +93,7 @@ const ScoreLine = ({
 }: Score & { className: string }) => {
   return (
     <div className="flex flex-row items-center gap-2 p-2 ring-2 ring-white ring-opacity-5">
-      <Picture identifier={user.image} className="bg-black">
+      <Picture identifier={user.image} className="shrink-0 bg-black">
         <img
           alt={`image of ${user.name}`}
           src={user.image!}

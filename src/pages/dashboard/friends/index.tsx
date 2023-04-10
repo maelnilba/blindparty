@@ -134,7 +134,7 @@ type UserCardProps = {
 const UserCard = ({ user, onAdd }: UserCardProps) => {
   return (
     <div className="group flex cursor-pointer items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
-      <Picture identifier={user.image}>
+      <Picture identifier={user.image} className="shrink-0">
         <img
           alt={`user picture of ${user.name}`}
           src={user.image!}
@@ -175,7 +175,7 @@ const InvitationCard = ({
   const friendUser = invited ? invitation.user_sent : invitation.user_invite;
   return (
     <div className="group flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
-      <Picture identifier={friendUser.image}>
+      <Picture identifier={friendUser.image} className="shrink-0">
         <img
           alt={`user picture of ${friendUser.name}`}
           src={friendUser.image!}

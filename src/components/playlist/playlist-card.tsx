@@ -28,7 +28,7 @@ export const PlaylistCard = ({
         onClick={onClick && (() => onClick(playlist))}
         className="flex flex-1 items-center gap-4 overflow-hidden"
       >
-        <Picture identifier={playlist.picture}>
+        <Picture identifier={playlist.picture} className="shrink-0">
           <img
             alt={`playlist picture of ${playlist.name}`}
             src={playlist.picture!}

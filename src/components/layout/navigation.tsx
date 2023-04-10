@@ -59,7 +59,7 @@ const Navigation = ({
                 >
                   <Picture
                     identifier={session.user.image}
-                    className="cursor-pointer hover:ring-gray-300"
+                    className="shrink-0 cursor-pointer hover:ring-gray-300"
                   >
                     <img
                       alt={`profile picture of ${

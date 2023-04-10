@@ -490,7 +490,7 @@ type PlayerCardProps = {
 const PlayerCard = ({ player, joined, connected }: PlayerCardProps) => {
   return (
     <div className={`${!joined && "opacity-50"} ${!connected && "blur-sm"}`}>
-      <Picture identifier={player.image}>
+      <Picture identifier={player.image} className="shrink-0">
         <img
           alt={`playlist picture of ${player.name}`}
           src={player.image!}

@@ -67,7 +67,7 @@ const ItemWrapper = ({ user, subscriber, onBan }: ItemWrapperProps) => {
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <Picture identifier={user?.image}>
+          <Picture identifier={user?.image} className="shrink-0">
             <img
               alt={`playlist picture of ${user.name}`}
               src={user.image!}

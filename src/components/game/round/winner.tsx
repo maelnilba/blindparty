@@ -26,7 +26,7 @@ export const Winner = ({ player }: WinnerProps) => {
         leaveFrom="opacity-100 -translate-x-0"
         leaveTo="opacity-0 -translate-x-28"
       >
-        <Picture identifier={player?.user?.image}>
+        <Picture identifier={player?.user?.image} className="shrink-0">
           <img
             alt={`playlist picture of ${player?.user.name}`}
             src={player?.user.image!}

@@ -163,7 +163,7 @@ const PlaylistCard = ({
           <p>{playlist.description}</p>
           <p>{playlist._count.tracks} tracks</p>
         </div>
-        <Picture identifier={playlist.picture}>
+        <Picture identifier={playlist.picture} className="shrink-0">
           <img
             className="aspect-square h-24 w-24 rounded border-gray-800 object-cover"
             src={playlist.picture!}

@@ -35,7 +35,7 @@ const PlaylistDiscover = ({
       <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-20 pt-20">
         <div className="sticky top-0 z-10 flex flex-col items-start justify-center gap-2 bg-black/5 py-2 backdrop-blur-sm">
           <div className="flex items-center justify-center gap-4 px-6">
-            <Picture identifier={playlist?.picture}>
+            <Picture identifier={playlist?.picture} className="shrink-0">
               <img
                 src={playlist?.picture!}
                 className="aspect-square h-24 w-24 object-cover"

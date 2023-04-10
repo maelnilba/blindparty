@@ -199,7 +199,10 @@ export const TrackPlayer = ({
       >
         <div className="grid w-full grid-cols-12 border-t-2 border-gray-800 p-2">
           <div className="col-span-3 flex items-center justify-center gap-4 px-[1.75rem]">
-            <Picture className="group/image relative" identifier={image?.url}>
+            <Picture
+              className="group/image relative shrink-0"
+              identifier={image?.url}
+            >
               <img
                 alt={`track picture of ${track?.name}`}
                 src={image?.url}

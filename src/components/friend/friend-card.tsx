@@ -11,7 +11,7 @@ type FriendCardProps = {
 export const FriendCard = ({ friend, onRemove }: FriendCardProps) => {
   return (
     <div className="group flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
-      <Picture identifier={friend.image}>
+      <Picture identifier={friend.image} className="shrink-0">
         <img
           alt={`user picture of ${friend.name}`}
           src={friend.image!}

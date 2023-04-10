@@ -250,7 +250,7 @@ const PartyCreate: NextPageWithAuth = () => {
                       type="hidden"
                       value={friend.friendId}
                     />
-                    <Picture identifier={friend.image}>
+                    <Picture identifier={friend.image} className="shrink-0">
                       <img
                         alt={`playlist picture of ${friend.name}`}
                         src={friend.image!}

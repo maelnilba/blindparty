@@ -53,7 +53,7 @@ const PlaylistCard = ({ playlist, onDelete }: PlaylistCardProps) => {
           <p>{playlist.description}</p>
           <p>{playlist._count.tracks} tracks</p>
         </div>
-        <Picture identifier={playlist.picture}>
+        <Picture identifier={playlist.picture} className="shrink-0">
           <img
             className="aspect-square h-24 w-24 rounded border-gray-800 object-cover"
             src={playlist.picture!}
@@ -101,13 +101,13 @@ const TrackCard = ({ track }: TrackCardProps) => {
   const image = track.album.images[0];
   return (
     <div className="flex cursor-pointer items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
-      <picture>
+      <Picture identifier={image?.url} className="shrink-0">
         <img
           alt={`track picture of ${track.name}`}
           src={image?.url}
           className="h-12 w-12 rounded border-gray-800 object-cover transition-transform"
         />
-      </picture>
+      </Picture>
       <div className="inline-block w-3/4">
         <span className="block overflow-hidden truncate text-ellipsis">
           {track.name}
