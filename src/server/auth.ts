@@ -87,6 +87,12 @@ export const authOptions: NextAuthOptions = {
     DeezerProvider({
       clientId: env.DEEZER_CLIENT_ID,
       clientSecret: env.DEEZER_CLIENT_SECRET,
+      authorization: {
+        params: {
+          perms: "basic_access,email,offline_access",
+          scope: "basic_access,email,offline_access",
+        },
+      },
     }),
   ],
 };

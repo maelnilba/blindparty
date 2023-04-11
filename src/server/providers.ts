@@ -23,8 +23,8 @@ export const DeezerProvider = (
     authorization: {
       url: "https://connect.deezer.com/oauth/auth.php",
       params: {
-        perms: "basic_access,email,offline_access",
-        scope: "basic_access,email,offline_access",
+        perms: "basic_access,email",
+        scope: "basic_access,email",
       },
     },
     token: {
@@ -71,6 +71,6 @@ export const DeezerProvider = (
         email: profile.email,
       };
     },
-    ...options,
+    options,
   };
 };
