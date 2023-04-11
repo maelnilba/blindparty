@@ -13,16 +13,22 @@ export type ProvidersCanTrackApi = typeof providersCanTrackApi;
 
 export const userRouter = createTRPCRouter({
   tokens: tokensRouter,
-  provider: protectedProcedure.query(async ({ ctx }) => {
-    const { accounts } = await ctx.prisma.user.findUniqueOrThrow({
+  accounts: protectedProcedure.query(async ({ ctx }) => {
+    const { accounts, platform } = await ctx.prisma.user.findUniqueOrThrow({
       where: {
         id: ctx.session.user.id,
       },
       select: {
+        email: true,
+        platform: true,
         accounts: true,
       },
     });
-    return accounts.map((account) => account.provider as Socials);
+
+    return {
+      providers: accounts.map((account) => account.provider as Socials),
+      platform: (platform ?? accounts.at(0)?.provider) as Socials,
+    };
   }),
   can_track_api: protectedProcedure.query(async ({ ctx }) => {
     const accounts = await ctx.prisma.user.findUniqueOrThrow({

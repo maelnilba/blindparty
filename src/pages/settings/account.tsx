@@ -1,68 +1,48 @@
+import { Divider } from "@components/elements/divider";
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { PlusIcon } from "@components/icons/plus";
+import { SignIn } from "@components/icons/sign-in";
 import { SocialIcon, ensureProvider } from "@components/icons/socials";
 import { AuthGuard } from "@components/layout/auth";
 import { Modal } from "@components/modals/modal";
 import { useSubmit } from "@hooks/zorm/useSubmit";
-import { getServerAuthSession } from "@server/auth";
+import { Noop } from "@lib/helpers/noop";
 import { useQuery } from "@tanstack/react-query";
 import { RouterOutputs, api } from "@utils/api";
-import type {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-  NextPageWithAuth,
-} from "next";
+import type { NextPageWithAuth } from "next";
 import { getProviders, signIn } from "next-auth/react";
-import { useRef } from "react";
+import { ReactNode, useRef } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
-
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  const session = await getServerAuthSession({
-    req: context.req,
-    res: context.res,
-  });
-
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/",
-        permanent: false,
-      },
-    };
-  }
-
-  return {
-    props: { user: session.user },
-  };
-}
 
 const editSchema = z.object({
   name: z.string().min(1),
 });
 
-const Settings: NextPageWithAuth<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ user: _user }) => {
-  const { data: providers } = api.user.provider.useQuery();
+const Settings: NextPageWithAuth = () => {
+  const { data: accounts } = api.user.accounts.useQuery();
   const { data: allProviders } = useQuery(["next-auth-providers"], () =>
     getProviders()
   );
-  const { data: __user, refetch } = api.user.me.useQuery();
-  const { mutateAsync: edit, isLoading } = api.user.edit.useMutation({
-    onSuccess: () => {
-      refetch();
+  const { data: user, isLoading, refetch } = api.user.me.useQuery();
 
-      // Hack for reload the next-auth session
-      const event = new Event("visibilitychange");
-      document.dispatchEvent(event);
-    },
-  });
+  const { mutateAsync: edit, isLoading: isUserLoading } =
+    api.user.edit.useMutation({
+      onSuccess: () => {
+        refetch();
+
+        // Hack for reload the next-auth session
+        const event = new Event("visibilitychange");
+        document.dispatchEvent(event);
+      },
+    });
 
   const imageUpload = useRef<ImageUploadRef | null>(null);
   const { submitPreventDefault, isSubmitting } = useSubmit<typeof editSchema>(
     async (e) => {
-      let s3key = __user?.s3key ?? getS3key(_user.image);
+      if (!user) throw new Error("Should have user");
+
+      let s3key = user?.s3key ?? getS3key(user.image);
       if (imageUpload.current && imageUpload.current.local) {
         await imageUpload.current.upload(s3key);
       }
@@ -78,7 +58,7 @@ const Settings: NextPageWithAuth<
     onValidSubmit: submitPreventDefault,
   });
 
-  const user = __user ? __user : _user;
+  if (!user || isUserLoading) return <Noop />;
 
   return (
     <div className="flex flex-wrap gap-4 p-4 px-28">
@@ -94,12 +74,12 @@ const Settings: NextPageWithAuth<
             </button>
             <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
               <div className="flex-1 p-2">
-                {allProviders && providers && (
+                {allProviders && accounts?.providers && (
                   <div className="flex flex-col gap-2">
                     {Object.values(allProviders)
                       .filter(
                         (provider) =>
-                          !providers.includes(
+                          !accounts.providers.includes(
                             ensureProvider(provider.name.toLocaleLowerCase())
                           )
                       )
@@ -109,12 +89,16 @@ const Settings: NextPageWithAuth<
                           provider={ensureProvider(
                             provider.name.toLocaleLowerCase()
                           )}
-                          onClick={() => {
-                            signIn(provider.id, {
-                              // callbackUrl: "http://localhost:3000/dashboard",
-                            });
-                          }}
-                        />
+                        >
+                          <PlusIcon
+                            onClick={() => {
+                              signIn(provider.id, {
+                                // callbackUrl: "http://localhost:3000/dashboard",
+                              });
+                            }}
+                            className="h-6 w-6 cursor-pointer group-hover:scale-125"
+                          />
+                        </ProviderCard>
                       ))}
                   </div>
                 )}
@@ -123,9 +107,22 @@ const Settings: NextPageWithAuth<
           </Modal>
         </div>
         <div className="flex flex-1 flex-col gap-2 p-2">
-          {providers?.map((provider, idx) => (
-            <ProviderCard key={idx} provider={provider} />
-          ))}
+          {accounts?.platform && <ProviderCard provider={accounts.platform} />}
+          <Divider />
+          {accounts?.providers
+            .filter((provider) => provider !== accounts.platform)
+            .map((provider, idx) => (
+              <ProviderCard key={idx} provider={provider}>
+                <SignIn
+                  onClick={() => {
+                    signIn(provider, {
+                      // callbackUrl: "http://localhost:3000/dashboard",
+                    });
+                  }}
+                  className="h-6 w-6 cursor-pointer group-hover:scale-125"
+                />
+              </ProviderCard>
+            ))}
         </div>
       </div>
       <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
@@ -172,23 +169,21 @@ const Settings: NextPageWithAuth<
   );
 };
 
-type Provider = RouterOutputs["user"]["provider"][number];
+type Provider = RouterOutputs["user"]["accounts"]["providers"][number];
 type ProviderCardProps = {
   provider: Provider;
-  onClick?: () => void;
+  children?: ReactNode;
 };
-const ProviderCard = ({ provider, onClick }: ProviderCardProps) => {
+const ProviderCard = ({ provider, children }: ProviderCardProps) => {
   return (
-    <div className="group flex cursor-pointer items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
+    <div className="group flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <SocialIcon provider={provider} />
-      <div className="inline-block w-3/4">
+      <div className="grow">
         <span className="block overflow-hidden truncate text-ellipsis font-bold capitalize tracking-tighter">
           {provider}
         </span>
       </div>
-      {onClick && (
-        <PlusIcon onClick={onClick} className="h-6 w-6 group-hover:scale-125" />
-      )}
+      {children}
     </div>
   );
 };

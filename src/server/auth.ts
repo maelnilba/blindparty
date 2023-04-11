@@ -39,6 +39,18 @@ export const authOptions: NextAuthOptions = {
     newUser: "/dashboard",
     error: "/auth/error",
   },
+  events: {
+    async signIn({ user, account }) {
+      await prisma.user.update({
+        where: {
+          id: user.id,
+        },
+        data: {
+          platform: account?.provider,
+        },
+      });
+    },
+  },
   callbacks: {
     session({ session, user }) {
       if (session.user) {

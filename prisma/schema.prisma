@@ -68,6 +68,7 @@ model User {
     emailVerified      DateTime?
     image              String?
     s3key              String?
+    platform           String?
     accounts           Account[]
     sessions           Session[]
     playlists          Playlist[]

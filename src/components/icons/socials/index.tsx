@@ -8,7 +8,7 @@ import { DeezerIcon } from "./deezer";
 
 const providerIcons: Record<Socials, (props: Icon) => JSX.Element> = {
   discord: (props) => (
-    <DiscordIcon className="h-10 w-10 scale-150 text-[#7289da]" {...props} />
+    <DiscordIcon className="h-10 w-10 text-[#7289da]" {...props} />
   ),
   google: (props) => <GoogleIcon className="h-10 w-10" {...props} />,
   spotify: (props) => <SpotifyIcon className="h-10 w-10" {...props} />,
