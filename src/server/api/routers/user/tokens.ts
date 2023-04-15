@@ -11,18 +11,25 @@ type Account = PrismaAccount & {
 
 export const tokensRouter = createTRPCRouter({
   token: protectedProcedure.query(async ({ ctx }) => {
-    const { accounts } = await ctx.prisma.user.findUniqueOrThrow({
-      where: {
-        id: ctx.session.user.id,
-      },
-      select: {
-        accounts: true,
-      },
-    });
+    const { accounts: allAccounts, platform } =
+      await ctx.prisma.user.findUniqueOrThrow({
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          accounts: true,
+          platform: true,
+        },
+      });
 
-    const account = accounts.filter((account) =>
+    const accounts = allAccounts.filter((account) =>
       providers.includes(account.provider as Provider)
-    )[0] as Account;
+    );
+
+    const account =
+      platform && accounts.map((p) => p.provider).includes(platform as Provider)
+        ? accounts.find((p) => p.provider === platform)
+        : accounts.at(0);
 
     const expire_at = account?.expires_at;
     const accessToken = account?.access_token;
@@ -77,18 +84,25 @@ export const tokensRouter = createTRPCRouter({
     };
   }),
   renew: protectedProcedure.mutation(async ({ ctx }) => {
-    const { accounts } = await ctx.prisma.user.findUniqueOrThrow({
-      where: {
-        id: ctx.session.user.id,
-      },
-      select: {
-        accounts: true,
-      },
-    });
+    const { accounts: allAccounts, platform } =
+      await ctx.prisma.user.findUniqueOrThrow({
+        where: {
+          id: ctx.session.user.id,
+        },
+        select: {
+          accounts: true,
+          platform: true,
+        },
+      });
 
-    const account = accounts.filter((account) =>
-      providers.includes(account.provider as (typeof providers)[number])
-    )[0] as Account;
+    const accounts = allAccounts.filter((account) =>
+      providers.includes(account.provider as Provider)
+    );
+
+    const account =
+      platform && accounts.map((p) => p.provider).includes(platform as Provider)
+        ? accounts.find((p) => p.provider === platform)
+        : accounts.at(0);
 
     const expire_at = account?.expires_at;
     const accessToken = account?.access_token;
