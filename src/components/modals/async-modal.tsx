@@ -11,7 +11,6 @@ type AsyncModalProps = {
   options?: Options;
 };
 
-// test
 type Options = {
   titleCenter?: boolean;
 };
