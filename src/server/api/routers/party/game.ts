@@ -1,3 +1,4 @@
+import stringSimilarity from "@lib/helpers/string-similarty";
 import { SEPARATOR } from "@server/api/root";
 import { TRPCError } from "@trpc/server";
 import { prpc } from "server/api/prpc";
@@ -282,63 +283,17 @@ export const gameRouter = createTRPCRouter({
       if (party.status !== "RUNNING" || party.view !== "GUESS")
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
-      const trackname = [
-        party.track.name,
-        party.track.artists[0],
-        party.track.album,
-      ]
-        .filter((v) => Boolean(v))
-        .join(" - ");
-
-      const album = party.track.album.toLocaleLowerCase();
-      const artists = party.track.artists
-        .split(SEPARATOR.PRISMA)
-        .map((a) => a.toLocaleLowerCase());
-      const name = party.track.name.toLocaleLowerCase();
-
-      const toGuessA = [
-        ...album.split(" ").map((a) => ({
-          score: 1.5,
-          name: a.toLocaleLowerCase(),
-          total: album.split(" ").length,
-        })),
-        ...artists.flat().map((a) => ({
-          score: 2,
-          name: a.toLocaleLowerCase(),
-          total: artists.flat().length,
-        })),
-        ...name.split(" ").map((a) => ({
-          score: 4,
-          name: a.toLocaleLowerCase(),
-          total: name.split(" ").length,
-        })),
-      ];
-
-      const RATIO = 20;
-      const SCORE_WIN = 5;
-      const length = (str1: string, str2: string) =>
-        (Math.abs(str1.length - str2.length) /
-          ((str1.length + str2.length) / 2)) *
-        100;
-
-      let score = 0;
-      toGuessA.forEach((toGuess) => {
-        input.guess.split(" ").forEach((word) => {
-          if (toGuess.name.includes(word) && toGuess.name.length > 2) {
-            score +=
-              toGuess.score /
-              (length(word, toGuess.name) / RATIO || 1) /
-              (toGuess.total || 1);
-          }
-        });
-      });
+      const nameSimilarity = stringSimilarity(input.guess, party.track.name);
+      const artistSimilarity = stringSimilarity(
+        input.guess,
+        party.track.artists[0]!
+      );
+      const albumSimilarity = stringSimilarity(input.guess, party.track.album);
 
       if (
-        true ||
-        input.guess === name ||
-        input.guess === album ||
-        artists.includes(input.guess) ||
-        score >= SCORE_WIN
+        nameSimilarity >= 0.7 ||
+        artistSimilarity >= 0.8 ||
+        albumSimilarity >= 0.8
       ) {
         await ctx.prisma.party.update({
           where: {
@@ -383,7 +338,9 @@ export const gameRouter = createTRPCRouter({
 
         return await ctx.pusher.trigger({
           players: points.players,
-          name: trackname,
+          name: [party.track.name, party.track.artists[0], party.track.album]
+            .filter((v) => Boolean(v))
+            .join(" - "),
           winner: points.players.find((p) => p.user.id === ctx.session.user.id),
         });
       }
