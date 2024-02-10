@@ -37,7 +37,7 @@ const createSchema = z.object({
       id: z.string(),
     })
   ),
-  round: z.coerce.number().min(10),
+  round: z.coerce.number().min(1),
 });
 
 const PartyCreate: NextPageWithAuth = () => {

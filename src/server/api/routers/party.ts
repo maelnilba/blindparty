@@ -11,7 +11,7 @@ export const partyRouter = createTRPCRouter({
       z.object({
         playlists_id: z.array(z.string().cuid()).min(1),
         inviteds: z.array(z.string().cuid()),
-        max_round: z.number().min(10),
+        max_round: z.number().min(1),
       })
     )
     .mutation(async ({ ctx, input }) => {
