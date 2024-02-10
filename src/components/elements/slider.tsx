@@ -79,7 +79,7 @@ export const Slider = forwardRef<HTMLSpanElement, SliderProps>(
           <RadixSlider.Track
             className={`relative ${
               orientation === "horizontal" ? "h-2" : "w-2"
-            } grow rounded-full border border-gray-800 bg-black`}
+            } grow rounded-full border border-gray-800`}
           >
             <RadixSlider.Range
               className={`absolute inset-0 z-[2] ${

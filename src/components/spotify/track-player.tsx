@@ -194,7 +194,7 @@ export const TrackPlayer = ({
       {children}
       <div
         {...props}
-        className="fixed bottom-0 z-50 bg-black/5 backdrop-blur-sm"
+        className="fixed bottom-0 z-50 bg-white/5 backdrop-blur-sm"
         style={{ width: "100%" }}
       >
         <div className="grid w-full grid-cols-12 border-t-2 border-gray-800 p-2">

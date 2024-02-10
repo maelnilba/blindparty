@@ -57,14 +57,14 @@ const Friends: NextPageWithAuth = () => {
               Rechercher des amis
             </button>
             <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
-              <div className="sticky top-0 flex flex-col gap-2 bg-black/10 font-semibold backdrop-blur-sm">
-                <label htmlFor="search" className="font-semibold">
-                  Rechercher un utilisateur
-                </label>
+              <label htmlFor="search" className="font-semibold">
+                Rechercher un utilisateur
+              </label>
+              <div className="sticky top-0 flex flex-col gap-2 font-semibold backdrop-blur-sm">
                 <input
                   onChange={(e) => onSearch(e.target.value)}
                   id="search"
-                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                  className="block w-full rounded-lg border border-gray-800 bg-transparent p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               <div className="flex-1">

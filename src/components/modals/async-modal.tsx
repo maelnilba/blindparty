@@ -82,7 +82,7 @@ export function AsyncModal(props: AsyncModalProps) {
                 leaveFrom="opacity-100 scale-100 translate-y-0"
                 leaveTo="opacity-0 scale-95 translate-y-4"
               >
-                <Dialog.Panel className="transform overflow-hidden rounded-2xl border border-gray-800 bg-black/80 p-6 text-left align-middle shadow-xl ring-1 ring-white/5 backdrop-blur-sm transition-all">
+                <Dialog.Panel className="transform overflow-hidden rounded-2xl border border-gray-800 bg-white/5 p-6 text-left align-middle shadow-xl ring-1 ring-white/5 backdrop-blur-sm transition-all">
                   <Dialog.Title
                     as="h3"
                     className={`mb-2 inline-block w-full max-w-sm text-lg font-medium leading-6 ${
