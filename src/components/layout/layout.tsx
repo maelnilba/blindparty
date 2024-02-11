@@ -6,7 +6,7 @@ import { Intercept } from "./routing";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const Main = ({ children }: { children: ReactNode }) => (
-  <main className={inter.className}>
+  <main className={inter.className} vaul-drawer-wrapper="">
     <div className="relative flex min-h-screen w-screen flex-col">
       {children}
     </div>
