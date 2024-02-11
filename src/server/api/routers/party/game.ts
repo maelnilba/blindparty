@@ -291,58 +291,62 @@ export const gameRouter = createTRPCRouter({
       const albumSimilarity = stringSimilarity(input.guess, party.track.album);
 
       if (
-        nameSimilarity >= 0.7 ||
-        artistSimilarity >= 0.8 ||
-        albumSimilarity >= 0.8
+        !(
+          nameSimilarity >= 0.7 ||
+          artistSimilarity >= 0.8 ||
+          albumSimilarity >= 0.8
+        )
       ) {
-        await ctx.prisma.party.update({
-          where: {
-            id: input.prpc.channel_id,
-          },
-          data: {
-            view: "SCORE",
-            players: {
-              updateMany: {
-                where: {
-                  userId: ctx.session.user.id,
-                },
-                data: {
-                  points: {
-                    increment: 1,
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        const points = await ctx.prisma.party.findUniqueOrThrow({
-          where: {
-            id: input.prpc.channel_id,
-          },
-          select: {
-            players: {
-              select: {
-                user: {
-                  select: {
-                    id: true,
-                    name: true,
-                    image: true,
-                  },
-                },
-                points: true,
-              },
-            },
-          },
-        });
-
-        return await ctx.pusher.trigger({
-          players: points.players,
-          name: [party.track.name, party.track.artists[0], party.track.album]
-            .filter((v) => Boolean(v))
-            .join(" - "),
-          winner: points.players.find((p) => p.user.id === ctx.session.user.id),
-        });
+        throw new TRPCError({ code: "NOT_FOUND" });
       }
+
+      await ctx.prisma.party.update({
+        where: {
+          id: input.prpc.channel_id,
+        },
+        data: {
+          view: "SCORE",
+          players: {
+            updateMany: {
+              where: {
+                userId: ctx.session.user.id,
+              },
+              data: {
+                points: {
+                  increment: 1,
+                },
+              },
+            },
+          },
+        },
+      });
+
+      const points = await ctx.prisma.party.findUniqueOrThrow({
+        where: {
+          id: input.prpc.channel_id,
+        },
+        select: {
+          players: {
+            select: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  image: true,
+                },
+              },
+              points: true,
+            },
+          },
+        },
+      });
+
+      return await ctx.pusher.trigger({
+        players: points.players,
+        name: [party.track.name, party.track.artists[0], party.track.album]
+          .filter((v) => Boolean(v))
+          .join(" - "),
+        winner: points.players.find((p) => p.user.id === ctx.session.user.id),
+      });
     }),
 });

@@ -1,7 +1,7 @@
 import { Picture } from "@components/images/picture";
 import { Transition } from "@headlessui/react";
 import { RouterOutputs } from "@utils/api";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 type WinnerProps = {
   player: RouterOutputs["party"]["game"]["guess"]["winner"] | null;
