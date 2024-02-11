@@ -3,6 +3,7 @@ import { customAlphabet } from "nanoid";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
 import { gameRouter } from "./party/game";
+import { pusherClient as pusher } from "../prpc";
 const nanoid = customAlphabet("1234567890", 6);
 
 export const partyRouter = createTRPCRouter({
@@ -12,6 +13,7 @@ export const partyRouter = createTRPCRouter({
         playlists_id: z.array(z.string().cuid()).min(1),
         inviteds: z.array(z.string().cuid()),
         max_round: z.number().min(1),
+        private: z.boolean().default(true),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -43,6 +45,7 @@ export const partyRouter = createTRPCRouter({
             tracks: {
               connect: tracks,
             },
+            access_mode: input.private ? "PRIVATE" : "PUBLIC",
             max_round:
               input.max_round <= tracks.length
                 ? input.max_round
@@ -82,7 +85,7 @@ export const partyRouter = createTRPCRouter({
   get_all_invite: protectedProcedure
     .input(z.object({ take: z.number().optional() }).optional())
     .query(async ({ ctx, input }) => {
-      return ctx.prisma.party.findMany({
+      const partys = await ctx.prisma.party.findMany({
         where: {
           inviteds: {
             some: {
@@ -110,6 +113,28 @@ export const partyRouter = createTRPCRouter({
         },
         take: input?.take,
       });
+
+      const channels = await Promise.all(
+        partys.map(async (party) => {
+          return pusher
+            .get({
+              path: `/channels/presence-game-${party.id}/users`,
+            })
+            .then((members) =>
+              members.json().then((members) => ({
+                count: Math.max(0, members.users.length - 1),
+                party: party,
+              }))
+            );
+        })
+      );
+
+      return partys.map((party) => ({
+        ...party,
+        members: {
+          count: channels.find((c) => c.party.id === party.id)?.count,
+        },
+      }));
     }),
   replay: protectedProcedure
     .input(

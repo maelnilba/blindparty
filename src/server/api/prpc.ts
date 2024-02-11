@@ -5,7 +5,7 @@ import { z } from "zod";
 import { env } from "../../env/server.mjs";
 import { createTRPCContext, protectedProcedure } from "./trpc";
 
-const pusherClient = new Pusher({
+export const pusherClient = new Pusher({
   appId: env.PUSHER_APP_ID,
   cluster: env.PUSHER_CLUSTER,
   key: env.PUSHER_KEY,

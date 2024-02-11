@@ -37,7 +37,7 @@ const PartyJoin: NextPageWithAuth = () => {
 
 export default PartyJoin;
 
-PartyJoin.auth = (session, status) => {
+PartyJoin.auth = (session) => {
   const router = useRouter();
   const id = getQuery(router.query.id);
   return {

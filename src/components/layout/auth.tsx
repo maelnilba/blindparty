@@ -71,15 +71,15 @@ const AuthFunctionRedirect = ({
 }>) => {
   const router = useRouter();
   const { data: session, status } = useSession();
-  const { auth, isLoading, redirect: to } = useAuth(session, status);
+  const { auth, isLoading, redirect: to } = useAuth(session);
 
   const redirect = () => {
     if (to === "/sign-in")
       router.push({ pathname: to, query: { redirect_to: router.pathname } });
     else router.push({ pathname: to });
   };
-
   if (isLoading) return <Noop />;
+
   if (status === "loading") return <Noop />;
 
   if (!auth) {

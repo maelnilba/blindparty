@@ -15,6 +15,7 @@ import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
 import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useSubmit } from "@hooks/zorm/useSubmit";
+import { Noop } from "@lib/helpers/noop";
 import { api } from "@utils/api";
 import { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
@@ -376,6 +377,16 @@ const PlaylistCreate = () => {
 };
 
 const PlaylistCreateWrapper: NextPageWithLayout & NextPageWithAuth = () => {
+  const router = useRouter();
+  const { isLoading } = api.user.can_track_api.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    onSuccess(can) {
+      if (!can) router.push("/dashboard");
+    },
+  });
+
+  if (isLoading) return <Noop />;
+
   return (
     <TrackPlayer>
       <PlaylistCreate />
@@ -386,14 +397,3 @@ const PlaylistCreateWrapper: NextPageWithLayout & NextPageWithAuth = () => {
 export default PlaylistCreateWrapper;
 
 PlaylistCreateWrapper.getLayout = GetLayoutThrough;
-PlaylistCreateWrapper.auth = () => {
-  const { data, isLoading } = api.user.can_track_api.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
-
-  return {
-    auth: data,
-    isLoading: isLoading,
-    redirect: "/dashboard",
-  };
-};

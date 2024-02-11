@@ -32,11 +32,19 @@ const createSchema = z.object({
     .transform((val) => {
       return val === 0 ? "SELECTION" : "RANDOM";
     }),
-  friends: z.array(
-    z.object({
-      id: z.string(),
-    })
-  ),
+  access: z.coerce
+    .number()
+    .min(0)
+    .max(1)
+    .transform((val) => !val),
+  friends: z
+    .array(
+      z.object({
+        id: z.string(),
+      })
+    )
+    .optional()
+    .default([]),
   round: z.coerce.number().min(1),
 });
 
@@ -78,11 +86,14 @@ const PartyCreate: NextPageWithAuth = () => {
 
   const { submitPreventDefault, isSubmitting } = useSubmit<typeof createSchema>(
     async (e) => {
-      if (!friends.size || !playlists) return;
+      if (!playlists) return;
       let playlist: Playlist | undefined;
       if (e.data.mode === "RANDOM") {
         playlist = playlists[Math.floor(Math.random() * playlists.length)];
       }
+
+      if (e.data.access && !friends.size) return;
+
       const max_round =
         e.data.mode === "RANDOM" && playlist
           ? playlist._count.tracks
@@ -90,6 +101,7 @@ const PartyCreate: NextPageWithAuth = () => {
 
       await create({
         max_round: Math.min(max_round, e.data.round),
+        private: e.data.access,
         playlists_id: playlist
           ? [playlist.id]
           : e.data.playlists.map(({ id }) => id),
@@ -106,6 +118,7 @@ const PartyCreate: NextPageWithAuth = () => {
 
   const evMode = useTrigger(zo, zo.fields.mode());
   const evRound = useTrigger(zo, zo.fields.round());
+  const evAccess = useTrigger(zo, zo.fields.access());
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 p-4">
@@ -183,6 +196,37 @@ const PartyCreate: NextPageWithAuth = () => {
         </div>
         <div className="flex flex-1 flex-col gap-10">
           <div className="">
+            <Tab.Group defaultIndex={0} onChange={evAccess}>
+              <Tab.List className="flex w-full gap-2 bg-black/10 px-6 backdrop-blur-sm">
+                {({ selectedIndex }) => (
+                  <div className="flex flex-1 justify-evenly gap-2 rounded-full ring-2 ring-white ring-opacity-5">
+                    <input
+                      name={zo.fields.access()}
+                      type="hidden"
+                      value={selectedIndex}
+                    />
+                    <Tab
+                      className={({ selected }) =>
+                        `flex-1 rounded-full py-1 px-6 text-lg font-semibold text-white no-underline transition-all duration-300 focus:outline-none ${
+                          selected && " bg-white text-black hover:scale-105"
+                        }`
+                      }
+                    >
+                      Privée
+                    </Tab>
+                    <Tab
+                      className={({ selected }) =>
+                        `flex-1 rounded-full py-1 px-6 text-lg font-semibold text-white no-underline transition-all duration-300 focus:outline-none ${
+                          selected && " bg-white text-black hover:scale-105"
+                        }`
+                      }
+                    >
+                      Publique
+                    </Tab>
+                  </div>
+                )}
+              </Tab.List>
+            </Tab.Group>
             <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto">
               <Tab.Group defaultIndex={0} onChange={evMode}>
                 <Tab.List className="absolute top-0 flex w-full gap-2 bg-black/10 px-6 py-2 backdrop-blur-sm">
