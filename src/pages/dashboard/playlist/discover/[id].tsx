@@ -1,6 +1,6 @@
 import { ClockIcon } from "@components/icons/clock";
 import { Picture } from "@components/images/picture";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { BlackScreen } from "@components/layout/blackscreen";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { Track } from "@components/playlist/types";
@@ -103,4 +103,4 @@ const PlaylistDiscoverWrapper: NextPageWithLayout & NextPageWithAuth = () => {
 export default PlaylistDiscoverWrapper;
 
 PlaylistDiscoverWrapper.getLayout = GetLayoutThrough;
-PlaylistDiscoverWrapper.auth = AuthGuard;
+PlaylistDiscoverWrapper.auth = AuthGuardUser;

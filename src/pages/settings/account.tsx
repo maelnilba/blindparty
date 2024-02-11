@@ -3,7 +3,7 @@ import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { PlusIcon } from "@components/icons/plus";
 import { SignIn } from "@components/icons/sign-in";
 import { SocialIcon, ensureProvider } from "@components/icons/socials";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { Modal } from "@components/modals/modal";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { Noop } from "@lib/helpers/noop";
@@ -189,7 +189,7 @@ const ProviderCard = ({ provider, children }: ProviderCardProps) => {
 };
 
 export default Settings;
-Settings.auth = AuthGuard;
+Settings.auth = AuthGuardUser;
 
 const getS3key = (url: string | null | undefined) => {
   if (!url) return undefined;

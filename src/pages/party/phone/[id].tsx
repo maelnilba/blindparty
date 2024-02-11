@@ -1,7 +1,7 @@
 import { Divider } from "@components/elements/divider";
 import { MicroIcon } from "@components/icons/micro";
 import { Picture } from "@components/images/picture";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { Modal } from "@components/modals/modal";
 import { TRACK_TIMER_MS } from "@components/party/constants";
 import { useMicroPermission } from "@hooks/helpers/useMicroPermission";
@@ -512,4 +512,4 @@ const PartyWrapper: NextPageWithAuth<
 };
 
 export default PartyWrapper;
-PartyWrapper.auth = AuthGuard;
+PartyWrapper.auth = AuthGuardUser;

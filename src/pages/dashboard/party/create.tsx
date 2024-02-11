@@ -3,7 +3,7 @@ import { InputSelect } from "@components/elements/input-select";
 import { Friend, FriendCard } from "@components/friend/friend-card";
 import { ExclamationIcon } from "@components/icons/exclamation";
 import { Picture } from "@components/images/picture";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { Playlist, PlaylistCard } from "@components/playlist/playlist-card";
 import { Tab } from "@headlessui/react";
 import { useDebug } from "@hooks/itsfine/useDebug";
@@ -319,4 +319,4 @@ const PartyCreate: NextPageWithAuth = () => {
 };
 
 export default PartyCreate;
-PartyCreate.auth = AuthGuard;
+PartyCreate.auth = AuthGuardUser;

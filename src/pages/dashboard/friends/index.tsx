@@ -6,7 +6,7 @@ import { PlusIcon } from "@components/icons/plus";
 import { UserPlusIcon } from "@components/icons/user-plus";
 import { XMarkIcon } from "@components/icons/x-mark";
 import { Picture } from "@components/images/picture";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
 import { useDebounce } from "@hooks/helpers/useDebounce";
@@ -215,4 +215,4 @@ const InvitationCard = ({
 };
 
 export default Friends;
-Friends.auth = AuthGuard;
+Friends.auth = AuthGuardUser;

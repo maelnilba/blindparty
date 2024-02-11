@@ -8,7 +8,7 @@ import { TrackPicture } from "@components/game/track-picture";
 import { TrackPlayer, TrackPlayerRef } from "@components/game/track-player";
 import { DesktopIcon } from "@components/icons/desktop";
 import { PhoneIcon } from "@components/icons/phone";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { GetLayoutThroughConfirm } from "@components/layout/layout";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import {
@@ -627,4 +627,4 @@ PartyWrapper.getLayout = GetLayoutThroughConfirm(
   "Êtes vous sur de vouloir quitter la page ? Cela signifira la fin de la partie",
   false
 );
-PartyWrapper.auth = AuthGuard;
+PartyWrapper.auth = AuthGuardUser;

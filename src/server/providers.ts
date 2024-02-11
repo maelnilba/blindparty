@@ -4,9 +4,9 @@
  * @see https://developers.deezer.com/api/user
  */
 
-import { OAuthUserConfig, OAuthConfig } from "next-auth/providers";
+import { OAuthConfig, OAuthUserConfig } from "next-auth/providers";
 
-type DeezerProfil = {
+type Profil = {
   id: number;
   name: string;
   email: string | null | undefined;
@@ -14,8 +14,8 @@ type DeezerProfil = {
 };
 
 export const DeezerProvider = (
-  options: OAuthUserConfig<DeezerProfil>
-): OAuthConfig<DeezerProfil> => {
+  options: OAuthUserConfig<Profil>
+): OAuthConfig<Profil> => {
   return {
     id: "deezer",
     name: "Deezer",
@@ -71,6 +71,6 @@ export const DeezerProvider = (
         email: profile.email,
       };
     },
-    options,
+    ...options,
   };
 };

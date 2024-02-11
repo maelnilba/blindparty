@@ -69,16 +69,19 @@ const AuthFunctionRedirect = ({
 }: PropsWithChildren<{
   auth: NonNullable<TakeFunction<NextPageWithAuth["auth"]>>;
 }>) => {
-  const { push, pathname } = useRouter();
-  const { data: session } = useSession();
+  const router = useRouter();
+  const { data: session, status } = useSession();
   const { auth, isLoading, redirect: to } = useAuth(session);
 
   const redirect = () => {
     if (to === "/sign-in")
-      push({ pathname: to, query: { redirect_to: pathname } });
-    else push({ pathname: to });
+      router.push({ pathname: to, query: { redirect_to: router.pathname } });
+    else router.push({ pathname: to });
   };
+
   if (isLoading) return <Noop />;
+  if (status === "loading") return <Noop />;
+
   if (!auth) {
     redirect();
     return <Noop />;
@@ -90,6 +93,15 @@ export const AuthGuardAdmin: NonNullable<NextPageWithAuth["auth"]> = {
   role: ["ADMIN"],
   redirect: "/dashboard",
 };
+
+export const AuthGuardUser: NonNullable<NextPageWithAuth["auth"]> = (
+  session
+) => ({
+  auth: Boolean(
+    session && session.user && session.user.role && session.user.role !== "ANON"
+  ),
+  redirect: "/sign-in",
+});
 
 export const AuthGuard: NonNullable<NextPageWithAuth["auth"]> = {
   redirect: "/sign-in",

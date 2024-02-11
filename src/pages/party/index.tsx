@@ -1,10 +1,9 @@
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { PartyCard } from "@components/party/party-card";
 import { api } from "@utils/api";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
-  NextPage,
   NextPageWithAuth,
 } from "next";
 import Link from "next/link";
@@ -104,4 +103,4 @@ const PartyHome: NextPageWithAuth<
 };
 
 export default PartyHome;
-PartyHome.auth = AuthGuard;
+PartyHome.auth = AuthGuardUser;

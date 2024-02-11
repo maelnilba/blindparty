@@ -1,5 +1,5 @@
 import { Picture } from "@components/images/picture";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { TrackCard } from "@components/playlist/playlist-track-card";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
@@ -68,7 +68,7 @@ const PlaylistSearch: NextPageWithAuth = () => {
 };
 
 export default PlaylistSearch;
-PlaylistSearch.auth = AuthGuard;
+PlaylistSearch.auth = AuthGuardUser;
 
 type PlaylistCardProps = {
   playlist: RouterOutputs["playlist"]["get_public"][number];

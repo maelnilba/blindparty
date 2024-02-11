@@ -1,5 +1,5 @@
 import { FriendCard } from "@components/friend/friend-card";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { PartyCard } from "@components/party/party-card";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { api } from "@utils/api";
@@ -69,4 +69,4 @@ const DashBoard: NextPageWithAuth = () => {
 
 export default DashBoard;
 
-DashBoard.auth = AuthGuard;
+DashBoard.auth = AuthGuardUser;

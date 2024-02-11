@@ -1,5 +1,5 @@
 import { Picture } from "@components/images/picture";
-import { AuthGuard } from "@components/layout/auth";
+import { AuthGuardUser } from "@components/layout/auth";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { TrackCard } from "@components/playlist/playlist-track-card";
 import { type ProvidersCanTrackApi } from "@server/api/routers/user";
@@ -177,4 +177,4 @@ const PlaylistCard = ({
 };
 
 export default Playlists;
-Playlists.auth = AuthGuard;
+Playlists.auth = AuthGuardUser;

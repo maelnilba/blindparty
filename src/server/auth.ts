@@ -1,4 +1,4 @@
-import { type GetServerSidePropsContext } from "next";
+import { NextApiRequest, type GetServerSidePropsContext } from "next";
 import { getServerSession } from "next-auth";
 
 /**
@@ -15,24 +15,52 @@ export const getServerAuthSession = async (ctx: {
   req: GetServerSidePropsContext["req"];
   res: GetServerSidePropsContext["res"];
 }) => {
-  return await getServerSession(ctx.req, ctx.res, authOptions);
+  return await getServerSession(
+    ctx.req,
+    ctx.res,
+    authOptions(ctx.req, ctx.res)
+  );
 };
 
 import { type NextAuthOptions } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
 import SpotifyProvider from "next-auth/providers/spotify";
-
-// Prisma adapter for NextAuth, optional and can be removed
+import CredentialsProvider from "next-auth/providers/credentials";
+import { DeezerProvider } from "./providers";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { prisma } from "@server/db";
 import { env } from "env/server.mjs";
-import { DeezerProvider } from "./providers";
+import { nanoid } from "nanoid";
+import { v4 } from "uuid";
+import { decode, encode } from "next-auth/jwt";
+import { Adapter, AdapterSession, AdapterUser } from "next-auth/adapters";
 
-// Prisma adapter for NextAuth, optional and can be removed
+const adapter = {
+  ...(PrismaAdapter(prisma) as Adapter),
+  async getSessionAndUser(sessionToken: string) {
+    const userAndSession = await prisma.session.findFirst({
+      where: {
+        sessionToken: sessionToken,
+      },
+      include: {
+        user: true,
+      },
+    });
+    if (!userAndSession) return null;
+    const { user, ...session } = userAndSession;
+    return { user: user, session: session } as {
+      user: AdapterUser;
+      session: AdapterSession;
+    };
+  },
+};
 
-export const authOptions: NextAuthOptions = {
+export const authOptions: (
+  req: GetServerSidePropsContext["req"],
+  res: GetServerSidePropsContext["res"]
+) => NextAuthOptions = (req, res) => ({
   debug: env.NODE_ENV !== "production",
   pages: {
     signIn: "/sign-in",
@@ -41,14 +69,16 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async signIn({ user, account }) {
-      await prisma.user.update({
-        where: {
-          id: user.id,
-        },
-        data: {
-          platform: account?.provider,
-        },
-      });
+      if (account) {
+        await prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            platform: account?.provider,
+          },
+        });
+      }
     },
   },
   callbacks: {
@@ -59,8 +89,58 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+    async signIn({ user }) {
+      const request = req as NextApiRequest;
+      if (
+        request.query.nextauth?.includes("callback") &&
+        request.query.nextauth?.includes("credentials") &&
+        request.method === "POST"
+      ) {
+        if (user && "id" in user) {
+          const session = await adapter.createSession!({
+            sessionToken: v4(),
+            userId: user.id,
+            expires: new Date(Date.now() + 24 * 60 * 60 * 1000),
+          });
+
+          res.setHeader(
+            "Set-Cookie",
+            `next-auth.session-token=${
+              session.sessionToken
+            };expires=${session.expires.toUTCString()};path=/`
+          );
+        }
+      }
+      return true;
+    },
   },
-  adapter: PrismaAdapter(prisma),
+  jwt: {
+    encode(params) {
+      const request = req as NextApiRequest;
+      if (
+        request.query.nextauth?.includes("callback") &&
+        request.query.nextauth?.includes("credentials") &&
+        request.method === "POST"
+      ) {
+        const cookie = request.cookies["next-auth.session-token"]!;
+        if (cookie) return cookie;
+        else return "";
+      }
+      return encode(params);
+    },
+    decode(params) {
+      const request = req as NextApiRequest;
+      if (
+        request.query.nextauth?.includes("callback") &&
+        request.query.nextauth?.includes("credentials") &&
+        request.method === "POST"
+      ) {
+        return null;
+      }
+      return decode(params);
+    },
+  },
+  adapter: adapter,
   providers: [
     SpotifyProvider({
       clientId: env.SPOTIFY_CLIENT_ID,
@@ -94,5 +174,20 @@ export const authOptions: NextAuthOptions = {
         },
       },
     }),
+    CredentialsProvider({
+      name: "anonymous",
+      credentials: {},
+      async authorize() {
+        const name = ["anon", "-", nanoid(8)].join("");
+        return await prisma.user.create({
+          data: {
+            email: `${name}@anon.blindparty.com`,
+            name: name,
+            image: null,
+            role: "ANON",
+          },
+        });
+      },
+    }),
   ],
-};
+});

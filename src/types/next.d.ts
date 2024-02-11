@@ -22,7 +22,7 @@ declare module "next" {
         }
       | ((session: Session | null) => {
           auth: boolean | undefined;
-          isLoading: boolean | undefined;
+          isLoading?: boolean | undefined;
           redirect: string;
         });
   };

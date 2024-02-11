@@ -14,7 +14,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     res: context.res,
   });
 
-  if (session) {
+  if (session && session.user && session.user.role !== "ANON") {
     return {
       redirect: {
         destination: "/dashboard",

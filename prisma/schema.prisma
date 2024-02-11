@@ -3,7 +3,6 @@
 
 generator client {
     provider        = "prisma-client-js"
-    previewFeatures = ["jsonProtocol"]
 }
 
 datasource db {
@@ -83,6 +82,7 @@ model User {
 }
 
 enum Role {
+    ANON
     USER
     MODERATOR
     ADMIN
