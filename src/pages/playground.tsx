@@ -1,4 +1,4 @@
-import { Drawer } from "@components/elements/drawer";
+import { Drawer } from "@components/modals/drawer";
 import { NextPageWithLayout } from "next";
 
 const Playground: NextPageWithLayout = () => {
