@@ -1,9 +1,9 @@
-import { createQueryValidator } from "@lib/helpers/query-validator";
+import { createQueryValidator } from "helpers/query-validator";
 import { RouterOutputs } from "@utils/api";
 import { z } from "zod";
 import Image from "next/image";
 import { ComponentProps } from "react";
-import { getBaseUrl } from "@lib/helpers/base-url";
+import { getBaseUrl } from "helpers/base-url";
 type TrackPictureProps = RouterOutputs["party"]["game"]["round"];
 
 const validator = createQueryValidator(

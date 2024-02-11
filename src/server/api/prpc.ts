@@ -1,4 +1,4 @@
-import { initPRPC } from "@prpc/server";
+import { initPRPC } from "modules/prpc/server";
 import Pusher from "pusher";
 import superjson from "superjson";
 import { z } from "zod";

@@ -1,4 +1,4 @@
-import { Noop } from "@lib/helpers/noop";
+import { Noop } from "helpers/noop";
 import { type NextPageWithAuth } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";

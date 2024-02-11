@@ -1,4 +1,4 @@
-import { createQueryValidator } from "@lib/helpers/query-validator";
+import { createQueryValidator } from "helpers/query-validator";
 import { z } from "zod";
 import { create } from "zustand";
 

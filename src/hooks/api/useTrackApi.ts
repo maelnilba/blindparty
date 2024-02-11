@@ -1,5 +1,5 @@
 import { useStateAsync } from "@hooks/itsfine/useStateAsync";
-import { TrackApi } from "@lib/trackapi";
+import { TrackApi } from "modules/trackapi";
 import type { Provider } from "@server/api/routers/user/tokens";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@utils/api";

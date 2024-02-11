@@ -2,7 +2,7 @@ import { PauseIcon } from "@components/icons/pause";
 import { PlayIcon } from "@components/icons/play";
 import { Picture } from "@components/images/picture";
 import { Track } from "@components/playlist/types";
-import { noop } from "@lib/helpers/noop";
+import { noop } from "helpers/noop";
 
 type PlaylistTrackCardProps = {
   track: Track;

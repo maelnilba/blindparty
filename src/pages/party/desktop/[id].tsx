@@ -27,8 +27,8 @@ import { prisma } from "@server/db";
 import { RouterOutputs, api } from "@utils/api";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
-import { ONE_SECOND_IN_MS } from "lib/helpers/date";
-import { sleep } from "lib/helpers/sleep";
+import { ONE_SECOND_IN_MS } from "helpers/date";
+import { sleep } from "helpers/sleep";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,

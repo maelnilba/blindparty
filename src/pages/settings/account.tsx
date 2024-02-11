@@ -6,7 +6,7 @@ import { SocialIcon, ensureProvider } from "@components/icons/socials";
 import { AuthGuardUser } from "@components/layout/auth";
 import { Modal } from "@components/modals/modal";
 import { useSubmit } from "@hooks/zorm/useSubmit";
-import { Noop } from "@lib/helpers/noop";
+import { Noop } from "helpers/noop";
 import { useQuery } from "@tanstack/react-query";
 import { RouterOutputs, api } from "@utils/api";
 import { getNextAuthProviders } from "@utils/next-auth";

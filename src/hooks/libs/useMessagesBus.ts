@@ -1,4 +1,4 @@
-import { getBaseUrl } from "@lib/helpers/base-url";
+import { getBaseUrl } from "helpers/base-url";
 import { useEffect, useRef, useState } from "react";
 import { z, ZodSchema } from "zod";
 

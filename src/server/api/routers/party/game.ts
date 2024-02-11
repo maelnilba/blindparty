@@ -1,4 +1,4 @@
-import stringSimilarity from "@lib/helpers/string-similarty";
+import stringSimilarity from "helpers/string-similarty";
 import { SEPARATOR } from "@server/api/root";
 import { TRPCError } from "@trpc/server";
 import { prpc } from "server/api/prpc";

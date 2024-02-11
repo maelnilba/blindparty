@@ -1,7 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { noop } from "@lib/helpers/noop";
+import { noop } from "helpers/noop";
 import { SEPARATOR } from "../root";
 
 export const pictureLink = (key: string | undefined) =>

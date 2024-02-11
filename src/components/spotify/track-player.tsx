@@ -3,8 +3,8 @@ import { PauseIcon } from "@components/icons/pause";
 import { PlayIcon } from "@components/icons/play";
 import { Picture } from "@components/images/picture";
 import { Track } from "@components/playlist/types";
-import { noop } from "@lib/helpers/noop";
-import { secondIntl } from "lib/helpers/date";
+import { noop } from "helpers/noop";
+import { secondIntl } from "helpers/date";
 import { useRouter } from "next/router";
 import {
   ComponentProps,

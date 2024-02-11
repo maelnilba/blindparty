@@ -1,7 +1,7 @@
 import {
   createNextApiHandler,
   createNextWehbookApiHandler,
-} from "@prpc/server";
+} from "modules/prpc/server";
 import { prpc } from "@server/api/prpc";
 import { env } from "../../../env/server.mjs";
 

@@ -1,7 +1,7 @@
 import { Picture } from "@components/images/picture";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { Menu, Transition } from "@headlessui/react";
-import { SubscriberProxy, useSubscriber } from "@lib/helpers/observable";
+import { SubscriberProxy, useSubscriber } from "helpers/observable";
 import { Player } from "pages/party/phone/[id]";
 import { useEffect } from "react";
 

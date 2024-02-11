@@ -1,4 +1,4 @@
-import { noop } from "@lib/helpers/noop";
+import { noop } from "helpers/noop";
 import { useSyncExternalStore } from "react";
 
 export const useClient = () =>

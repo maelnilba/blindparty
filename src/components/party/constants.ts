@@ -1,4 +1,4 @@
-import { ONE_SECOND_IN_MS } from "lib/helpers/date";
+import { ONE_SECOND_IN_MS } from "helpers/date";
 
 export const VIEW_SCORE_MS =
   process.env.NODE_ENV === "production"

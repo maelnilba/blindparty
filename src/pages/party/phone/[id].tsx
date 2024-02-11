@@ -6,15 +6,15 @@ import { Modal } from "@components/modals/modal";
 import { TRACK_TIMER_MS } from "@components/party/constants";
 import { useMicroPermission } from "@hooks/helpers/useMicroPermission";
 import { useVoiceDetector } from "@hooks/libs/useVoiceDetector";
-import { nearest, parse } from "@lib/helpers/accept-language";
-import { noop } from "@lib/helpers/noop";
+import { nearest, parse } from "helpers/accept-language";
+import { noop } from "helpers/noop";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
-import { sleep } from "lib/helpers/sleep";
-import { raw } from "lib/tailwindcolors";
+import { sleep } from "helpers/sleep";
+import { raw } from "modules/tailwindcolors";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,

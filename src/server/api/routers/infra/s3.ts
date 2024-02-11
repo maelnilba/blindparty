@@ -1,4 +1,4 @@
-import { noop } from "@lib/helpers/noop";
+import { noop } from "helpers/noop";
 import { SEPARATOR } from "@server/api/root";
 import { TRPCError } from "@trpc/server";
 import { nanoid } from "nanoid";

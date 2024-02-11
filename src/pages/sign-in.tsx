@@ -1,4 +1,4 @@
-import { getBaseUrl } from "@lib/helpers/base-url";
+import { getBaseUrl } from "helpers/base-url";
 import { getServerAuthSession } from "@server/auth";
 import { getNextAuthProviders } from "@utils/next-auth";
 import type {

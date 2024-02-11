@@ -1,5 +1,5 @@
 import { prisma } from "@server/db";
-import { ONE_DAY_IN_MS, THIRTY_MINUTES_IN_MS } from "lib/helpers/date";
+import { ONE_DAY_IN_MS, THIRTY_MINUTES_IN_MS } from "helpers/date";
 import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
