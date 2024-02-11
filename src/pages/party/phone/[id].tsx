@@ -1,7 +1,7 @@
 import { Divider } from "@components/elements/divider";
 import { MicroIcon } from "@components/icons/micro";
 import { Picture } from "@components/images/picture";
-import { AuthGuardUser } from "@components/layout/auth";
+import { AuthGuard, AuthGuardUser } from "@components/layout/auth";
 import { Modal } from "@components/modals/modal";
 import { TRACK_TIMER_MS } from "@components/party/constants";
 import { useMicroPermission } from "@hooks/helpers/useMicroPermission";
@@ -121,14 +121,19 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  if (!party.inviteds.map((invited) => invited.id).includes(session.user.id)) {
-    return {
-      redirect: {
-        destination: exclude("NOT_INVITED", "/party"),
-        permanent: false,
-      },
-    };
+  if (party.access_mode === "PRIVATE") {
+    if (
+      !party.inviteds.map((invited) => invited.id).includes(session.user.id)
+    ) {
+      return {
+        redirect: {
+          destination: exclude("NOT_INVITED", "/party"),
+          permanent: false,
+        },
+      };
+    }
   }
+
   if (
     party.status !== "PENDING" &&
     !party.players.map((player) => player.userId).includes(session.user.id)
@@ -336,7 +341,18 @@ const Party: NextPage<
   const players = useMemo<
     { player: Player; joined: boolean; connected: boolean }[]
   >(() => {
-    return party.inviteds.map((invited) => ({
+    const players =
+      party.access_mode === "PRIVATE"
+        ? party.inviteds
+        : (members ? Object.values(members) : [])
+            .filter((m) => !m.isHost)
+            .map(({ id, name, image }) => ({
+              id,
+              name,
+              image,
+            }));
+
+    return players.map((invited) => ({
       player: invited,
       joined: party.players
         .map((player) => player.user.id)
@@ -512,4 +528,4 @@ const PartyWrapper: NextPageWithAuth<
 };
 
 export default PartyWrapper;
-PartyWrapper.auth = AuthGuardUser;
+PartyWrapper.auth = AuthGuard;

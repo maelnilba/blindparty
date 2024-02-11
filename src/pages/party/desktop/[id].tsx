@@ -360,7 +360,18 @@ const Party: NextPage<
   const players = useMemo<
     { player: Player; joined: boolean; connected: boolean }[]
   >(() => {
-    return party.inviteds.map((invited) => ({
+    const players =
+      party.access_mode === "PRIVATE"
+        ? party.inviteds
+        : (members ? Object.values(members) : [])
+            .filter((m) => !m.isHost)
+            .map(({ id, name, image }) => ({
+              id,
+              name,
+              image,
+            }));
+
+    return players.map((invited) => ({
       player: invited,
       joined: party.players
         .map((player) => player.user.id)

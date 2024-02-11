@@ -183,7 +183,7 @@ export const authOptions: (
           data: {
             email: `${name}@anon.blindparty.com`,
             name: name,
-            image: null,
+            image: "/placeholders/avatar.webp",
             role: "ANON",
           },
         });

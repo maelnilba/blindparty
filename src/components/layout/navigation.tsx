@@ -102,7 +102,12 @@ const Navigation = ({ through = false }: NavigationProps) => {
   return (
     <>
       <div className="fixed top-0 z-navigation flex h-20 w-full flex-row items-center justify-around bg-black/5 p-6 backdrop-blur-sm">
-        <p className="text-4xl font-extrabold">BlindParty</p>
+        <Link
+          href="/"
+          className="text-4xl font-extrabold transition-transform hover:scale-105"
+        >
+          BlindParty
+        </Link>
         <div className="flex-1"></div>
         <div>
           <button

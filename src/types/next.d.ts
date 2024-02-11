@@ -20,7 +20,10 @@ declare module "next" {
           role?: Role[];
           redirect: string;
         }
-      | ((session: Session | null) => {
+      | ((
+          session: Session | null,
+          status: "loading" | "authenticated" | "unauthenticated"
+        ) => {
           auth: boolean | undefined;
           isLoading?: boolean | undefined;
           redirect: string;

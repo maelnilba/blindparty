@@ -9,8 +9,9 @@ import { useSubmit } from "@hooks/zorm/useSubmit";
 import { Noop } from "@lib/helpers/noop";
 import { useQuery } from "@tanstack/react-query";
 import { RouterOutputs, api } from "@utils/api";
+import { getNextAuthProviders } from "@utils/next-auth";
 import type { NextPageWithAuth } from "next";
-import { getProviders, signIn } from "next-auth/react";
+import { signIn } from "next-auth/react";
 import { ReactNode, useRef } from "react";
 import { useZorm } from "react-zorm";
 import { z } from "zod";
@@ -22,7 +23,7 @@ const editSchema = z.object({
 const Settings: NextPageWithAuth = () => {
   const { data: accounts } = api.user.accounts.useQuery();
   const { data: allProviders } = useQuery(["next-auth-providers"], () =>
-    getProviders()
+    getNextAuthProviders()
   );
   const { data: user, isLoading, refetch } = api.user.me.useQuery();
 
@@ -76,7 +77,7 @@ const Settings: NextPageWithAuth = () => {
               <div className="flex-1 p-2">
                 {allProviders && accounts?.providers && (
                   <div className="flex flex-col gap-2">
-                    {Object.values(allProviders)
+                    {allProviders
                       .filter(
                         (provider) =>
                           !accounts.providers.includes(

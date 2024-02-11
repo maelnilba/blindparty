@@ -179,6 +179,7 @@ model Party {
     hostId    String
     status    PartyStatus     @default(PENDING)
     view      PartyViewStatus @default(NONE)
+    access_mode PartyAccessMode @default(PRIVATE)
     max_round Int
     round     Int             @default(1)
     track     Track?          @relation(name: "current", fields: [trackId], references: [id])
@@ -200,6 +201,11 @@ enum PartyViewStatus {
     NONE
     GUESS
     SCORE
+}
+
+enum PartyAccessMode {
+    PUBLIC
+    PRIVATE
 }
 
 model PartyLink {

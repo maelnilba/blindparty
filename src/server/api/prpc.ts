@@ -25,6 +25,7 @@ export const prpc = p.createPRPCRouter({
       user: z.object({
         id: z.string(),
         name: z.string(),
+        image: z.string(),
         isHost: z.boolean(),
       }),
     })
@@ -32,6 +33,7 @@ export const prpc = p.createPRPCRouter({
       return {
         id: ctx.session?.user?.id || "",
         name: ctx.session?.user?.name || "",
+        image: ctx.session?.user?.image || "",
         isHost: data.isHost || false,
       };
     }),

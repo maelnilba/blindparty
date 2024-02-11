@@ -1,13 +1,13 @@
-name: Clean party cron
+name: CLEAN ANON
 on:
   schedule:
-    - cron: "*/60 * * * *"
+    - cron: "0 0 * * *"
 jobs:
   cron:
     runs-on: ubuntu-latest
     steps:
-      - name: Clean party cron
+      - name: CLEAN ANON
         run: |
           curl --request POST \
-          --url 'https://www.blind.nib.gg/api/cron/party' \
+          --url 'https://www.blind.nib.gg/api/cron/anon' \
           --header 'Authorization: Bearer ${{ secrets.ACTION_KEY }}'

@@ -1,5 +1,6 @@
-import { AuthGuardUser } from "@components/layout/auth";
+import { AuthGuard, AuthGuardUser } from "@components/layout/auth";
 import { PartyCard } from "@components/party/party-card";
+import { getServerAuthSession } from "@server/auth";
 import { api } from "@utils/api";
 import type {
   GetServerSidePropsContext,
@@ -34,9 +35,23 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
 
+  const session = await getServerAuthSession({
+    req: context.req,
+    res: context.res,
+  });
+
+  if (!session || !session.user) {
+    return {
+      redirect: {
+        destination: "/sign-in",
+        permanent: false,
+      },
+    };
+  }
+
   const pathname = new URL(referer).pathname;
   const paths = pathname.substring(0, pathname.lastIndexOf("/") + 1);
-  if (!(paths === "/party/desktop/" || paths === "/party/phone/"))
+  if (!paths.startsWith("/party/"))
     return {
       redirect: {
         destination: "/dashboard",
@@ -50,17 +65,22 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     const _reason = excludeReasons.safeParse(query.reason);
     if (_reason.success) reason = _reason.data;
   }
+
   return {
     props: {
       reason,
+      role: session.user.role,
     },
   };
 }
 
 const PartyHome: NextPageWithAuth<
   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ reason }) => {
-  const { data: partys } = api.party.get_all_invite.useQuery();
+> = ({ reason, role }) => {
+  const { data: partys } = api.party.get_all_invite.useQuery(
+    {},
+    { enabled: role !== "ANON" }
+  );
 
   return (
     <div className="flex items-center justify-center gap-4 p-4">
@@ -85,12 +105,14 @@ const PartyHome: NextPageWithAuth<
           {reason === "PARTY_NOT_EXISTS" && <p>La partie est introuvable</p>}
           {reason === "HOST_LEAVE" && <p>L'Hôte a quitté la partie en cours</p>}
           {reason === "PARTY_ENDED" && <p>La partie est terminée</p>}
-          <Link
-            href="/dashboard/party/create"
-            className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-          >
-            Créer une partie
-          </Link>
+          {role !== "ANON" && (
+            <Link
+              href="/dashboard/party/create"
+              className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            >
+              Créer une partie
+            </Link>
+          )}
         </div>
         <div className="flex-1 p-2">
           {partys?.map((party) => (
@@ -103,4 +125,4 @@ const PartyHome: NextPageWithAuth<
 };
 
 export default PartyHome;
-PartyHome.auth = AuthGuardUser;
+PartyHome.auth = AuthGuard;

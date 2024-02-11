@@ -108,3 +108,7 @@ export function GetLayoutThroughConfirm(
     );
   };
 }
+
+export function GetLayoutWithoutNavigation(page: ReactElement) {
+  return <Main>{page}</Main>;
+}

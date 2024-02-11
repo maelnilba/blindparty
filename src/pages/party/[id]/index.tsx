@@ -5,7 +5,7 @@ import { getQuery, getUA } from "@utils/next-router";
 import {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
-  NextPage,
+  NextPageWithAuth,
 } from "next";
 import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
@@ -26,15 +26,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     res: context.res,
   });
 
-  if (!session || !session.user) {
-    return {
-      redirect: {
-        destination: "/dashboard",
-        permanent: false,
-      },
-    };
-  }
-
   const party = await prisma.party.findUnique({
     where: {
       id: id,
@@ -50,18 +41,44 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   });
 
-  if (
-    !party ||
-    !party.inviteds.map((invited) => invited.id).includes(session.user.id) ||
-    (party.status !== "PENDING" &&
-      !party.players.map((player) => player.userId).includes(session.user.id))
-  ) {
+  if (!party) {
     return {
       redirect: {
         destination: "/dashboard",
         permanent: false,
       },
     };
+  }
+
+  if ((!session || !session.user) && party.access_mode == "PUBLIC") {
+    return {
+      redirect: {
+        destination: "/party/" + party.id + "/join",
+        permanent: false,
+      },
+    };
+  } else if (!session || !session.user) {
+    return {
+      redirect: {
+        destination: "/sign-in",
+        permanent: false,
+      },
+    };
+  }
+
+  if (party.access_mode === "PRIVATE") {
+    if (
+      !party.inviteds.map((invited) => invited.id).includes(session.user.id) ||
+      (party.status !== "PENDING" &&
+        !party.players.map((player) => player.userId).includes(session.user.id))
+    ) {
+      return {
+        redirect: {
+          destination: "/dashboard",
+          permanent: false,
+        },
+      };
+    }
   }
 
   const user_agent = userAgentFromString(context.req.headers["user-agent"]);
@@ -72,23 +89,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       id: id,
     },
   };
-  // if (getUA(user_agent).isDesktop()) {
-  //   return {
-  //     redirect: {
-  //       destination: "/party/desktop/" + id,
-  //       permanent: false,
-  //     },
-  //   };
-  // } else {
-  //   return {
-  //     redirect: {
-  //       destination: "/party/phone/" + id,
-  //       permanent: false,
-  //     },
-  //   };
-  // }
 }
-const Party: NextPage<
+const Party: NextPageWithAuth<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ userAgent, id }) => {
   const ua = getUA(userAgent);
