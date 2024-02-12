@@ -156,7 +156,7 @@ const validateQuery = <T extends QueryZodSchema>(
   return res as ReturnType<T["parse"]>;
 };
 
-const getQueries = (searchParams: URLSearchParams) => {
+export const getQueries = (searchParams: URLSearchParams) => {
   const queries: { [k: string]: any } = {};
   searchParams.forEach((v, key) => {
     const value = toPrimitive(v);

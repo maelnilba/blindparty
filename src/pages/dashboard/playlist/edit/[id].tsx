@@ -18,6 +18,7 @@ import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
+import { Noop } from "helpers/noop";
 import type { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
@@ -435,7 +436,17 @@ const PlaylistEdit = () => {
   );
 };
 
-const PlaylistEditWrapper: NextPageWithLayout & NextPageWithAuth = () => {
+const PlaylistEditWrapper: NextPageWithLayout = () => {
+  const router = useRouter();
+  const { isLoading } = api.user.can_track_api.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    onSuccess(can) {
+      if (!can) router.push("/dashboard");
+    },
+  });
+
+  if (isLoading) return <Noop />;
+
   return (
     <TrackPlayer>
       <PlaylistEdit />
@@ -446,14 +457,3 @@ const PlaylistEditWrapper: NextPageWithLayout & NextPageWithAuth = () => {
 export default PlaylistEditWrapper;
 
 PlaylistEditWrapper.getLayout = GetLayoutThrough;
-PlaylistEditWrapper.auth = () => {
-  const { data, isLoading } = api.user.can_track_api.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
-
-  return {
-    auth: data,
-    isLoading: isLoading,
-    redirect: "/dashboard",
-  };
-};

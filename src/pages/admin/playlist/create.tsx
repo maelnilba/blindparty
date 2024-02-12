@@ -16,6 +16,7 @@ import { useMap } from "@hooks/helpers/useMap";
 import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { api } from "@utils/api";
+import { Noop } from "helpers/noop";
 import { NextPageWithAuth, NextPageWithLayout } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
@@ -392,7 +393,17 @@ const PlaylistCreate = () => {
   );
 };
 
-const PlaylistCreateWrapper: NextPageWithLayout & NextPageWithAuth = () => {
+const PlaylistCreateWrapper: NextPageWithLayout = () => {
+  const router = useRouter();
+  const { isLoading } = api.user.can_track_api.useQuery(undefined, {
+    refetchOnWindowFocus: false,
+    onSuccess(can) {
+      if (!can) router.push("/dashboard");
+    },
+  });
+
+  if (isLoading) return <Noop />;
+
   return (
     <TrackPlayer>
       <PlaylistCreate />
@@ -403,14 +414,3 @@ const PlaylistCreateWrapper: NextPageWithLayout & NextPageWithAuth = () => {
 export default PlaylistCreateWrapper;
 
 PlaylistCreateWrapper.getLayout = GetLayoutThrough;
-PlaylistCreateWrapper.auth = (session) => {
-  const { data, isLoading } = api.user.can_track_api.useQuery(undefined, {
-    refetchOnWindowFocus: false,
-  });
-
-  return {
-    auth: data && session?.user?.role === "ADMIN",
-    isLoading: isLoading,
-    redirect: "/dashboard",
-  };
-};
