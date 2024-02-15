@@ -1,6 +1,6 @@
 import { Picture } from "@components/images/picture";
 import { AuthGuardAdmin } from "@components/layout/auth";
-import { ConfirmationModal } from "@components/modals/confirmation-modal";
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { api, RouterOutputs } from "@utils/api";
 import { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
@@ -67,7 +67,7 @@ const PlaylistCard = ({ playlist, onDelete }: PlaylistCardProps) => {
       </div>
       <div className="flex-1 p-2">
         {playlist.tracks.map((track) => (
-          <TrackCard key={track.id} track={track} />
+          <TrackBanner key={track.id} track={track} />
         ))}
       </div>
       <div className="sticky bottom-0 flex flex-row items-center justify-center gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">
@@ -95,10 +95,10 @@ const PlaylistCard = ({ playlist, onDelete }: PlaylistCardProps) => {
   );
 };
 
-type TrackCardProps = {
+type TrackBannerProps = {
   track: RouterOutputs["playlist"]["get_all"][number]["tracks"][number];
 };
-const TrackCard = ({ track }: TrackCardProps) => {
+const TrackBanner = ({ track }: TrackBannerProps) => {
   const image = track.album.images[0];
   return (
     <div className="flex cursor-pointer items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">

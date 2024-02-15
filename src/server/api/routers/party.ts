@@ -82,6 +82,7 @@ export const partyRouter = createTRPCRouter({
         return { ...party, link: link };
       });
     }),
+  get_all: protectedProcedure.query(async ({ ctx, input }) => {}),
   get_all_invite: protectedProcedure
     .input(z.object({ take: z.number().optional() }).optional())
     .query(async ({ ctx, input }) => {

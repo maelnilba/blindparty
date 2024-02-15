@@ -1,7 +1,7 @@
 import {
   ConfirmationModal,
   ModalRef,
-} from "@components/modals/confirmation-modal";
+} from "@components/elements/confirmation-modal";
 import { noop } from "helpers/noop";
 import { useRouter } from "next/router";
 import { useEffect, useRef } from "react";

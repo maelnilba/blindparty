@@ -4,7 +4,7 @@ import { AuthGuardUser } from "@components/layout/auth";
 import { BlackScreen } from "@components/layout/blackscreen";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { Track } from "@components/playlist/types";
-import { PlaylistTrackInfoCard } from "@components/player/playlist-track-card";
+import { TrackExpandedBanner } from "@components/player/track-banner";
 import { TrackPlayer, usePlayer } from "@components/player/track-player";
 import { useRelativeTime } from "@hooks/helpers/useRelativeTime";
 import { RouterOutputs, api } from "@utils/api";
@@ -64,7 +64,7 @@ const PlaylistDiscover = ({
         </div>
         <div className="p-4">
           {playlist.tracks.map((track) => (
-            <PlaylistTrackInfoCard
+            <TrackExpandedBanner
               key={track.id}
               track={track}
               onPlay={playTrack}

@@ -1,8 +1,8 @@
 import { Divider } from "@components/elements/divider";
 import { Url } from "@components/elements/url";
 import { PlayerStack } from "@components/game/players-stack";
-import { Round } from "@components/game/round/round";
-import { Winner } from "@components/game/round/winner";
+import { RoundTile } from "@components/game/round/round-tile";
+import { WinnerTile } from "@components/game/round/winner-tile";
 import { Score, ScoreBoard } from "@components/game/score-board";
 import { TrackPicture } from "@components/game/track-picture";
 import { TrackPlayer, TrackPlayerRef } from "@components/game/track-player";
@@ -10,13 +10,13 @@ import { DesktopIcon } from "@components/icons/desktop";
 import { PhoneIcon } from "@components/icons/phone";
 import { AuthGuardUser } from "@components/layout/auth";
 import { GetLayoutThroughConfirm } from "@components/layout/layout";
-import { ConfirmationModal } from "@components/modals/confirmation-modal";
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import {
   GUESS_MS,
   TRACK_TIMER_MS,
   VIEW_SCORE_MS,
 } from "@components/party/constants";
-import { PlayerCard } from "@components/party/player-card";
+import { PlayerTile } from "@components/party/player-tile";
 import { Volume } from "@components/player/volume";
 import { useMessagesBus } from "@hooks/libs/useMessagesBus";
 import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
@@ -519,7 +519,7 @@ const Party: NextPage<
               <Divider />
               <div className="flex max-h-96 flex-wrap gap-x-2.5 gap-y-2 overflow-hidden">
                 {players.map(({ player, joined }) => (
-                  <PlayerCard
+                  <PlayerTile
                     key={player.id}
                     player={player}
                     joined={joined}
@@ -539,12 +539,12 @@ const Party: NextPage<
               onBan={ban}
             />
             <div className="pb-24 pt-32">
-              <Winner player={winner} />
+              <WinnerTile player={winner} />
             </div>
           </div>
           <div className="fixed right-0 top-0 flex w-max">
             <div className="flex flex-col items-center gap-4 px-8 pt-32">
-              <Round round={roundCount} />
+              <RoundTile round={roundCount} />
               <Divider />
               <p className="text-4xl font-extrabold">{party.max_round}</p>
               <Volume
@@ -562,7 +562,7 @@ const Party: NextPage<
             </div>
           </div>
           {view === "GUESS" && (
-            <div className="aspect-square flex w-full max-w-xl flex-col items-center justify-center">
+            <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
               {track?.track && (
                 <TrackPlayer
                   tracktimer={TRACK_TIMER_MS}
@@ -574,7 +574,7 @@ const Party: NextPage<
             </div>
           )}
           {view === "SCORE" && (
-            <div className="aspect-square flex w-full max-w-xl flex-col items-center justify-center">
+            <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
               <div className="flex flex-col items-center justify-center gap-2">
                 <p className="text-4xl font-extrabold">Le son était</p>
                 <div className="px-10 py-6">

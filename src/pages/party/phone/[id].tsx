@@ -2,7 +2,7 @@ import { Divider } from "@components/elements/divider";
 import { MicroIcon } from "@components/icons/micro";
 import { Picture } from "@components/images/picture";
 import { AuthGuard, AuthGuardUser } from "@components/layout/auth";
-import { Modal } from "@components/modals/modal";
+import { Modal } from "@components/elements/modal";
 import { TRACK_TIMER_MS } from "@components/party/constants";
 import { useMicroPermission } from "@hooks/helpers/useMicroPermission";
 import { useVoiceDetector } from "@hooks/libs/useVoiceDetector";
@@ -28,6 +28,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { exclude } from "..";
+import { PlayerTile } from "@components/party/player-tile";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -423,7 +424,7 @@ const Party: NextPage<
               <Divider />
               <div className="flex flex-wrap gap-2">
                 {players.map(({ player, joined, connected }) => (
-                  <PlayerCard
+                  <PlayerTile
                     key={player.id}
                     connected={connected}
                     player={player}
@@ -494,25 +495,6 @@ const Party: NextPage<
           </div>
         </>
       )}
-    </div>
-  );
-};
-
-type PlayerCardProps = {
-  player: Player;
-  connected: boolean;
-  joined: boolean;
-};
-const PlayerCard = ({ player, joined, connected }: PlayerCardProps) => {
-  return (
-    <div className={`${!joined && "opacity-50"} ${!connected && "blur-sm"}`}>
-      <Picture identifier={player.image} className="shrink-0">
-        <img
-          alt={`playlist picture of ${player.name}`}
-          src={player.image!}
-          className="h-12 w-12 rounded border-gray-800 object-cover"
-        />
-      </Picture>
     </div>
   );
 };

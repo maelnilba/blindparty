@@ -1,14 +1,14 @@
 import { UserMinusIcon } from "@components/icons/user-minus";
 import { Picture } from "@components/images/picture";
-import { ConfirmationModal } from "@components/modals/confirmation-modal";
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { RouterOutputs } from "@utils/api";
 
 export type Friend = RouterOutputs["friend"]["get_all"][number];
-type FriendCardProps = {
+type FriendBannerProps = {
   friend: Friend;
   onRemove?: (friend: Friend) => void;
 };
-export const FriendCard = ({ friend, onRemove }: FriendCardProps) => {
+export const FriendBanner = ({ friend, onRemove }: FriendBannerProps) => {
   return (
     <div className="group flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <Picture identifier={friend.image} className="shrink-0">

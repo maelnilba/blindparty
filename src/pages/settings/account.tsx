@@ -4,7 +4,7 @@ import { PlusIcon } from "@components/icons/plus";
 import { SignIn } from "@components/icons/sign-in";
 import { SocialIcon, ensureProvider } from "@components/icons/socials";
 import { AuthGuardUser } from "@components/layout/auth";
-import { Modal } from "@components/modals/modal";
+import { Modal } from "@components/elements/modal";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { Noop } from "helpers/noop";
 import { useQuery } from "@tanstack/react-query";
@@ -85,7 +85,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
                           )
                       )
                       .map((provider) => (
-                        <ProviderCard
+                        <ProviderBanner
                           key={provider.id}
                           provider={ensureProvider(
                             provider.name.toLocaleLowerCase()
@@ -99,7 +99,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
                             }}
                             className="h-6 w-6 cursor-pointer group-hover:scale-125"
                           />
-                        </ProviderCard>
+                        </ProviderBanner>
                       ))}
                   </div>
                 )}
@@ -108,12 +108,14 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
           </Modal>
         </div>
         <div className="flex flex-1 flex-col gap-2 p-2">
-          {accounts?.platform && <ProviderCard provider={accounts.platform} />}
+          {accounts?.platform && (
+            <ProviderBanner provider={accounts.platform} />
+          )}
           <Divider />
           {accounts?.providers
             .filter((provider) => provider !== accounts.platform)
             .map((provider, idx) => (
-              <ProviderCard key={idx} provider={provider}>
+              <ProviderBanner key={idx} provider={provider}>
                 <SignIn
                   onClick={() => {
                     signIn(provider, {
@@ -122,7 +124,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
                   }}
                   className="h-6 w-6 cursor-pointer group-hover:scale-125"
                 />
-              </ProviderCard>
+              </ProviderBanner>
             ))}
         </div>
       </div>
@@ -171,11 +173,11 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
 };
 
 type Provider = RouterOutputs["user"]["accounts"]["providers"][number];
-type ProviderCardProps = {
+type ProviderBanner = {
   provider: Provider;
   children?: ReactNode;
 };
-const ProviderCard = ({ provider, children }: ProviderCardProps) => {
+const ProviderBanner = ({ provider, children }: ProviderBanner) => {
   return (
     <div className="group flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <SocialIcon provider={provider} />

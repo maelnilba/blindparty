@@ -1,11 +1,11 @@
 import { Picture } from "@components/images/picture";
 import { Playlist } from "@components/playlist/types";
 
-type PlaylistCardProps = {
+type PlaylistBannerProps = {
   playlist: Playlist;
   onClick: (id: string) => void;
 };
-export const PlaylistCard = ({ playlist, onClick }: PlaylistCardProps) => {
+export const PlaylistBanner = ({ playlist, onClick }: PlaylistBannerProps) => {
   const image = playlist.images[0];
   return (
     <div

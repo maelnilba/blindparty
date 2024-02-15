@@ -1,10 +1,10 @@
 import { Transition } from "@headlessui/react";
 import { ComponentProps, PropsWithChildren } from "react";
 
-type RoundProps = PropsWithChildren<ComponentProps<"div">> & {
+type RoundTileProps = PropsWithChildren<ComponentProps<"div">> & {
   round: number;
 };
-export const Round = ({ round, ...props }: RoundProps) => {
+export const RoundTile = ({ round, ...props }: RoundTileProps) => {
   return (
     <div {...props} key={round}>
       <Transition

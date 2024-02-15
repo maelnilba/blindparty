@@ -1,13 +1,13 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { GetLayoutThrough } from "@components/layout/layout";
-import { Modal, ModalRef } from "@components/modals/modal";
+import { Modal, ModalRef } from "@components/elements/modal";
 import {
   AlbumsPicture,
   useAlbumsPictureStore,
 } from "@components/playlist/albums-picture";
 import { Track } from "@components/playlist/types";
-import { PlaylistCard } from "@components/player/playlist-card";
-import { PlaylistTrackCard } from "@components/player/playlist-track-card";
+import { PlaylistBanner } from "@components/player/playlist-banner";
+import { TrackBanner } from "@components/player/track-banner";
 import { TrackPlayer, usePlayer } from "@components/player/track-player";
 import { spotify } from "@hooks/api/useTrackApi";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
@@ -227,7 +227,7 @@ const PlaylistCreate = () => {
         </div>
         <div className="p-4">
           {playlists?.map((playlist) => (
-            <PlaylistCard
+            <PlaylistBanner
               key={playlist.id}
               playlist={playlist}
               onClick={getPlaylistTrack}
@@ -260,7 +260,7 @@ const PlaylistCreate = () => {
         )}
         <div className="p-4">
           {tracks?.map((track) => (
-            <PlaylistTrackCard
+            <TrackBanner
               key={track.id}
               track={track}
               onAdd={addTrack}
@@ -375,7 +375,7 @@ const PlaylistCreate = () => {
         </Modal>
         <div className="p-4">
           {[...tracksMap].map(([_, track]) => (
-            <PlaylistTrackCard
+            <TrackBanner
               key={track.id}
               track={track}
               onRemove={handleRemoveTrack}

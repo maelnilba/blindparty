@@ -1,20 +1,20 @@
 import { ExpandIcon } from "@components/icons/expand";
 import { Picture } from "@components/images/picture";
-import { AsyncModal } from "@components/modals/async-modal";
-import { TrackCard } from "@components/playlist/playlist-track-card";
+import { AsyncModal } from "@components/elements/async-modal";
+import { TrackBanner } from "@components/playlist/track-banner";
 import { api, RouterOutputs } from "@utils/api";
 
 export type Playlist = RouterOutputs["playlist"]["get_all"][number];
-type PlaylistCardProps = {
+type PlaylistBannerProps = {
   playlist: Playlist;
   onClick?: (playlist: Playlist) => void;
   canShow?: boolean;
 };
-export const PlaylistCard = ({
+export const PlaylistBanner = ({
   playlist,
   onClick,
   canShow,
-}: PlaylistCardProps) => {
+}: PlaylistBannerProps) => {
   const { data: full_playlist, refetch } = api.playlist.get_playlist.useQuery(
     { id: playlist.id },
     {
@@ -58,7 +58,7 @@ export const PlaylistCard = ({
           <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
             <div className="flex flex-1 flex-col gap-2">
               {full_playlist?.tracks?.map((track) => (
-                <TrackCard key={track.id} track={track} />
+                <TrackBanner key={track.id} track={track} />
               ))}
             </div>
           </div>

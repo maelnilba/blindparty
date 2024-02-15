@@ -1,10 +1,10 @@
 import { InputFade } from "@components/elements/input-fade";
 import { InputSelect } from "@components/elements/input-select";
-import { Friend, FriendCard } from "@components/friend/friend-card";
+import { Friend, FriendBanner } from "@components/friend/friend-banner";
 import { ExclamationIcon } from "@components/icons/exclamation";
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
-import { Playlist, PlaylistCard } from "@components/playlist/playlist-card";
+import { Playlist, PlaylistBanner } from "@components/playlist/playlist-banner";
 import { Tab } from "@headlessui/react";
 import { useDebug } from "@hooks/itsfine/useDebug";
 import { useSubmit } from "@hooks/zorm/useSubmit";
@@ -141,7 +141,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
             )
             .map((playlist) => (
               <div key={playlist.id} className="cursor-pointer">
-                <PlaylistCard
+                <PlaylistBanner
                   key={playlist.id}
                   playlist={playlist}
                   onClick={(playlist) =>
@@ -176,7 +176,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                 className="cursor-pointer"
                 onClick={() => handleFriends(friend)}
               >
-                <FriendCard key={friend.id} friend={friend} />
+                <FriendBanner key={friend.id} friend={friend} />
               </div>
             ))}
         </div>
@@ -275,7 +275,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                           name={zo.fields.playlists(index).id()}
                           value={playlist.id}
                         />
-                        <PlaylistCard
+                        <PlaylistBanner
                           playlist={playlist}
                           canShow
                           onClick={(playlist) => {

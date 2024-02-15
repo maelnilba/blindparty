@@ -1,5 +1,5 @@
 import { Picture } from "@components/images/picture";
-import { ConfirmationModal } from "@components/modals/confirmation-modal";
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { Menu, Transition } from "@headlessui/react";
 import { SubscriberProxy, useSubscriber } from "helpers/observable";
 import { Player } from "pages/party/phone/[id]";

@@ -1,7 +1,7 @@
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
-import { ConfirmationModal } from "@components/modals/confirmation-modal";
-import { TrackCard } from "@components/playlist/playlist-track-card";
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
+import { TrackBanner } from "@components/playlist/track-banner";
 import { type ProvidersCanTrackApi } from "@server/api/routers/user";
 import { api, RouterOutputs } from "@utils/api";
 import { NextPageWithAuth, NextPageWithTitle } from "next";
@@ -122,7 +122,7 @@ const PlaylistCard = ({
       </div>
       <div className="flex-1 p-2">
         {playlist.tracks.map((track) => (
-          <TrackCard key={track.id} track={track} />
+          <TrackBanner key={track.id} track={track} />
         ))}
       </div>
       <div className="sticky bottom-0 flex flex-row items-center justify-center gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">

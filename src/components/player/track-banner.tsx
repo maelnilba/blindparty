@@ -4,7 +4,7 @@ import { Picture } from "@components/images/picture";
 import { Track } from "@components/playlist/types";
 import { noop } from "helpers/noop";
 
-type PlaylistTrackCardProps = {
+type TrackBannerProps = {
   track: Track;
   onAdd?: (track: Track) => void;
   onRemove?: (track: Track) => void;
@@ -13,14 +13,14 @@ type PlaylistTrackCardProps = {
   playing?: boolean;
 };
 
-export const PlaylistTrackCard = ({
+export const TrackBanner = ({
   track,
   onAdd,
   onRemove,
   onPlay,
   playing,
   on,
-}: PlaylistTrackCardProps) => {
+}: TrackBannerProps) => {
   const image = track.album.images[0];
   return (
     <div className="group/item flex items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
@@ -78,17 +78,17 @@ export const PlaylistTrackCard = ({
   );
 };
 
-type PlaylistTrackInfoCardProps = {
+type TrackExpandedBanner = {
   track: Track;
   onPlay?: (track: Track) => void;
   playing?: boolean;
 };
 
-export const PlaylistTrackInfoCard = ({
+export const TrackExpandedBanner = ({
   track,
   onPlay,
   playing,
-}: PlaylistTrackInfoCardProps) => {
+}: TrackExpandedBanner) => {
   const image = track.album.images[0];
   return (
     <div

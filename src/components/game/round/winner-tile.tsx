@@ -3,21 +3,21 @@ import { Transition } from "@headlessui/react";
 import { RouterOutputs } from "@utils/api";
 import { useEffect, useState } from "react";
 
-type WinnerProps = {
+type WinnerTileProps = {
   player: RouterOutputs["party"]["game"]["guess"]["winner"] | null;
 };
 
-export const Winner = ({ player }: WinnerProps) => {
-  const [cardAppear, setCardAppear] = useState(false);
+export const WinnerTile = ({ player }: WinnerTileProps) => {
+  const [tileAppear, setTileAppear] = useState(false);
   const [thumbAppear, setThumbAppear] = useState(false);
   useEffect(() => {
-    setCardAppear(!!player);
+    setTileAppear(!!player);
   }, [player]);
 
   return (
     <div className="pointer-events-none relative mt-2">
       <Transition
-        show={cardAppear}
+        show={tileAppear}
         enter="transition-all duration-500 ease-out"
         enterFrom="opacity-0 -translate-x-28"
         enterTo="opacity-100 -translate-x-0"
@@ -43,7 +43,7 @@ export const Winner = ({ player }: WinnerProps) => {
           setThumbAppear(false);
         }}
         afterLeave={() => {
-          setCardAppear(false);
+          setTileAppear(false);
         }}
         leave="transition-all duration-500 ease-in"
         leaveFrom="opacity-100 -translate-y-28"

@@ -1,5 +1,5 @@
 import { AuthGuard, AuthGuardUser } from "@components/layout/auth";
-import { PartyCard } from "@components/party/party-card";
+import { PartyBanner } from "@components/party/party-banner";
 import { getServerAuthSession } from "@server/auth";
 import { api } from "@utils/api";
 import type {
@@ -119,7 +119,7 @@ const PartyHome: NextPageWithAuth<GSSPProps> & NextPageWithTitle<GSSPProps> = ({
         </div>
         <div className="flex-1 p-2">
           {partys?.map((party) => (
-            <PartyCard key={party.id} party={party} />
+            <PartyBanner key={party.id} party={party} />
           ))}
         </div>
       </div>

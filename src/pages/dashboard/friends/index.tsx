@@ -1,4 +1,4 @@
-import { FriendCard } from "@components/friend/friend-card";
+import { FriendBanner } from "@components/friend/friend-banner";
 import { useInvitation } from "@components/friend/useInvitation";
 import { EnvelopeIcon } from "@components/icons/envelope";
 import { LockClosedIcon } from "@components/icons/lock-closed";
@@ -7,8 +7,8 @@ import { UserPlusIcon } from "@components/icons/user-plus";
 import { XMarkIcon } from "@components/icons/x-mark";
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
-import { ConfirmationModal } from "@components/modals/confirmation-modal";
-import { Modal } from "@components/modals/modal";
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
+import { Modal } from "@components/elements/modal";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
@@ -69,7 +69,11 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
               </div>
               <div className="flex-1">
                 {users?.map((user) => (
-                  <UserCard key={user.id} user={user} onAdd={sendInvitation} />
+                  <UserBanner
+                    key={user.id}
+                    user={user}
+                    onAdd={sendInvitation}
+                  />
                 ))}
               </div>
             </div>
@@ -77,7 +81,7 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
         </div>
         <div className="flex-1 p-2">
           {friends?.map((friend) => (
-            <FriendCard
+            <FriendBanner
               key={friend.id}
               friend={friend}
               onRemove={() => remove({ id: friend.id })}
@@ -95,7 +99,7 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
           {session?.user && session.user.id && (
             <>
               {invitations?.map((invitation) => (
-                <InvitationCard
+                <InvitationBanner
                   key={invitation.id}
                   invitation={invitation}
                   sessionUserId={session.user!.id}
@@ -127,11 +131,11 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
   );
 };
 
-type UserCardProps = {
+type UserBannerProps = {
   user: RouterOutputs["friend"]["search"][number];
   onAdd: (user: RouterOutputs["friend"]["search"][number]) => void;
 };
-const UserCard = ({ user, onAdd }: UserCardProps) => {
+const UserBanner = ({ user, onAdd }: UserBannerProps) => {
   return (
     <div className="group flex cursor-pointer items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <Picture identifier={user.image} className="shrink-0">
@@ -155,7 +159,7 @@ const UserCard = ({ user, onAdd }: UserCardProps) => {
 };
 
 type Invitation = RouterOutputs["friend"]["get_invitations"][number];
-type InvitationCardProps = {
+type InvitationBannerProps = {
   invitation: Invitation;
   sessionUserId: string;
   onAccept: (invitation: Invitation) => void;
@@ -163,14 +167,14 @@ type InvitationCardProps = {
   onRefresh: (invitation: Invitation) => void;
   onBlock: (invitation: Invitation) => void;
 };
-const InvitationCard = ({
+const InvitationBanner = ({
   invitation,
   sessionUserId,
   onAccept,
   onRefresh,
   onBlock,
   onReject,
-}: InvitationCardProps) => {
+}: InvitationBannerProps) => {
   const invited = invitation.user_sent.id === sessionUserId ? false : true;
   const friendUser = invited ? invitation.user_sent : invitation.user_invite;
   return (

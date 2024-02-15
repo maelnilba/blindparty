@@ -1,12 +1,12 @@
 import { Picture } from "@components/images/picture";
 import { Player } from "pages/party/phone/[id]";
 
-type PlayerCardProps = {
+type PlayerTileProps = {
   player: Player;
   connected: boolean;
   joined: boolean;
 };
-export const PlayerCard = ({ player, joined, connected }: PlayerCardProps) => {
+export const PlayerTile = ({ player, joined, connected }: PlayerTileProps) => {
   return (
     <div
       title={player.name ?? ""}
