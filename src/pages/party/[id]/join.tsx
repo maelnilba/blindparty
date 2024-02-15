@@ -1,16 +1,22 @@
 import { getQuery } from "@utils/next-router";
 import { NextPageWithTitle } from "next";
-import { NextPageWithAuth } from "next";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-const PartyJoin: NextPageWithAuth & NextPageWithTitle = () => {
+const PartyJoin: NextPageWithTitle = () => {
   const router = useRouter();
+  const id = getQuery(router.query.id);
+  const { status } = useSession();
+
   const signInAnon = async () => {
     const id = getQuery(router.query.id);
     await signIn("credentials", { callbackUrl: "/party/" + id });
   };
+
+  if (status === "authenticated") {
+    router.replace("/party/" + id);
+  }
 
   return (
     <div className="flex h-full min-h-screen w-screen flex-col items-center justify-center">
@@ -38,13 +44,4 @@ const PartyJoin: NextPageWithAuth & NextPageWithTitle = () => {
 
 export default PartyJoin;
 
-PartyJoin.auth = (session) => {
-  const router = useRouter();
-  const id = getQuery(router.query.id);
-  return {
-    auth: !Boolean(session && session.user),
-    isLoading: status === "loading",
-    redirect: "/party/" + id,
-  };
-};
 PartyJoin.title = "Party | Join";
