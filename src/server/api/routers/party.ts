@@ -115,7 +115,7 @@ export const partyRouter = createTRPCRouter({
       });
 
       const channels = await Promise.all(
-        partys.map(async (party) => {
+        partys.map((party) => {
           return pusher
             .get({
               path: `/channels/presence-game-${party.id}/users`,
