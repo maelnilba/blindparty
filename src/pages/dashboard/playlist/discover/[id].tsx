@@ -9,7 +9,11 @@ import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
 import { useRelativeTime } from "@hooks/helpers/useRelativeTime";
 import { RouterOutputs, api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
-import type { NextPageWithAuth, NextPageWithLayout } from "next";
+import type {
+  NextPageWithAuth,
+  NextPageWithLayout,
+  NextPageWithTitle,
+} from "next";
 import { useRouter } from "next/router";
 
 const PlaylistDiscover = ({
@@ -77,10 +81,11 @@ const PlaylistDiscover = ({
   );
 };
 
-const PlaylistDiscoverWrapper: NextPageWithLayout & NextPageWithAuth = () => {
+const usePlaylist = () => {
   const { query } = useRouter();
   const id = getQuery(query.id);
-  const { data: playlist } = api.playlist.discover.useQuery(
+
+  const { data } = api.playlist.discover.useQuery(
     { id: id! },
     {
       enabled: id !== undefined,
@@ -88,6 +93,14 @@ const PlaylistDiscoverWrapper: NextPageWithLayout & NextPageWithAuth = () => {
       refetchOnWindowFocus: false,
     }
   );
+
+  return data;
+};
+
+const PlaylistDiscoverWrapper: NextPageWithLayout &
+  NextPageWithAuth &
+  NextPageWithTitle = () => {
+  const playlist = usePlaylist();
 
   if (!playlist) {
     return <BlackScreen />;
@@ -104,3 +117,8 @@ export default PlaylistDiscoverWrapper;
 
 PlaylistDiscoverWrapper.getLayout = GetLayoutThrough;
 PlaylistDiscoverWrapper.auth = AuthGuardUser;
+PlaylistDiscoverWrapper.title = () => {
+  const playlist = usePlaylist();
+  if (!playlist) return;
+  return `Playlists | Discover | ${playlist.name}`;
+};

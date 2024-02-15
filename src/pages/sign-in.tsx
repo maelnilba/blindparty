@@ -1,13 +1,12 @@
-import { getBaseUrl } from "helpers/base-url";
 import { getServerAuthSession } from "@server/auth";
 import { getNextAuthProviders } from "@utils/next-auth";
+import { getBaseUrl } from "helpers/base-url";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
+  NextPageWithTitle,
 } from "next";
-import type { BuiltInProviderType } from "next-auth/providers";
-import type { ClientSafeProvider, LiteralUnion } from "next-auth/react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
 import { z } from "zod";
@@ -52,9 +51,10 @@ const querySchema = z.object({
   redirect_to: z.string().optional(),
 });
 
-const Index: NextPage<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ providers }) => {
+type GSSPProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+const Index: NextPage<GSSPProps> & NextPageWithTitle<GSSPProps> = ({
+  providers,
+}) => {
   const { query: qu } = useRouter();
   const query = querySchema.parse(qu);
 
@@ -89,3 +89,4 @@ const Index: NextPage<
 };
 
 export default Index;
+Index.title = "Blindparty | Sign-in";

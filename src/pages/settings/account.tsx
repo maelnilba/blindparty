@@ -10,7 +10,7 @@ import { Noop } from "helpers/noop";
 import { useQuery } from "@tanstack/react-query";
 import { RouterOutputs, api } from "@utils/api";
 import { getNextAuthProviders } from "@utils/next-auth";
-import type { NextPageWithAuth } from "next";
+import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { signIn } from "next-auth/react";
 import { ReactNode, useRef } from "react";
 import { useZorm } from "react-zorm";
@@ -20,7 +20,7 @@ const editSchema = z.object({
   name: z.string().min(1),
 });
 
-const Settings: NextPageWithAuth = () => {
+const Settings: NextPageWithAuth & NextPageWithTitle = () => {
   const { data: accounts } = api.user.accounts.useQuery();
   const { data: allProviders } = useQuery(["next-auth-providers"], () =>
     getNextAuthProviders()
@@ -191,6 +191,7 @@ const ProviderCard = ({ provider, children }: ProviderCardProps) => {
 
 export default Settings;
 Settings.auth = AuthGuardUser;
+Settings.title = "Account";
 
 const getS3key = (url: string | null | undefined) => {
   if (!url) return undefined;

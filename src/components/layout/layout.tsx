@@ -2,11 +2,13 @@ import { Inter } from "next/font/google";
 import { ReactElement, ReactNode } from "react";
 import Navigation from "./navigation";
 import { Intercept } from "./routing";
+import { Grid } from "./grid";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 const Main = ({ children }: { children: ReactNode }) => (
   <main className={inter.className} vaul-drawer-wrapper="">
+    <Grid />
     <div className="relative flex min-h-screen w-screen flex-col">
       {children}
     </div>

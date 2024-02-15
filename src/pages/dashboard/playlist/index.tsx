@@ -4,7 +4,7 @@ import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { TrackCard } from "@components/playlist/playlist-track-card";
 import { type ProvidersCanTrackApi } from "@server/api/routers/user";
 import { api, RouterOutputs } from "@utils/api";
-import { NextPageWithAuth } from "next";
+import { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
@@ -13,7 +13,7 @@ const providersCanTrackApi: ProvidersCanTrackApi = [
   "deezer",
 ] as const;
 
-const Playlists: NextPageWithAuth = () => {
+const Playlists: NextPageWithAuth & NextPageWithTitle = () => {
   const router = useRouter();
   const { data: canTrackApi, isLoading } = api.user.can_track_api.useQuery();
   const { data: playlists, refetch } = api.playlist.get_all.useQuery();
@@ -178,3 +178,4 @@ const PlaylistCard = ({
 
 export default Playlists;
 Playlists.auth = AuthGuardUser;
+Playlists.title = "Playlists";

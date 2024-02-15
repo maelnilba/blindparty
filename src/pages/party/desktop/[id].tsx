@@ -619,12 +619,9 @@ const Party: NextPage<
   );
 };
 
-const PartyWrapper: NextPageWithAuth<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> &
-  NextPageWithLayout<
-    InferGetServerSidePropsType<typeof getServerSideProps>
-  > = ({ party, isHost }) => {
+type GSSPProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+const PartyWrapper: NextPageWithAuth<GSSPProps> &
+  NextPageWithLayout<GSSPProps> = ({ party, isHost }) => {
   return (
     <prpc.withPRPC {...prpc.context}>
       <Party party={party} isHost={isHost} />

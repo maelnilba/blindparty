@@ -2,10 +2,10 @@ import { Picture } from "@components/images/picture";
 import { AuthGuardAdmin } from "@components/layout/auth";
 import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { api, RouterOutputs } from "@utils/api";
-import { NextPageWithAuth } from "next";
+import { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
 
-const Playlists: NextPageWithAuth = () => {
+const Playlists: NextPageWithAuth & NextPageWithTitle = () => {
   const { data: playlists, refetch } = api.admin.playlist.get_all.useQuery();
   const { mutate: erase } = api.admin.playlist.delete.useMutation({
     onSuccess: () => {
@@ -37,6 +37,11 @@ const Playlists: NextPageWithAuth = () => {
     </div>
   );
 };
+
+export default Playlists;
+
+Playlists.auth = AuthGuardAdmin;
+Playlists.title = "Playlists";
 
 type PlaylistCardProps = {
   playlist: RouterOutputs["admin"]["playlist"]["get_all"][number];
@@ -89,10 +94,6 @@ const PlaylistCard = ({ playlist, onDelete }: PlaylistCardProps) => {
     </div>
   );
 };
-
-export default Playlists;
-
-Playlists.auth = AuthGuardAdmin;
 
 type TrackCardProps = {
   track: RouterOutputs["playlist"]["get_all"][number]["tracks"][number];

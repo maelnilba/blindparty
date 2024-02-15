@@ -3,10 +3,10 @@ import { AuthGuardUser } from "@components/layout/auth";
 import { PartyCard } from "@components/party/party-card";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { api } from "@utils/api";
-import type { NextPageWithAuth } from "next";
+import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
 
-const DashBoard: NextPageWithAuth = () => {
+const DashBoard: NextPageWithAuth & NextPageWithTitle = () => {
   const { data: playlists } = api.playlist.get_all.useQuery();
   const { data: friends } = api.friend.get_all.useQuery();
   const { data: partys } = api.party.get_all_invite.useQuery();
@@ -70,3 +70,4 @@ const DashBoard: NextPageWithAuth = () => {
 export default DashBoard;
 
 DashBoard.auth = AuthGuardUser;
+DashBoard.title = "Dashboard";

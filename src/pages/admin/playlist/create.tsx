@@ -17,7 +17,7 @@ import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { api } from "@utils/api";
 import { Noop } from "helpers/noop";
-import { NextPageWithAuth, NextPageWithLayout } from "next";
+import { NextPageWithLayout, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
@@ -393,7 +393,7 @@ const PlaylistCreate = () => {
   );
 };
 
-const PlaylistCreateWrapper: NextPageWithLayout = () => {
+const PlaylistCreateWrapper: NextPageWithLayout & NextPageWithTitle = () => {
   const router = useRouter();
   const { isLoading } = api.user.can_track_api.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -414,3 +414,4 @@ const PlaylistCreateWrapper: NextPageWithLayout = () => {
 export default PlaylistCreateWrapper;
 
 PlaylistCreateWrapper.getLayout = GetLayoutThrough;
+PlaylistCreateWrapper.title = "Playlists | New";

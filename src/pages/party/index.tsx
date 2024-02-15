@@ -6,6 +6,7 @@ import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPageWithAuth,
+  NextPageWithTitle,
 } from "next";
 import Link from "next/link";
 import { z } from "zod";
@@ -74,9 +75,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 
-const PartyHome: NextPageWithAuth<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ reason, role }) => {
+type GSSPProps = InferGetServerSidePropsType<typeof getServerSideProps>;
+const PartyHome: NextPageWithAuth<GSSPProps> & NextPageWithTitle<GSSPProps> = ({
+  reason,
+  role,
+}) => {
   const { data: partys } = api.party.get_all_invite.useQuery(
     {},
     { enabled: role !== "ANON" }
@@ -126,3 +129,12 @@ const PartyHome: NextPageWithAuth<
 
 export default PartyHome;
 PartyHome.auth = AuthGuard;
+PartyHome.title = ({ reason }) => {
+  if (reason) {
+    return `Party | ${reason
+      .replaceAll("_", " ")
+      .toLowerCase()
+      .replace(/^\w/, (c) => c.toUpperCase())}`;
+  }
+  return `Party`;
+};

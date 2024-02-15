@@ -1,10 +1,11 @@
 import { getQuery } from "@utils/next-router";
+import { NextPageWithTitle } from "next";
 import { NextPageWithAuth } from "next";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-const PartyJoin: NextPageWithAuth = () => {
+const PartyJoin: NextPageWithAuth & NextPageWithTitle = () => {
   const router = useRouter();
   const signInAnon = async () => {
     const id = getQuery(router.query.id);
@@ -46,3 +47,4 @@ PartyJoin.auth = (session) => {
     redirect: "/party/" + id,
   };
 };
+PartyJoin.title = "Party | Join";

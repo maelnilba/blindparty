@@ -1,7 +1,7 @@
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { getQuery } from "@utils/next-router";
-import type { GetServerSidePropsContext, NextPageWithAuth } from "next";
+import type { GetServerSidePropsContext } from "next";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const session = await getServerAuthSession({
@@ -77,7 +77,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     },
   };
 }
-const PartyUrl: NextPageWithAuth = () => {
+const PartyUrl = () => {
   return <div></div>;
 };
 

@@ -10,7 +10,7 @@ import { useDebug } from "@hooks/itsfine/useDebug";
 import { useSubmit } from "@hooks/zorm/useSubmit";
 import { useTrigger } from "@hooks/zorm/useTrigger";
 import { api } from "@utils/api";
-import type { NextPageWithAuth } from "next";
+import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { Fragment, useState } from "react";
 import { Value, useZorm } from "react-zorm";
@@ -48,7 +48,7 @@ const createSchema = z.object({
   round: z.coerce.number().min(1),
 });
 
-const PartyCreate: NextPageWithAuth = () => {
+const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
   const router = useRouter();
   const { data: playlists } = api.playlist.get_all.useQuery();
   const { data: allfriends } = api.friend.get_all.useQuery();
@@ -364,3 +364,4 @@ const PartyCreate: NextPageWithAuth = () => {
 
 export default PartyCreate;
 PartyCreate.auth = AuthGuardUser;
+PartyCreate.title = "Party | Create";

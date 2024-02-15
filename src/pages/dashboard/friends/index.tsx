@@ -11,10 +11,10 @@ import { ConfirmationModal } from "@components/modals/confirmation-modal";
 import { Modal } from "@components/modals/modal";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
-import type { NextPageWithAuth } from "next";
+import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { useSession } from "next-auth/react";
 
-const Friends: NextPageWithAuth = () => {
+const Friends: NextPageWithAuth & NextPageWithTitle = () => {
   const { data: session } = useSession();
   const { data: friends, refetch: refetch_friends } =
     api.friend.get_all.useQuery();
@@ -216,3 +216,4 @@ const InvitationCard = ({
 
 export default Friends;
 Friends.auth = AuthGuardUser;
+Friends.title = "Friends";

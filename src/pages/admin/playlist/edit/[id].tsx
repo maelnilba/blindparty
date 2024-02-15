@@ -18,7 +18,8 @@ import { useSubmit } from "@hooks/zorm/useSubmit";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import { Noop } from "helpers/noop";
-import type { NextPageWithAuth, NextPageWithLayout } from "next";
+import type { NextPageWithLayout } from "next";
+import { NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { useZorm } from "react-zorm";
@@ -452,7 +453,7 @@ const PlaylistEdit = () => {
   );
 };
 
-const PlaylistEditWrapper: NextPageWithLayout = () => {
+const PlaylistEditWrapper: NextPageWithLayout & NextPageWithTitle = () => {
   const router = useRouter();
   const { isLoading } = api.user.can_track_api.useQuery(undefined, {
     refetchOnWindowFocus: false,
@@ -473,3 +474,20 @@ const PlaylistEditWrapper: NextPageWithLayout = () => {
 export default PlaylistEditWrapper;
 
 PlaylistEditWrapper.getLayout = GetLayoutThrough;
+PlaylistEditWrapper.title = (_) => {
+  const { query } = useRouter();
+  const id = getQuery(query.id);
+
+  const { data } = api.admin.playlist.get_playlist.useQuery(
+    { id: id! },
+    {
+      enabled: id !== undefined,
+      refetchOnMount: true,
+      refetchOnWindowFocus: false,
+    }
+  );
+
+  if (!data) return;
+
+  return `Playlists | Edit | ${data.name}`;
+};

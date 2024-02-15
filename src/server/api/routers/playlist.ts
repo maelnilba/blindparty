@@ -431,6 +431,7 @@ export const playlistRouter = createTRPCRouter({
         tracks: mapped(playlist.tracks),
       };
     }),
+
   get_public: protectedProcedure
     .input(z.object({ field: z.string() }).optional())
     .mutation(async ({ ctx, input }) => {

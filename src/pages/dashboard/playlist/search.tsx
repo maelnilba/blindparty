@@ -4,10 +4,11 @@ import { TrackCard } from "@components/playlist/playlist-track-card";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import type { NextPageWithAuth } from "next";
+import { NextPageWithTitle } from "next";
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 
-const PlaylistSearch: NextPageWithAuth = () => {
+const PlaylistSearch: NextPageWithAuth & NextPageWithTitle = () => {
   const searchRef = useRef<HTMLInputElement | null>(null);
   const { data: playlists, mutate: search } =
     api.playlist.get_public.useMutation();
@@ -69,6 +70,7 @@ const PlaylistSearch: NextPageWithAuth = () => {
 
 export default PlaylistSearch;
 PlaylistSearch.auth = AuthGuardUser;
+PlaylistSearch.title = "Playlists | Search";
 
 type PlaylistCardProps = {
   playlist: RouterOutputs["playlist"]["get_public"][number];
