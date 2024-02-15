@@ -632,7 +632,7 @@ const PartyWrapper: NextPageWithAuth<GSSPProps> &
 export default PartyWrapper;
 
 PartyWrapper.getLayout = GetLayoutThroughConfirm(
-  "Êtes vous sur de vouloir quitter la page ? Cela signifira la fin de la partie",
+  "Êtes vous sur de vouloir quitter la page ? Cela signifiera la fin de la partie",
   false
 );
 PartyWrapper.auth = AuthGuardUser;
