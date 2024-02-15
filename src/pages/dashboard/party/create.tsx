@@ -207,8 +207,10 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                     />
                     <Tab
                       className={({ selected }) =>
-                        `flex-1 rounded-full py-1 px-6 text-lg font-semibold text-white no-underline transition-all duration-300 focus:outline-none ${
-                          selected && " bg-white text-black hover:scale-105"
+                        `flex-1 rounded-full px-6 py-1 text-lg font-semibold no-underline transition-all duration-300 focus:outline-none ${
+                          selected
+                            ? " bg-white text-black hover:scale-105"
+                            : "text-white"
                         }`
                       }
                     >
@@ -216,8 +218,10 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                     </Tab>
                     <Tab
                       className={({ selected }) =>
-                        `flex-1 rounded-full py-1 px-6 text-lg font-semibold text-white no-underline transition-all duration-300 focus:outline-none ${
-                          selected && " bg-white text-black hover:scale-105"
+                        `flex-1 rounded-full px-6 py-1 text-lg font-semibold no-underline transition-all duration-300 focus:outline-none ${
+                          selected
+                            ? " bg-white text-black hover:scale-105"
+                            : "text-white"
                         }`
                       }
                     >
@@ -239,8 +243,10 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                       />
                       <Tab
                         className={({ selected }) =>
-                          `flex-1 rounded-full py-1 px-6 text-lg font-semibold text-white no-underline transition-all duration-300 focus:outline-none ${
-                            selected && " bg-white text-black hover:scale-105"
+                          `flex-1 rounded-full px-6 py-1 text-lg font-semibold no-underline transition-all duration-300 focus:outline-none ${
+                            selected
+                              ? " bg-white text-black hover:scale-105"
+                              : "text-white"
                           }`
                         }
                       >
@@ -248,8 +254,10 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                       </Tab>
                       <Tab
                         className={({ selected }) =>
-                          `flex-1 rounded-full py-1 px-6 text-lg font-semibold text-white no-underline transition-all duration-300 focus:outline-none ${
-                            selected && " bg-white text-black hover:scale-105"
+                          `flex-1 rounded-full px-6 py-1 text-lg font-semibold no-underline transition-all duration-300 focus:outline-none ${
+                            selected
+                              ? " bg-white text-black hover:scale-105"
+                              : "text-white"
                           }`
                         }
                       >
