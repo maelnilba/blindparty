@@ -22,20 +22,20 @@ export const getServerAuthSession = async (ctx: {
   );
 };
 
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { type NextAuthOptions } from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import DiscordProvider from "next-auth/providers/discord";
 import GoogleProvider from "next-auth/providers/google";
 import SpotifyProvider from "next-auth/providers/spotify";
-import CredentialsProvider from "next-auth/providers/credentials";
 import { DeezerProvider } from "./providers";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
 
 import { prisma } from "@server/db";
 import { env } from "env/server.mjs";
 import { nanoid } from "nanoid";
-import { v4 } from "uuid";
-import { decode, encode } from "next-auth/jwt";
 import { Adapter, AdapterSession, AdapterUser } from "next-auth/adapters";
+import { decode, encode } from "next-auth/jwt";
+import { v4 } from "uuid";
 
 const adapter = {
   ...(PrismaAdapter(prisma) as Adapter),
@@ -178,12 +178,12 @@ export const authOptions: (
       name: "anonymous",
       credentials: {},
       async authorize() {
-        const name = ["anon", "-", nanoid(8)].join("");
+        const name = ["Anon", nanoid(8)].join("");
         return await prisma.user.create({
           data: {
             email: `${name}@anon.blindparty.com`,
             name: name,
-            image: "/placeholders/avatar.webp",
+            image: "/api/og/avatar/" + Math.floor(Math.random() * 1024) + 1,
             role: "ANON",
           },
         });
