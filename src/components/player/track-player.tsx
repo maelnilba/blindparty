@@ -206,7 +206,7 @@ export const TrackPlayer = ({
               <img
                 alt={`track picture of ${track?.name}`}
                 src={image?.url}
-                className="h-12 w-12 rounded border-gray-800 object-cover transition-all duration-75 group-hover/item:scale-105 group-hover/image:opacity-75"
+                className="h-12 w-12 rounded border-gray-800 object-cover transition-all duration-75 group-hover/item:scale-105"
               />
             </Picture>
             <div className="inline-block w-3/4">

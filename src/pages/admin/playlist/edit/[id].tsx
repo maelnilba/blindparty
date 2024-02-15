@@ -6,9 +6,9 @@ import {
   useAlbumsPictureStore,
 } from "@components/playlist/albums-picture";
 import { Track } from "@components/playlist/types";
-import { PlaylistCard } from "@components/spotify/playlist-card";
-import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
-import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
+import { PlaylistCard } from "@components/player/playlist-card";
+import { PlaylistTrackCard } from "@components/player/playlist-track-card";
+import { TrackPlayer, usePlayer } from "@components/player/track-player";
 import { spotify } from "@hooks/api/useTrackApi";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";

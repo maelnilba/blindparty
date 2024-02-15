@@ -2,7 +2,7 @@ import { Square } from "@components/elements/square-loader";
 import {
   usePlayerVolumeStore,
   useVolumeAudio,
-} from "@components/spotify/volume";
+} from "@components/player/volume";
 import { useCountdown } from "@hooks/helpers/useCountdown";
 import { RouterOutputs } from "@utils/api";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";

@@ -17,7 +17,7 @@ import {
   VIEW_SCORE_MS,
 } from "@components/party/constants";
 import { PlayerCard } from "@components/party/player-card";
-import { Volume } from "@components/spotify/volume";
+import { Volume } from "@components/player/volume";
 import { useMessagesBus } from "@hooks/libs/useMessagesBus";
 import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
 import { useWindowLocation } from "@hooks/next/useWindowLocation";
@@ -538,7 +538,7 @@ const Party: NextPage<
               players={players.filter((p) => p.joined).map((p) => p.player)}
               onBan={ban}
             />
-            <div className="pt-32 pb-24">
+            <div className="pb-24 pt-32">
               <Winner player={winner} />
             </div>
           </div>
@@ -562,7 +562,7 @@ const Party: NextPage<
             </div>
           </div>
           {view === "GUESS" && (
-            <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
+            <div className="aspect-square flex w-full max-w-xl flex-col items-center justify-center">
               {track?.track && (
                 <TrackPlayer
                   tracktimer={TRACK_TIMER_MS}
@@ -574,7 +574,7 @@ const Party: NextPage<
             </div>
           )}
           {view === "SCORE" && (
-            <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
+            <div className="aspect-square flex w-full max-w-xl flex-col items-center justify-center">
               <div className="flex flex-col items-center justify-center gap-2">
                 <p className="text-4xl font-extrabold">Le son était</p>
                 <div className="px-10 py-6">

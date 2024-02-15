@@ -7,9 +7,9 @@ import {
   useAlbumsPictureStore,
 } from "@components/playlist/albums-picture";
 import { Track } from "@components/playlist/types";
-import { PlaylistCard } from "@components/spotify/playlist-card";
-import { PlaylistTrackCard } from "@components/spotify/playlist-track-card";
-import { TrackPlayer, usePlayer } from "@components/spotify/track-player";
+import { PlaylistCard } from "@components/player/playlist-card";
+import { PlaylistTrackCard } from "@components/player/playlist-track-card";
+import { TrackPlayer, usePlayer } from "@components/player/track-player";
 import { spotify } from "@hooks/api/useTrackApi";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
@@ -278,7 +278,7 @@ const PlaylistEdit = () => {
           />
         ))}
       </div>
-      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pt-0.5 pb-24">
+      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24 pt-0.5">
         {tracks && (
           <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">
             {!(
