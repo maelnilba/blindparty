@@ -22,8 +22,8 @@ import type { NextPageWithLayout } from "next";
 import { NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
-import { useZorm } from "react-zorm";
 import { z } from "zod";
+import { useF0rm } from "modules/f0rm";
 
 const editSchema = z.object({
   name: z.string().min(1),
@@ -152,6 +152,7 @@ const PlaylistEdit = () => {
   });
 
   const s3key = useRef<string>();
+  const form = useRef<HTMLFormElement>(null);
   const { data: playlist } = api.admin.playlist.get_playlist.useQuery(
     { id: id! },
     {
@@ -162,14 +163,18 @@ const PlaylistEdit = () => {
         if (!playlist) {
           return;
         }
-        if (!zo.form) {
+        if (!form.current) {
           return;
         }
 
-        (zo.form.elements.namedItem(zo.fields.name()) as any).value =
-          playlist.name;
-        (zo.form.elements.namedItem(zo.fields.description()) as any).value =
-          playlist.description;
+        (
+          form.current.elements.namedItem(f0rm.fields.name().name()) as any
+        ).value = playlist.name;
+        (
+          form.current.elements.namedItem(
+            f0rm.fields.description().name()
+          ) as any
+        ).value = playlist.description;
         s3key.current = playlist.s3key ?? undefined;
         addTracks(playlist.tracks);
       },
@@ -179,6 +184,7 @@ const PlaylistEdit = () => {
   const imageUpload = useRef<ImageUploadRef | null>(null);
   const { submitPreventDefault, isSubmitting } = useSubmit<typeof editSchema>(
     async (e) => {
+      if (!e.success) return;
       if (!id || !playlist) {
         return;
       }
@@ -260,9 +266,7 @@ const PlaylistEdit = () => {
     }
   );
 
-  const zo = useZorm("create", editSchema, {
-    onValidSubmit: submitPreventDefault,
-  });
+  const f0rm = useF0rm(editSchema, submitPreventDefault);
 
   const getPlaylistTrack = (id: string) => {
     mutate({ id });
@@ -372,30 +376,34 @@ const PlaylistEdit = () => {
               )}
             </ImageUpload>
             <form
-              ref={zo.ref}
+              ref={form}
+              onSubmit={f0rm.form.submit}
               id="create-playlist"
               className="flex flex-[2] flex-col gap-2"
             >
               <div>
-                <label htmlFor={zo.fields.name()} className="font-semibold">
+                <label
+                  htmlFor={f0rm.fields.name().name()}
+                  className="font-semibold"
+                >
                   Nom
                 </label>
                 <input
-                  id={zo.fields.name()}
-                  name={zo.fields.name()}
+                  id={f0rm.fields.name().name()}
+                  name={f0rm.fields.name().name()}
                   className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               <div>
                 <label
-                  htmlFor={zo.fields.description()}
+                  htmlFor={f0rm.fields.description().name()}
                   className="font-semibold"
                 >
                   Description
                 </label>
                 <input
-                  id={zo.fields.description()}
-                  name={zo.fields.description()}
+                  id={f0rm.fields.description().name()}
+                  name={f0rm.fields.description().name()}
                   className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>

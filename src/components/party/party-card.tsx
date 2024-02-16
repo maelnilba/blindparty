@@ -22,40 +22,40 @@ export const PartyCard = ({ party, onAction }: PartyCardProps) => {
     <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
       <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">
         <p className="flex flex-1 flex-col items-center">
-          {party.status === "PENDING" && <p>{party.max_round} rounds</p>}
+          {party.status === "PENDING" && <span>{party.max_round} rounds</span>}
           {party.status === "RUNNING" && (
-            <p>
+            <span>
               {party.round}/{party.max_round} rounds
-            </p>
+            </span>
           )}
-          <p>{party._count.tracks} tracks</p>
+          <span>{party._count.tracks} tracks</span>
         </p>
         <p className="flex flex-col">
           {party.status === "PENDING" ||
             (party.status === "RUNNING" && (
               <>
                 {party.access_mode === "PRIVATE" && (
-                  <p>
+                  <span>
                     {party.members.count}/{party._count.inviteds} joueurs
-                  </p>
+                  </span>
                 )}
                 {party.access_mode === "PUBLIC" && (
-                  <p>{party.members.count} joueurs</p>
+                  <span>{party.members.count} joueurs</span>
                 )}
               </>
             ))}
-          <p className="overflow-hidden truncate text-ellipsis text-xs font-normal">
+          <span className="overflow-hidden truncate text-ellipsis text-xs font-normal">
             {party.status === "PENDING" && (
               <span>Crée par {party.host.name}</span>
             )}
             {party.status === "RUNNING" && <span>En cours</span>}
             {party.status === "ENDED" && <span>Terminé</span>}
             {party.status === "CANCELED" && <span>Annulé</span>}
-          </p>
-          <div className="flex flex-row gap-2">
+          </span>
+          <span className="flex flex-row gap-2">
             <ClockIcon className="h-4 w-4" />
-            <p className="text-xs font-normal">{relativeUpdate}</p>
-          </div>
+            <span className="text-xs font-normal">{relativeUpdate}</span>
+          </span>
         </p>
         <Picture identifier={party.host.image} className="shrink-0">
           <img
@@ -77,8 +77,11 @@ export const PartyCard = ({ party, onAction }: PartyCardProps) => {
           party.players
             .sort((a, b) => b.points - a.points)
             .map((player, position) => (
-              <div className="flex items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
-                <PlayerTile key={player.id} player={player.user} />
+              <div
+                key={player.id}
+                className="flex items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5"
+              >
+                <PlayerTile player={player.user} />
                 {formatPosition(position + 1, locale)} - {player.points} points
               </div>
             ))}
@@ -145,7 +148,6 @@ function formatPosition(position: number, locale?: string) {
       default:
         if (num === 1) return "er";
         return "ème";
-        break;
     }
   };
 

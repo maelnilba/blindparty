@@ -150,7 +150,7 @@ export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
         />
 
         {src ? (
-          <img src={src} className="aspect-square object-cover" />
+          <img src={src} className="aspect-square w-full object-cover" />
         ) : (
           <ImageIcon className="pointer-events-none h-12 w-12 group-hover:scale-105" />
         )}

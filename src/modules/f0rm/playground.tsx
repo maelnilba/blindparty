@@ -1,18 +1,15 @@
-import { useF0rm } from "modules/f0rm";
 import { useRef } from "react";
 import { z } from "zod";
+import { useF0rm } from ".";
 
 const schema = z.object({
   test: z.coerce.number().max(10).optional(),
-  array: z
-    .array(
-      z.object({
-        testoa: z.coerce.number(),
-        darr: z.array(z.object({ huhu: z.coerce.string() })),
-      })
-    )
-    .optional()
-    .default([]),
+  array: z.array(
+    z.object({
+      testoa: z.coerce.number(),
+      darr: z.array(z.object({ huhu: z.coerce.string() })),
+    })
+  ),
   object: z.object({
     testobj: z.coerce.number(),
   }),
