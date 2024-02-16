@@ -61,7 +61,7 @@ export const playlistRouter = createTRPCRouter({
         description: z.string().optional(),
         s3key: z.string().optional(),
         generated: z.boolean(),
-        tracks: trackSchema.min(1),
+        tracks: trackSchema.min(1).max(1000),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -110,7 +110,7 @@ export const playlistRouter = createTRPCRouter({
         description: z.string().optional(),
         s3key: z.string().optional(),
         generated: z.boolean(),
-        tracks: trackSchema,
+        tracks: trackSchema.min(1).max(1000),
         removed_tracks: z.array(z.string()),
       })
     )

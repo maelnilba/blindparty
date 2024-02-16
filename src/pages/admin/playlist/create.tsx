@@ -1,5 +1,6 @@
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { Modal, ModalRef } from "@components/elements/modal";
+import { ExclamationIcon } from "@components/icons/exclamation";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { PlaylistBanner } from "@components/player/playlist-banner";
 import { TrackBanner } from "@components/player/track-banner";
@@ -20,12 +21,19 @@ import { Noop } from "helpers/noop";
 import { useF0rm } from "modules/f0rm";
 import { NextPageWithLayout, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 
 const createSchema = z.object({
   name: z.string().min(1),
   description: z.string().optional(),
+  tracks: z
+    .array(z.object({ id: z.string() }))
+    .min(1, { message: "Une playlist doit contenir au minimum une track." })
+    .max(1000, {
+      message: "Une playlist ne peut contenir plus de 1000 tracks.",
+    })
+    .default([]),
 });
 
 const PlaylistCreate = () => {
@@ -258,7 +266,7 @@ const PlaylistCreate = () => {
             )}
           </div>
         )}
-        <div className="p-4">
+        <div className="flex flex-col gap-2 p-4">
           {tracks?.map((track) => (
             <TrackBanner
               key={track.id}
@@ -276,7 +284,7 @@ const PlaylistCreate = () => {
           ))}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto pb-24 pt-0.5">
+      <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto px-2 pb-24 pt-0.5">
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm ">
           <div className="px-4 pb-2">
             <button
@@ -326,7 +334,8 @@ const PlaylistCreate = () => {
                 <input
                   id={f0rm.fields.name().name()}
                   name={f0rm.fields.name().name()}
-                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                  data-error={!!f0rm.errors.name().errors()?.length}
+                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 data-[error=true]:border-red-500"
                 />
               </div>
               <div>
@@ -376,19 +385,39 @@ const PlaylistCreate = () => {
             </button>
           </div>
         </Modal>
-        <div className="p-4">
-          {[...tracksMap].map(([_, track]) => (
-            <TrackBanner
-              key={track.id}
-              track={track}
-              onRemove={handleRemoveTrack}
-              onPlay={playTrack}
-              playing={
-                Boolean(currentTrack) &&
-                currentTrack?.id === track.id &&
-                playing
-              }
-            />
+        <div className="flex flex-1 flex-col gap-2 p-4">
+          {!tracksMap.size &&
+            f0rm.errors
+              .tracks()
+              .errors()
+              ?.map((error, index) => (
+                <div
+                  key={index}
+                  className="mx-auto flex select-none flex-row gap-2 text-center text-red-500"
+                >
+                  <ExclamationIcon className="h-4 w-4" />
+                  <span className="text-xs font-normal">{error.message}</span>
+                </div>
+              ))}
+          {[...tracksMap].map(([_, track], index) => (
+            <Fragment key={track.id}>
+              <input
+                form="create-playlist"
+                type="hidden"
+                value={track.id}
+                name={f0rm.fields.tracks(index).id().name()}
+              />
+              <TrackBanner
+                track={track}
+                onRemove={handleRemoveTrack}
+                onPlay={playTrack}
+                playing={
+                  Boolean(currentTrack) &&
+                  currentTrack?.id === track.id &&
+                  playing
+                }
+              />
+            </Fragment>
           ))}
         </div>
       </div>
