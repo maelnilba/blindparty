@@ -6,14 +6,12 @@ import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
 import { Playlist, PlaylistBanner } from "@components/playlist/playlist-banner";
 import { Tab } from "@headlessui/react";
-import { useDebug } from "@hooks/itsfine/useDebug";
 import { useSubmit } from "@hooks/zorm/useSubmit";
-import { useTrigger } from "@hooks/zorm/useTrigger";
 import { api } from "@utils/api";
+import { useF0rm } from "modules/f0rm";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
-import { Fragment, useState } from "react";
-import { Value, useZorm } from "react-zorm";
+import { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -84,9 +82,12 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
     },
   });
 
+  const form = useRef<HTMLFormElement>(null);
   const { submitPreventDefault, isSubmitting } = useSubmit<typeof createSchema>(
     async (e) => {
+      if (!e.success) return;
       if (!playlists) return;
+
       let playlist: Playlist | undefined;
       if (e.data.mode === "RANDOM") {
         playlist = playlists[Math.floor(Math.random() * playlists.length)];
@@ -110,15 +111,9 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
     }
   );
 
-  const zo = useZorm("create", createSchema, {
-    onValidSubmit: submitPreventDefault,
-  });
-
-  useDebug(zo, "form");
-
-  const evMode = useTrigger(zo, zo.fields.mode());
-  const evRound = useTrigger(zo, zo.fields.round());
-  const evAccess = useTrigger(zo, zo.fields.access());
+  const f0rm = useF0rm(createSchema, submitPreventDefault);
+  const mode = f0rm.watch(form, f0rm.fields.mode().name());
+  const round = f0rm.watch(form, f0rm.fields.round().name());
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 p-4">
@@ -182,7 +177,8 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
         </div>
       </div>
       <form
-        ref={zo.ref}
+        ref={form}
+        onSubmit={f0rm.form.submit}
         className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800 "
       >
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
@@ -196,12 +192,12 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
         </div>
         <div className="flex flex-1 flex-col gap-10">
           <div className="">
-            <Tab.Group defaultIndex={0} onChange={evAccess}>
+            <Tab.Group defaultIndex={0}>
               <Tab.List className="flex w-full gap-2 bg-black/10 px-6 backdrop-blur-sm">
                 {({ selectedIndex }) => (
                   <div className="flex flex-1 justify-evenly gap-2 rounded-full ring-2 ring-white ring-opacity-5">
                     <input
-                      name={zo.fields.access()}
+                      name={f0rm.fields.access().name()}
                       type="hidden"
                       value={selectedIndex}
                     />
@@ -232,12 +228,12 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
               </Tab.List>
             </Tab.Group>
             <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto">
-              <Tab.Group defaultIndex={0} onChange={evMode}>
+              <Tab.Group defaultIndex={0}>
                 <Tab.List className="absolute top-0 flex w-full gap-2 bg-black/10 px-6 py-2 backdrop-blur-sm">
                   {({ selectedIndex }) => (
                     <div className="flex flex-1 justify-evenly gap-2 rounded-full ring-2 ring-white ring-opacity-5">
                       <input
-                        name={zo.fields.mode()}
+                        name={f0rm.fields.mode().name()}
                         type="hidden"
                         value={selectedIndex}
                       />
@@ -272,7 +268,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                       <div key={playlist.id} className="cursor-pointer">
                         <input
                           type="hidden"
-                          name={zo.fields.playlists(index).id()}
+                          name={f0rm.fields.playlists(index).id().name()}
                           value={playlist.id}
                         />
                         <PlaylistBanner
@@ -298,7 +294,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                 {[...friends].map(([_, friend], index) => (
                   <Fragment key={friend.id}>
                     <input
-                      name={zo.fields.friends(index).id()}
+                      name={f0rm.fields.friends(index).id().name()}
                       type="hidden"
                       value={friend.friendId}
                     />
@@ -315,14 +311,16 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
             </div>
             <div className="flex flex-1 flex-col gap-2">
               <div className="flex-1">
-                <label htmlFor={zo.fields.round()} className="font-semibold">
+                <label
+                  htmlFor={f0rm.fields.round().name()}
+                  className="font-semibold"
+                >
                   Nombre de round
                 </label>
 
                 <InputSelect
-                  onChange={evRound}
-                  id={zo.fields.round()}
-                  name={zo.fields.round()}
+                  id={f0rm.fields.round().name()}
+                  name={f0rm.fields.round().name()}
                   type="number"
                   min="1"
                   max="100"
@@ -337,31 +335,24 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                     ))}
                 </InputSelect>
               </div>
-              <Value zorm={zo} name={zo.fields.mode()} event="change">
-                {(random) => (
-                  <Value zorm={zo} name={zo.fields.round()} event="change">
-                    {(round) => (
-                      <>
-                        {Boolean(
-                          selectedsPlaylist.size &&
-                            selectedsPlaylistCount < Number(round) &&
-                            !Number(random)
-                        ) && (
-                          <div className="mt-2 flex items-center">
-                            <div className="float-left px-2">
-                              <ExclamationIcon className="h-6 w-6" />
-                            </div>
-                            <p>
-                              Le nombre de round de la partie sera de{" "}
-                              {selectedsPlaylistCount}
-                            </p>
-                          </div>
-                        )}
-                      </>
-                    )}
-                  </Value>
+
+              <>
+                {Boolean(
+                  selectedsPlaylist.size &&
+                    selectedsPlaylistCount < Number(round) &&
+                    !Number(mode)
+                ) && (
+                  <div className="mt-2 flex items-center">
+                    <div className="float-left px-2">
+                      <ExclamationIcon className="h-6 w-6" />
+                    </div>
+                    <p>
+                      Le nombre de round de la partie sera de{" "}
+                      {selectedsPlaylistCount}
+                    </p>
+                  </div>
                 )}
-              </Value>
+              </>
             </div>
           </div>
         </div>

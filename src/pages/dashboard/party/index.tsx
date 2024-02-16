@@ -53,4 +53,4 @@ const Party: NextPageWithAuth & NextPageWithTitle = () => {
 
 export default Party;
 Party.auth = AuthGuardUser;
-Party.title = "Party | Create";
+Party.title = "Party";

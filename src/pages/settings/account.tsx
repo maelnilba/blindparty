@@ -1,19 +1,18 @@
 import { Divider } from "@components/elements/divider";
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
+import { Modal } from "@components/elements/modal";
 import { PlusIcon } from "@components/icons/plus";
 import { SignIn } from "@components/icons/sign-in";
 import { SocialIcon, ensureProvider } from "@components/icons/socials";
 import { AuthGuardUser } from "@components/layout/auth";
-import { Modal } from "@components/elements/modal";
 import { useSubmit } from "@hooks/zorm/useSubmit";
-import { Noop } from "helpers/noop";
 import { useQuery } from "@tanstack/react-query";
 import { RouterOutputs, api } from "@utils/api";
 import { getNextAuthProviders } from "@utils/next-auth";
+import { useF0rm } from "modules/f0rm";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
-import { signIn } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { ReactNode, useRef } from "react";
-import { useZorm } from "react-zorm";
 import { z } from "zod";
 
 const editSchema = z.object({
@@ -21,26 +20,24 @@ const editSchema = z.object({
 });
 
 const Settings: NextPageWithAuth & NextPageWithTitle = () => {
+  const { update, data: session } = useSession();
   const { data: accounts } = api.user.accounts.useQuery();
   const { data: allProviders } = useQuery(["next-auth-providers"], () =>
     getNextAuthProviders()
   );
-  const { data: user, isLoading, refetch } = api.user.me.useQuery();
+  const { data: user, isLoading } = api.user.me.useQuery();
 
-  const { mutateAsync: edit, isLoading: isUserLoading } =
-    api.user.edit.useMutation({
-      onSuccess: () => {
-        refetch();
-
-        // Hack for reload the next-auth session
-        const event = new Event("visibilitychange");
-        document.dispatchEvent(event);
-      },
-    });
+  const { mutateAsync: edit } = api.user.edit.useMutation({
+    onSuccess: async () => {
+      const x = await update();
+      console.log(x);
+    },
+  });
 
   const imageUpload = useRef<ImageUploadRef | null>(null);
   const { submitPreventDefault, isSubmitting } = useSubmit<typeof editSchema>(
     async (e) => {
+      if (!e.success) return;
       if (!user) throw new Error("Should have user");
 
       let s3key = user?.s3key ?? getS3key(user.image);
@@ -55,11 +52,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
     }
   );
 
-  const zo = useZorm("edit", editSchema, {
-    onValidSubmit: submitPreventDefault,
-  });
-
-  if (!user || isUserLoading) return <Noop />;
+  const f0rm = useF0rm(editSchema, submitPreventDefault);
 
   return (
     <div className="flex flex-wrap gap-4 p-4 px-28">
@@ -142,25 +135,28 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
         <div className="flex flex-1 flex-col gap-2 p-2">
           <div className="flex justify-center gap-4">
             <ImageUpload
-              src={user.image}
+              src={session?.user?.image}
               ref={imageUpload}
               className="flex-1"
               prefix="user"
               presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
             />
             <form
-              ref={zo.ref}
+              onSubmit={f0rm.form.submit}
               id="edit-user"
               className="flex h-full flex-[2] flex-col gap-2"
             >
               <div>
-                <label htmlFor={zo.fields.name()} className="font-semibold">
+                <label
+                  htmlFor={f0rm.fields.name().name()}
+                  className="font-semibold"
+                >
                   Nom
                 </label>
                 <input
-                  defaultValue={user.name ?? ""}
-                  name={zo.fields.name()}
-                  id={zo.fields.name()}
+                  defaultValue={session?.user?.name ?? ""}
+                  name={f0rm.fields.name().name()}
+                  id={f0rm.fields.name().name()}
                   className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>

@@ -20,8 +20,8 @@ import { api } from "@utils/api";
 import { NextPageWithAuth, NextPageWithLayout, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
-import { useZorm } from "react-zorm";
 import { z } from "zod";
+import { useF0rm } from "modules/f0rm";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -142,7 +142,9 @@ const PlaylistCreate = () => {
   };
 
   const imageUpload = useRef<ImageUploadRef | null>(null);
+
   const { submitPreventDefault, isSubmitting } = useSubmit(async (e) => {
+    if (!e.success) return;
     const tracks = [...tracksMap].map(([_, track]) => ({
       id: track.id,
       name: track.name,
@@ -202,9 +204,7 @@ const PlaylistCreate = () => {
     }
   });
 
-  const zo = useZorm("create", createSchema, {
-    onValidSubmit: submitPreventDefault,
-  });
+  const f0rm = useF0rm(createSchema, submitPreventDefault);
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 overflow-y-hidden">
@@ -295,30 +295,33 @@ const PlaylistCreate = () => {
               )}
             </ImageUpload>
             <form
-              ref={zo.ref}
+              onSubmit={f0rm.form.submit}
               id="create-playlist"
               className="flex flex-[2] flex-col gap-2"
             >
               <div>
-                <label htmlFor={zo.fields.name()} className="font-semibold">
+                <label
+                  htmlFor={f0rm.fields.name().name()}
+                  className="font-semibold"
+                >
                   Nom
                 </label>
                 <input
-                  id={zo.fields.name()}
-                  name={zo.fields.name()}
+                  id={f0rm.fields.name().name()}
+                  name={f0rm.fields.name().name()}
                   className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               <div>
                 <label
-                  htmlFor={zo.fields.description()}
+                  htmlFor={f0rm.fields.description().name()}
                   className="font-semibold"
                 >
                   Description
                 </label>
                 <input
-                  id={zo.fields.description()}
-                  name={zo.fields.description()}
+                  id={f0rm.fields.description().name()}
+                  name={f0rm.fields.description().name()}
                   className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>

@@ -1,15 +1,20 @@
 import { useRef, useState } from "react";
-import { ValidSubmitEvent } from "react-zorm/dist/use-zorm";
 import { z, ZodObject } from "zod";
 
 export function useSubmit<TData extends ZodObject<any>>(
-  func: (e: ValidSubmitEvent<z.infer<TData>>) => Promise<any>
+  func: (
+    e: React.FormEvent<HTMLFormElement> &
+      z.SafeParseReturnType<z.infer<TData>, z.infer<TData>>
+  ) => Promise<any>
 ) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isError, setIsError] = useState(false);
 
   const submitting = useRef(false);
-  const handleFunc = async (e: ValidSubmitEvent<any>) => {
+  const handleFunc = async (
+    e: React.FormEvent<HTMLFormElement> &
+      z.SafeParseReturnType<z.infer<any>, z.infer<any>>
+  ) => {
     if (submitting.current) return;
     submitting.current = true;
     try {
@@ -24,7 +29,10 @@ export function useSubmit<TData extends ZodObject<any>>(
     }
   };
 
-  const handleFuncPreventDefault = async (e: ValidSubmitEvent<any>) => {
+  const handleFuncPreventDefault = async (
+    e: React.FormEvent<HTMLFormElement> &
+      z.SafeParseReturnType<z.infer<any>, z.infer<any>>
+  ) => {
     if (submitting.current) return;
     submitting.current = true;
     try {
@@ -41,9 +49,13 @@ export function useSubmit<TData extends ZodObject<any>>(
   };
 
   return {
-    submit: handleFunc as (e: ValidSubmitEvent<z.infer<TData>>) => Promise<any>,
+    submit: handleFunc as (
+      e: React.FormEvent<HTMLFormElement> &
+        z.SafeParseReturnType<z.infer<TData>, z.infer<TData>>
+    ) => Promise<any>,
     submitPreventDefault: handleFuncPreventDefault as (
-      e: ValidSubmitEvent<z.infer<TData>>
+      e: React.FormEvent<HTMLFormElement> &
+        z.SafeParseReturnType<z.infer<TData>, z.infer<TData>>
     ) => Promise<any>,
     isSubmitting,
     isError,

@@ -74,7 +74,7 @@ export const userRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const picture = pictureLink(input.s3key);
 
-      return ctx.prisma.user.update({
+      return await ctx.prisma.user.update({
         where: {
           id: ctx.session.user.id,
         },
