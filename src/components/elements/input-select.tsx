@@ -89,13 +89,12 @@ export const InputSelect = forwardRef<HTMLSelectElement, InputSelectProps>(
 
     // Remove type for the hidden input
     const { type, ...hiddenProps } = props;
-    // Remove id, name for the input input
-    const { name, id, ...hiddeNprops } = props;
+
     return (
       <>
         <input
           ref={iref}
-          {...hiddeNprops}
+          {...hiddenProps}
           value={input}
           onKeyDown={(e) => {
             if (!iref.current) return;
