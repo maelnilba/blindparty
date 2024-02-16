@@ -37,6 +37,22 @@ export function useMap<T extends MapObject>() {
     });
   };
 
+  const toggle = (item: T) => {
+    if (map.has(item.id)) {
+      map.delete(item.id);
+      setMap(new Map(map));
+    } else setMap(new Map(map.set(item.id, item)));
+  };
+
+  const toggles = (items: T[]) => {
+    items.forEach((item) => {
+      if (map.has(item.id)) map.delete(item.id);
+      else map.set(item.id, item);
+    });
+
+    setMap(new Map(map));
+  };
+
   const reset = () => {
     setMap((m) => {
       return new Map();
@@ -49,6 +65,8 @@ export function useMap<T extends MapObject>() {
     remove,
     adds,
     removes,
+    toggle,
+    toggles,
     reset,
   };
 }

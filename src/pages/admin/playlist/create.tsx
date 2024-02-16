@@ -1,6 +1,6 @@
+import { ErrorMessages } from "@components/elements/error";
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
 import { Modal, ModalRef } from "@components/elements/modal";
-import { ExclamationIcon } from "@components/icons/exclamation";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { PlaylistBanner } from "@components/player/playlist-banner";
 import { TrackBanner } from "@components/player/track-banner";
@@ -386,19 +386,9 @@ const PlaylistCreate = () => {
           </div>
         </Modal>
         <div className="flex flex-1 flex-col gap-2 p-4">
-          {!tracksMap.size &&
-            f0rm.errors
-              .tracks()
-              .errors()
-              ?.map((error, index) => (
-                <div
-                  key={index}
-                  className="mx-auto flex select-none flex-row gap-2 text-center text-red-500"
-                >
-                  <ExclamationIcon className="h-4 w-4" />
-                  <span className="text-xs font-normal">{error.message}</span>
-                </div>
-              ))}
+          {!tracksMap.size && (
+            <ErrorMessages errors={f0rm.errors.tracks().errors()} />
+          )}
           {[...tracksMap].map(([_, track], index) => (
             <Fragment key={track.id}>
               <input

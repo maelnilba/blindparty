@@ -288,6 +288,7 @@ export const gameRouter = createTRPCRouter({
       if (party.status !== "RUNNING" || party.view !== "GUESS")
         throw new TRPCError({ code: "INTERNAL_SERVER_ERROR" });
 
+      // TODO: Take case of name like Music (feat. dude) / Music (with dude) / Music name - dude Remix
       const nameSimilarity = stringSimilarity(input.guess, party.track.name);
       const artistSimilarity = stringSimilarity(
         input.guess,

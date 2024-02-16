@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
-import { z, ZodObject } from "zod";
+import { ZodSchema, z } from "zod";
 
-export function useSubmit<TData extends ZodObject<any>>(
+export function useSubmit<TData extends ZodSchema>(
   func: (
     e: React.FormEvent<HTMLFormElement> &
       z.SafeParseReturnType<z.infer<TData>, z.infer<TData>>
