@@ -204,6 +204,7 @@ export const gameRouter = createTRPCRouter({
           },
         },
         select: {
+          id: true,
           max_round: true,
           round: true,
           tracks: {
@@ -219,6 +220,11 @@ export const gameRouter = createTRPCRouter({
       if (!party) throw new TRPCError({ code: "UNAUTHORIZED" });
 
       if (party.round > party.max_round) {
+        await ctx.prisma.party.update({
+          where: { id: party.id },
+          data: { status: "ENDED" },
+        });
+
         await ctx.pusher.trigger({}, "over");
         throw new TRPCError({ code: "CONFLICT" });
       }
@@ -231,7 +237,7 @@ export const gameRouter = createTRPCRouter({
 
       await ctx.prisma.party.update({
         where: {
-          id: input.prpc.channel_id,
+          id: party.id,
         },
         data: {
           view: "GUESS",
