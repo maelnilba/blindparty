@@ -16,7 +16,9 @@ import { ReactNode, useRef } from "react";
 import { z } from "zod";
 
 const editSchema = z.object({
-  name: z.string().min(1),
+  name: z
+    .string()
+    .min(3, { message: "Un pseudo doit contenir au minimum 3 caractère." }),
 });
 
 const Settings: NextPageWithAuth & NextPageWithTitle = () => {
@@ -157,7 +159,8 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
                   defaultValue={session?.user?.name ?? ""}
                   name={f0rm.fields.name().name()}
                   id={f0rm.fields.name().name()}
-                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                  data-error={!!f0rm.errors.name().errors()?.length}
+                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 data-[error=true]:border-red-500"
                 />
               </div>
             </form>
