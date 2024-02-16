@@ -10,21 +10,13 @@ import { TrackBanner } from "@components/playlist/track-banner";
 
 type PartyCardProps = {
   party: RouterOutputs["party"]["get_all"][number];
+  onAction?: (...args: any) => void;
 };
-export const PartyCard = ({ party }: PartyCardProps) => {
-  const router = useRouter();
-
-  const { mutateAsync: replay } = api.party.replay.useMutation({
-    onSuccess: ({ id }) => {
-      router.push({ pathname: "/party/[id]", query: { id: id } });
-    },
-  });
-
-  const { mutateAsync: erase } = api.party.delete.useMutation();
-
+export const PartyCard = ({ party, onAction }: PartyCardProps) => {
+  const { locale } = useRouter();
   const relativeUpdate = useRelativeTime(party.updatedAt, {
     refresh: true,
-    locale: router.locale,
+    locale: locale,
   });
   return (
     <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
@@ -87,8 +79,7 @@ export const PartyCard = ({ party }: PartyCardProps) => {
             .map((player, position) => (
               <div className="flex items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
                 <PlayerTile key={player.id} player={player.user} />
-                {formatPosition(position + 1, router.locale)} - {player.points}{" "}
-                points
+                {formatPosition(position + 1, locale)} - {player.points} points
               </div>
             ))}
         {party.status === "CANCELED" &&
@@ -109,7 +100,7 @@ export const PartyCard = ({ party }: PartyCardProps) => {
               title={`Supprimer la partie`}
               message={`Êtes vous certain de vouloir supprimer la partie ? Cette action est irreversible.`}
               actions={["Supprimer"]}
-              onSuccess={() => erase({ id: party.id })}
+              onSuccess={() => onAction?.({ id: party.id })}
             >
               <button className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                 Supprimer
@@ -120,7 +111,7 @@ export const PartyCard = ({ party }: PartyCardProps) => {
         {party.status === "CANCELED" && (
           <>
             <button
-              onClick={() => replay({ id: party.id })}
+              onClick={() => onAction?.({ id: party.id })}
               className="flex-1 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
             >
               Rejouer
@@ -129,7 +120,7 @@ export const PartyCard = ({ party }: PartyCardProps) => {
               title={`Supprimer la partie`}
               message={`Êtes vous certain de vouloir supprimer la partie ? Cette action est irreversible.`}
               actions={["Supprimer"]}
-              onSuccess={() => erase({ id: party.id })}
+              onSuccess={() => onAction?.({ id: party.id })}
             >
               <button className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                 Supprimer

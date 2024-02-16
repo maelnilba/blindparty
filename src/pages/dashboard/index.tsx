@@ -20,12 +20,6 @@ const DashBoard: NextPageWithAuth & NextPageWithTitle = () => {
           >
             Voir mes parties
           </Link>
-          <Link
-            href="/dashboard/party/create"
-            className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-          >
-            Créer une partie
-          </Link>
         </div>
         <div className="flex flex-1 flex-col gap-1 p-2">
           {partys?.map((party) => (
