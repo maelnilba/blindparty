@@ -4,12 +4,17 @@ import { Picture } from "@components/images/picture";
 import { useRelativeTime } from "@hooks/helpers/useRelativeTime";
 import { RouterOutputs } from "@utils/api";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 type PartyBannerProps = {
   party: RouterOutputs["party"]["get_all_invite"][number];
 };
 export const PartyBanner = ({ party }: PartyBannerProps) => {
-  const relativeUpdate = useRelativeTime(party.updatedAt, { refresh: true });
+  const { locale } = useRouter();
+  const relativeUpdate = useRelativeTime(party.updatedAt, {
+    refresh: true,
+    locale,
+  });
   return (
     <div className="flex items-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <Picture identifier={party.host.image} className="shrink-0">

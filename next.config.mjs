@@ -9,8 +9,8 @@
 const config = {
   reactStrictMode: true,
   i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
+    locales: ["en", "fr"],
+    defaultLocale: "fr",
   },
   experimental: {
     swcPlugins: [

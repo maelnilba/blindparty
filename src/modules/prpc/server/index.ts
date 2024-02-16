@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { z, type ZodObject } from "zod";
+import { type ZodObject } from "zod";
 import {
   authHandlerBodySchema,
   getChannelName,
@@ -13,8 +13,8 @@ import { PRPCBuilder } from "./PRPCBuilder";
 import { PRPCPresenceRouteTRPC } from "./PRPCRouteTRPC";
 import type {
   NextApiHandler,
-  PRPCInternalRouter,
   NextApiWebhookHandler,
+  PRPCInternalRouter,
   PRPCRouterProcedures,
 } from "./types";
 

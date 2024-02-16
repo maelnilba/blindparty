@@ -21,7 +21,8 @@ const PlaylistDiscover = ({
 }: {
   playlist: RouterOutputs["playlist"]["discover"];
 }) => {
-  const relativeUpdate = useRelativeTime(playlist.updatedAt);
+  const { locale } = useRouter();
+  const relativeUpdate = useRelativeTime(playlist.updatedAt, { locale });
   const { load, start, pause, unpause, currentTrack, playing } = usePlayer();
   const playTrack = async (track: Track) => {
     if (currentTrack?.id === track.id && playing) {

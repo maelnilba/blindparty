@@ -16,7 +16,7 @@ import {
   TRACK_TIMER_MS,
   VIEW_SCORE_MS,
 } from "@components/party/constants";
-import { PlayerTile } from "@components/party/player-tile";
+import { PlayerStatusTile } from "@components/party/player-tile";
 import { Volume } from "@components/player/volume";
 import { useMessagesBus } from "@hooks/libs/useMessagesBus";
 import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
@@ -519,7 +519,7 @@ const Party: NextPage<
               <Divider />
               <div className="flex max-h-96 flex-wrap gap-x-2.5 gap-y-2 overflow-hidden">
                 {players.map(({ player, joined }) => (
-                  <PlayerTile
+                  <PlayerStatusTile
                     key={player.id}
                     player={player}
                     joined={joined}

@@ -1,18 +1,18 @@
 import { Divider } from "@components/elements/divider";
-import { MicroIcon } from "@components/icons/micro";
-import { Picture } from "@components/images/picture";
-import { AuthGuard, AuthGuardUser } from "@components/layout/auth";
 import { Modal } from "@components/elements/modal";
+import { MicroIcon } from "@components/icons/micro";
+import { AuthGuard } from "@components/layout/auth";
 import { TRACK_TIMER_MS } from "@components/party/constants";
+import { PlayerStatusTile } from "@components/party/player-tile";
 import { useMicroPermission } from "@hooks/helpers/useMicroPermission";
 import { useVoiceDetector } from "@hooks/libs/useVoiceDetector";
-import { nearest, parse } from "helpers/accept-language";
-import { noop } from "helpers/noop";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
+import { nearest, parse } from "helpers/accept-language";
+import { noop } from "helpers/noop";
 import { sleep } from "helpers/sleep";
 import { raw } from "modules/tailwindcolors";
 import type {
@@ -28,7 +28,6 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { exclude } from "..";
-import { PlayerTile } from "@components/party/player-tile";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -183,7 +182,7 @@ const Party: NextPage<
   const [view, setView] = useState<PartyViewStatus>(party.view);
   const [guesses, setGuesses] = useState<string[]>([]);
 
-  const { send, bind, members, unbind_all } = prpc.game.useConnect(
+  const { send, bind, members, unbind_all, me } = prpc.game.useConnect(
     party.id,
     {
       subscribeOnMount: true,
@@ -250,6 +249,26 @@ const Party: NextPage<
       bind("guess", () => {
         setGuesses([]);
         setView("SCORE");
+      });
+
+      bind("force-stop", () => {
+        router.push({
+          pathname: "/party",
+          query: {
+            reason: exclude("PARTY_DELETED"),
+          },
+        });
+      });
+
+      bind("ban", ({ id }) => {
+        if (id === me?.id) {
+          router.push({
+            pathname: "/party",
+            query: {
+              reason: exclude("BANNED"),
+            },
+          });
+        }
       });
 
       return () => {
@@ -424,7 +443,7 @@ const Party: NextPage<
               <Divider />
               <div className="flex flex-wrap gap-2">
                 {players.map(({ player, joined, connected }) => (
-                  <PlayerTile
+                  <PlayerStatusTile
                     key={player.id}
                     connected={connected}
                     player={player}

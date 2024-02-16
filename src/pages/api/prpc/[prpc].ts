@@ -16,6 +16,22 @@ const webhooks = createNextWehbookApiHandler<typeof prpc>({
       });
     }
   },
+  presence: async (data, ctx) => {
+    if (data.name === "member_removed") {
+      await ctx.prisma.party.update({
+        where: {
+          id: data.channel.id,
+        },
+        data: {
+          players: {
+            delete: {
+              id: data.user_id,
+            },
+          },
+        },
+      });
+    }
+  },
 });
 
 export default createNextApiHandler({

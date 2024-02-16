@@ -20,6 +20,8 @@ const excludeReasons = z.enum([
   "PARTY_NOT_EXISTS",
   "HOST_LEAVE",
   "PARTY_ENDED",
+  "PARTY_DELETED",
+  "BANNED",
 ]);
 export const exclude = (
   reason: z.infer<typeof excludeReasons>,
@@ -92,7 +94,7 @@ const PartyHome: NextPageWithAuth<GSSPProps> & NextPageWithTitle<GSSPProps> = ({
           {(reason === "MULTIPLE_TAB_OPEN" ||
             reason === "DESKTOP_ALREADY_EXIST") && (
             <p>
-              Vous ne pouvez pas avoir plusieur fênetre ouverte pour la même
+              Vous ne pouvez pas avoir plusieurs fênetres ouvertes pour la même
               partie
             </p>
           )}
@@ -103,11 +105,13 @@ const PartyHome: NextPageWithAuth<GSSPProps> & NextPageWithTitle<GSSPProps> = ({
             <p>Vous n'avez pas rejoint la partie avant qu'elle ne commence</p>
           )}
           {reason === "NOT_INVITED" && (
-            <p>Vous n'avez pas était invité pour joindre la partie</p>
+            <p>Vous n'avez pas été invité pour joindre la partie</p>
           )}
           {reason === "PARTY_NOT_EXISTS" && <p>La partie est introuvable</p>}
           {reason === "HOST_LEAVE" && <p>L'Hôte a quitté la partie en cours</p>}
           {reason === "PARTY_ENDED" && <p>La partie est terminée</p>}
+          {reason === "PARTY_DELETED" && <p>La partie a été supprimée</p>}
+          {reason === "BANNED" && <p>Vous avez été banni de la partie</p>}
           {role !== "ANON" && (
             <Link
               href="/dashboard/party/create"

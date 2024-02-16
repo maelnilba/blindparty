@@ -1,10 +1,16 @@
 import { TRPCError } from "@trpc/server";
+import { setChannelName } from "modules/prpc/shared/utils";
 import { customAlphabet } from "nanoid";
 import { z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { gameRouter } from "./party/game";
 import { pusherClient as pusher } from "../prpc";
+import { createTRPCRouter, protectedProcedure } from "../trpc";
+import { trackMapped } from "./admin/playlist";
+import { gameRouter } from "./party/game";
+
 const nanoid = customAlphabet("1234567890", 6);
+const channelMembers = z.object({
+  users: z.array(z.object({ id: z.string() })),
+});
 
 export const partyRouter = createTRPCRouter({
   create: protectedProcedure
@@ -82,7 +88,86 @@ export const partyRouter = createTRPCRouter({
         return { ...party, link: link };
       });
     }),
-  get_all: protectedProcedure.query(async ({ ctx, input }) => {}),
+  get_all: protectedProcedure.query(async ({ ctx, input }) => {
+    const partys = await ctx.prisma.party.findMany({
+      where: {
+        inviteds: {
+          some: {
+            id: ctx.session.user.id,
+          },
+        },
+      },
+      select: {
+        id: true,
+        updatedAt: true,
+        createdAt: true,
+        status: true,
+        round: true,
+        max_round: true,
+        access_mode: true,
+        host: {
+          select: {
+            id: true,
+            name: true,
+            image: true,
+          },
+        },
+        tracks: {
+          select: {
+            id: true,
+            name: true,
+            preview_url: true,
+            album: true,
+            images: true,
+            artists: true,
+          },
+        },
+        inviteds: {
+          select: { id: true, name: true, image: true },
+        },
+        players: {
+          include: {
+            user: true,
+          },
+        },
+        _count: {
+          select: {
+            inviteds: true,
+            tracks: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    const channels = await Promise.all(
+      partys.map((party) => {
+        return pusher
+          .get({
+            path: `/channels/presence-game-${party.id}/users`,
+          })
+          .then((members) =>
+            members
+              .json()
+              .then(channelMembers.parseAsync)
+              .then((members) => ({
+                count: Math.max(0, members.users.length - 1),
+                party: party,
+              }))
+          );
+      })
+    );
+
+    return partys.map((party) => ({
+      ...party,
+      members: {
+        count: channels.find((c) => c.party.id === party.id)?.count,
+      },
+      tracks: trackMapped(party.tracks),
+    }));
+  }),
   get_all_invite: protectedProcedure
     .input(z.object({ take: z.number().optional() }).optional())
     .query(async ({ ctx, input }) => {
@@ -122,10 +207,13 @@ export const partyRouter = createTRPCRouter({
               path: `/channels/presence-game-${party.id}/users`,
             })
             .then((members) =>
-              members.json().then((members) => ({
-                count: Math.max(0, members.users.length - 1),
-                party: party,
-              }))
+              members
+                .json()
+                .then(channelMembers.parseAsync)
+                .then((members) => ({
+                  count: Math.max(0, members.users.length - 1),
+                  party: party,
+                }))
             );
         })
       );
@@ -188,6 +276,25 @@ export const partyRouter = createTRPCRouter({
 
         return { id: party.id };
       });
+    }),
+  delete: protectedProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ input, ctx }) => {
+      await ctx.prisma.party.deleteMany({
+        where: {
+          id: input.id,
+          host: { id: ctx.session.user.id },
+          status: {
+            in: ["PENDING", "CANCELED"],
+          },
+        },
+      });
+
+      await pusher.trigger(
+        setChannelName("presence", "game", input.id),
+        "force-stop",
+        {}
+      );
     }),
   game: gameRouter,
 });

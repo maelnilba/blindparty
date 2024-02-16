@@ -1,6 +1,6 @@
-import stringSimilarity from "helpers/string-similarty";
 import { SEPARATOR } from "@server/api/root";
 import { TRPCError } from "@trpc/server";
+import stringSimilarity from "helpers/string-similarty";
 import { prpc } from "server/api/prpc";
 import { createTRPCRouter, enforceUserIsHost } from "server/api/trpc";
 import { z } from "zod";
@@ -108,11 +108,10 @@ export const gameRouter = createTRPCRouter({
     .trigger(async ({ ctx, input }) => {
       const [id, user] = Object.entries<{ id: string }>(
         input.prpc.members
-      ).find(([id, user]) => user.id === input.id) ?? [undefined, undefined];
+      ).find(([_, user]) => user.id === input.id) ?? [undefined, undefined];
 
       if (!user) throw new TRPCError({ code: "NOT_FOUND" });
 
-      await ctx.pusher.terminate(id);
       return ctx.pusher.trigger({ id: user.id });
     }),
   start: prpc.game.use(enforceUserIsHost).trigger(async ({ ctx, input }) => {
@@ -349,4 +348,7 @@ export const gameRouter = createTRPCRouter({
         winner: points.players.find((p) => p.user.id === ctx.session.user.id),
       });
     }),
+  "force-stop": prpc.game.trigger(async ({ ctx }) => {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }),
 });

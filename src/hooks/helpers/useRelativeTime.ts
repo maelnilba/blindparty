@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useReducer } from "react";
 
 type RelativeTimeOptions = {
-  locale?: "fr" | "en";
+  locale?: string;
   /*$
    * Refresh time in seconds
    */
@@ -12,7 +12,7 @@ export function useRelativeTime(
   options?: RelativeTimeOptions
 ) {
   const [state, dispatch] = useReducer((state) => state + 1, 0);
-  const locale = options?.locale ?? "fr";
+  const locale = options?.locale;
   const refresh =
     typeof options?.refresh === "undefined"
       ? false

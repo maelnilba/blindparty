@@ -31,7 +31,7 @@ const trackSchema = z.array(
   })
 );
 
-const mapped = (
+export const trackMapped = (
   tracks: {
     id: string;
     name: string;
@@ -308,7 +308,7 @@ export const playlistRouter = createTRPCRouter({
       })
     ).map((playlist) => ({
       ...playlist,
-      tracks: mapped(playlist.tracks),
+      tracks: trackMapped(playlist.tracks),
     }));
   }),
   get_playlist: protectedAdminProcedure
@@ -337,7 +337,7 @@ export const playlistRouter = createTRPCRouter({
 
       return {
         ...playlist,
-        tracks: mapped(playlist.tracks),
+        tracks: trackMapped(playlist.tracks),
       };
     }),
 });
