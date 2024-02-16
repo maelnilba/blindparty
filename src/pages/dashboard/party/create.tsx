@@ -6,7 +6,7 @@ import { AuthGuardUser } from "@components/layout/auth";
 import { Playlist, PlaylistBanner } from "@components/playlist/playlist-banner";
 import { Tab } from "@headlessui/react";
 import { useMap } from "@hooks/helpers/useMap";
-import { useSubmit } from "@hooks/zorm/useSubmit";
+import { useSubmit } from "@hooks/form/useSubmit";
 import { api } from "@utils/api";
 import { useF0rm } from "modules/f0rm";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
