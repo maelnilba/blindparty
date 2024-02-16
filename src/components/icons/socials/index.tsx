@@ -16,7 +16,7 @@ const providerIcons: Record<Socials, (props: Icon) => JSX.Element> = {
 } as const;
 
 export function ensureProvider(provider: ClientSafeProvider["name"]) {
-  if (Object.keys(providerIcons).includes(provider)) {
+  if ((Object.keys(providerIcons) as string[]).includes(provider)) {
     return provider as Socials;
   } else {
     throw new Error(`The provider ${provider} is not set in NextAuth config.`);
