@@ -25,7 +25,7 @@ export const PartyCard = ({ party, onAction }: PartyCardProps) => {
           {party.status === "PENDING" && <span>{party.max_round} rounds</span>}
           {party.status === "RUNNING" && (
             <span>
-              {party.round}/{party.max_round} rounds
+              {Math.min(party.round, party.max_round)}/{party.max_round} rounds
             </span>
           )}
           <span>{party._count.tracks} tracks</span>
