@@ -22,6 +22,8 @@
     "@trpc/next": "^10.8.1",
     "@trpc/react-query": "^10.8.1",
     "@trpc/server": "^10.8.1",
+    "@tsparticles/preset-confetti": "^3.0.2",
+    "@tsparticles/react": "^3.0.0",
     "@vercel/og": "^0.6.2",
     "aws-sdk": "^2.1338.0",
     "mini-svg-data-uri": "^1.4.4",
@@ -46,6 +48,7 @@
     "zustand": "^4.3.6"
   },
   "devDependencies": {
+    "@tsparticles/engine": "^3.2.1",
     "@types/node": "^18.11.18",
     "@types/prettier": "^2.7.2",
     "@types/react": "^18.0.26",

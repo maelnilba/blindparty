@@ -1,86 +1,258 @@
-import { getLanguage, getAcceptLanguage } from "helpers/accept-language";
-import {
-  GetServerSidePropsContext,
-  InferGetServerSidePropsType,
-  NextPage,
-} from "next";
-import { ComponentProps, useEffect, useState } from "react";
-import SpeechRecognition, {
-  useSpeechRecognition,
-} from "react-speech-recognition";
+import { type Container, type ISourceOptions } from "@tsparticles/engine";
+import Particles, { initParticlesEngine } from "@tsparticles/react";
+import { loadConfettiPreset } from "@tsparticles/preset-confetti";
+import { useEffect, useMemo, useState } from "react";
+const App = () => {
+  const [init, setInit] = useState(false);
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  return {
-    props: {
-      language: getLanguage(
-        getAcceptLanguage(context.req.headers["accept-language"]).at(0) ??
-          context.locale ??
-          context.defaultLocale ??
-          "fr"
-      ),
-    },
-  };
-}
-const Home: NextPage<
-  InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ language }) => {
-  const { finalTranscript, interimTranscript, transcript, listening } =
-    useSpeechRecognition();
-
-  const listenContinuously = async () => {
-    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-      return null;
-    }
-
-    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-      console.warn(
-        "Your browser does not support speech recognition software! Try Chrome desktop, maybe?"
-      );
-      return;
-    }
-    await SpeechRecognition.startListening({
-      continuous: true,
-      language: language,
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadConfettiPreset(engine);
+    }).then(() => {
+      setInit(true);
     });
+  }, []);
+
+  const particlesLoaded = async (container?: Container): Promise<void> => {
+    console.log(container);
   };
 
-  // useEffect(() => {
-  //   listenContinuously();
-  //   return () => SpeechRecognition.stopListening();
-  // }, []);
-
-  const [state, setState] = useState("");
-  return (
-    <main className="">
-      <div>final: {finalTranscript}</div>
-      <div>interim: {interimTranscript}</div>
-      <div>transcript: {transcript}</div>
-      <div>listening: {JSON.stringify(listening)}</div>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const data = (
-            (e.target as HTMLFormElement).elements.namedItem(
-              "test"
-            ) as HTMLInputElement
-          ).value;
-          setState(data);
-        }}
-      >
-        {state}
-        <input type="submit" hidden />
-        <Input
-          name="test"
-          type="text"
-          className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-blue-500 focus:ring-blue-500"
-        />
-      </form>
-    </main>
+  const options: ISourceOptions = useMemo(
+    () => ({
+      preset: "confetti",
+      background: {
+        color: {
+          value: "#000000",
+        },
+      },
+      fpsLimit: 120,
+      detectRetina: true,
+      interactivity: {
+        events: {
+          onClick: {
+            enable: true,
+            mode: "emitter",
+          },
+        },
+        modes: {
+          emitters: {
+            direction: "none",
+            spawnColor: {
+              animation: {
+                h: {
+                  enable: true,
+                  offset: {
+                    min: -1.4,
+                    max: 1.4,
+                  },
+                  speed: 0.1,
+                  sync: false,
+                },
+                l: {
+                  enable: true,
+                  offset: {
+                    min: 20,
+                    max: 80,
+                  },
+                  speed: 0,
+                  sync: false,
+                },
+              },
+            },
+            life: {
+              count: 1,
+              duration: 0.1,
+              delay: 0.6,
+            },
+            rate: {
+              delay: 0.1,
+              quantity: 100,
+            },
+            size: {
+              width: 0,
+              height: 0,
+            },
+          },
+        },
+      },
+      emitters: [
+        {
+          life: {
+            duration: 5,
+            count: 0,
+          },
+          rate: {
+            delay: 0.1,
+            quantity: 5,
+          },
+          position: {
+            x: 0,
+            y: 40,
+          },
+          particles: {
+            move: {
+              direction: "top-right",
+            },
+          },
+        },
+        {
+          life: {
+            duration: 5,
+            count: 0,
+          },
+          rate: {
+            delay: 0.1,
+            quantity: 5,
+          },
+          position: {
+            x: 100,
+            y: 35,
+          },
+          particles: {
+            move: {
+              direction: "top-left",
+            },
+          },
+        },
+      ],
+      particles: {
+        color: {
+          value: ["#0000ff", "#00ff00"],
+        },
+      },
+      responsive: [
+        {
+          maxWidth: 600,
+          options: {
+            interactivity: {
+              modes: {
+                emitters: {
+                  life: {
+                    count: 1,
+                    duration: 0.1,
+                    delay: 0.6,
+                  },
+                  rate: {
+                    delay: 0.1,
+                    quantity: 10,
+                  },
+                },
+              },
+            },
+            emitters: [
+              {
+                life: {
+                  duration: 5,
+                  count: 0,
+                },
+                rate: {
+                  quantity: 1,
+                },
+                position: {
+                  x: 0,
+                  y: 20,
+                },
+                particles: {
+                  move: {
+                    direction: "top-right",
+                  },
+                },
+              },
+              {
+                life: {
+                  duration: 5,
+                  count: 0,
+                },
+                rate: {
+                  quantity: 1,
+                },
+                position: {
+                  x: 100,
+                  y: 50,
+                },
+                particles: {
+                  move: {
+                    direction: "top-left",
+                  },
+                },
+              },
+            ],
+          },
+        },
+        {
+          maxWidth: 1000,
+          options: {
+            interactivity: {
+              modes: {
+                emitters: {
+                  life: {
+                    count: 1,
+                    duration: 0.1,
+                    delay: 0.6,
+                  },
+                  rate: {
+                    delay: 0.1,
+                    quantity: 50,
+                  },
+                },
+              },
+            },
+            emitters: [
+              {
+                life: {
+                  duration: 5,
+                  count: 0,
+                },
+                rate: {
+                  quantity: 3,
+                },
+                position: {
+                  x: 0,
+                  y: 50,
+                },
+                particles: {
+                  move: {
+                    direction: "top-right",
+                  },
+                },
+              },
+              {
+                life: {
+                  duration: 5,
+                  count: 0,
+                },
+                rate: {
+                  quantity: 3,
+                },
+                position: {
+                  x: 100,
+                  y: 50,
+                },
+                particles: {
+                  move: {
+                    direction: "top-left",
+                  },
+                },
+              },
+            ],
+          },
+        },
+      ],
+    }),
+    []
   );
+
+  if (init) {
+    return (
+      <Particles
+        id="tsparticles"
+        particlesLoaded={particlesLoaded}
+        options={options}
+      />
+    );
+  }
+
+  return <></>;
 };
 
-const Input = (props: ComponentProps<"input">) => {
-  return <input {...props} />;
-};
-
-export default Home;
+export default App;
