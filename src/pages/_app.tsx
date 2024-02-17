@@ -1,3 +1,4 @@
+import "regenerator-runtime/runtime"; // for react-speech-recognition
 import { FaviconLoader } from "@components/elements/favicon-loader";
 import { Auth } from "@components/layout/auth";
 import { Layout } from "@components/layout/layout";

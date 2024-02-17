@@ -1,3 +1,4 @@
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { Divider } from "@components/elements/divider";
 import { Url } from "@components/elements/url";
 import { PlayerStack } from "@components/game/players-stack";
@@ -10,7 +11,6 @@ import { DesktopIcon } from "@components/icons/desktop";
 import { PhoneIcon } from "@components/icons/phone";
 import { AuthGuardUser } from "@components/layout/auth";
 import { GetLayoutThroughConfirm } from "@components/layout/layout";
-import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import {
   GUESS_MS,
   TRACK_TIMER_MS,
@@ -351,9 +351,23 @@ const Party: NextPage<
     [game]
   );
 
-  useEffect(() => {
-    if (!isSubscribe) return;
-  }, [isSubscribe]);
+  const start = () => {
+    send("start", undefined, ({ error, result }) => {
+      if (!error && result?.running) {
+        setGame("RUNNING");
+        subscribeConfirm();
+        message("start", true);
+      }
+    });
+  };
+
+  const round = (_tracks?: string[]) => {
+    send("round", { tracks: _tracks ?? tracks });
+  };
+
+  const ban = (id: string) => {
+    send("ban", { id: id });
+  };
 
   const location = useWindowLocation();
   // @TODO: Fix connected UI ?
@@ -396,24 +410,6 @@ const Party: NextPage<
       }))
       .every((player) => player.joined);
   }, [party]);
-
-  const start = () => {
-    send("start", undefined, ({ error, result }) => {
-      if (!error && result?.running) {
-        setGame("RUNNING");
-        subscribeConfirm();
-        message("start", true);
-      }
-    });
-  };
-
-  const round = (_tracks?: string[]) => {
-    send("round", { tracks: _tracks ?? tracks });
-  };
-
-  const ban = (id: string) => {
-    send("ban", { id: id });
-  };
 
   useEffect(() => {
     if (track) {

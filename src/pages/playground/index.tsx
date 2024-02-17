@@ -1,103 +1,62 @@
-import { useF0rm } from "modules/f0rm";
-import { useRef } from "react";
-import { z } from "zod";
+import { getLanguage, getAcceptLanguage } from "helpers/accept-language";
+import {
+  GetServerSidePropsContext,
+  InferGetServerSidePropsType,
+  NextPage,
+} from "next";
+import { useEffect } from "react";
+import SpeechRecognition, {
+  useSpeechRecognition,
+} from "react-speech-recognition";
 
-const schema = z.object({
-  test: z.coerce.number().max(10).optional(),
-  array: z
-    .array(
-      z.object({
-        testoa: z.coerce.number(),
-        darr: z.array(z.object({ huhu: z.coerce.string() })),
-      })
-    )
-    .optional()
-    .default([]),
-  object: z.object({
-    testobj: z.coerce.number(),
-  }),
-});
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  return {
+    props: {
+      language: getLanguage(
+        getAcceptLanguage(context.req.headers["accept-language"]).at(0) ??
+          context.locale ??
+          context.defaultLocale ??
+          "fr"
+      ),
+    },
+  };
+}
+const Home: NextPage<
+  InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ language }) => {
+  const { finalTranscript, interimTranscript, transcript, listening } =
+    useSpeechRecognition();
 
-export default function Home() {
-  const form = useRef<HTMLFormElement>(null);
+  const listenContinuously = async () => {
+    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+      return null;
+    }
 
-  const f0rm = useF0rm(schema, (event) => {
-    if (event.success) event.data;
-    event.preventDefault();
-    // valide
-  });
+    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
+      console.warn(
+        "Your browser does not support speech recognition software! Try Chrome desktop, maybe?"
+      );
+      return;
+    }
+    await SpeechRecognition.startListening({
+      continuous: true,
+      language: language,
+    });
+  };
 
-  const test = f0rm.watch(form, f0rm.fields.object().name());
-
-  const arr = f0rm.watch(form, f0rm.fields.array().name());
+  useEffect(() => {
+    listenContinuously();
+    return () => SpeechRecognition.stopListening();
+  }, []);
 
   return (
     <main className="min-h-screen bg-slate-950 p-4 text-white">
-      <p>VALUE: {test?.testobj} </p>
-      <p>
-        ERROR:
-        {f0rm.errors
-          .object()
-          .errors()
-          ?.map((e) => (
-            <span key={e.code}>{e.message}</span>
-          ))}
-      </p>
-      <p>VALUE: {JSON.stringify(arr)} </p>
-      <p>
-        ERROR:
-        {f0rm.errors
-          .array()
-          .errors()
-          ?.map((e) => (
-            <span key={e.code}>{e.message}</span>
-          ))}
-      </p>
-      <form ref={form} onSubmit={f0rm.form.submit}>
-        <input
-          type="number"
-          name={f0rm.fields.test().name()}
-          className="border border-slate-400 bg-slate-600 p-2 text-white"
-          placeholder="test"
-        />
-        <input
-          type="text"
-          name={f0rm.fields.object().testobj().name()}
-          className="border border-slate-400 bg-slate-600 p-2 text-white"
-          placeholder="testobj"
-        />
-        {Array(5)
-          .fill(null)
-          .map((_, index) => {
-            return (
-              <div key={index}>
-                {Array(5)
-                  .fill(null)
-                  .map((_, index2) => (
-                    <input
-                      key={index2}
-                      type="text"
-                      name={f0rm.fields.array(index).darr(index2).huhu().name()}
-                      className="border border-slate-400 bg-slate-600 p-2 text-white"
-                      placeholder="array darr huhu"
-                    />
-                  ))}
-                <input
-                  type="text"
-                  name={f0rm.fields.array(index).testoa().name()}
-                  className="border border-slate-400 bg-slate-600 p-2 text-white"
-                  placeholder="array testoa"
-                />
-              </div>
-            );
-          })}
-        <button
-          className="cursor-pointer rounded bg-slate-900 px-2.5 py-1 text-white focus-within:bg-slate-800 hover:bg-slate-950"
-          type="submit"
-        >
-          submit
-        </button>
-      </form>
+      <div>final: {finalTranscript}</div>
+      <div>interim: {interimTranscript}</div>
+      <div>transcript: {transcript}</div>
+      <div>listening: {JSON.stringify(listening)}</div>
     </main>
   );
-}
+};
+
+export default Home;

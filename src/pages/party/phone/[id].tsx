@@ -1,20 +1,16 @@
 import { Divider } from "@components/elements/divider";
 import { Modal } from "@components/elements/modal";
-import { MicroIcon } from "@components/icons/micro";
 import { AuthGuard } from "@components/layout/auth";
 import { TRACK_TIMER_MS } from "@components/party/constants";
 import { PlayerStatusTile } from "@components/party/player-tile";
 import { useMicroPermission } from "@hooks/helpers/useMicroPermission";
-import { useVoiceDetector } from "@hooks/libs/useVoiceDetector";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
-import { nearest, parse } from "helpers/accept-language";
-import { noop } from "helpers/noop";
+import { getAcceptLanguage, getLanguage } from "helpers/accept-language";
 import { sleep } from "helpers/sleep";
-import { raw } from "modules/tailwindcolors";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
@@ -23,7 +19,7 @@ import type {
 } from "next";
 import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -160,13 +156,16 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   return {
     props: {
       party: party,
-      language: nearest(
-        parse(context.req.headers["accept-language"] ?? "en-GB"),
-        "en - GB"
+      language: getLanguage(
+        getAcceptLanguage(context.req.headers["accept-language"]).at(0) ??
+          context.locale ??
+          context.defaultLocale ??
+          "fr"
       ),
     },
   };
 }
+
 export type Player =
   | InferGetServerSidePropsType<
       typeof getServerSideProps
@@ -283,14 +282,13 @@ const Party: NextPage<
     send("guess", { guess: word.trim().toLocaleLowerCase() });
   };
 
-  const micro = useMicroPermission();
-  const { finalTranscript } = useSpeechRecognition();
+  const join = () => {
+    send("join", { joined: !isJoined });
+    setIsJoined((j) => !j);
+  };
 
-  useEffect(() => {
-    if (view === "GUESS") {
-      guess(finalTranscript);
-    }
-  }, [finalTranscript]);
+  const micro = useMicroPermission();
+  const { finalTranscript, resetTranscript } = useSpeechRecognition();
 
   const listenContinuously = async () => {
     if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
@@ -308,47 +306,22 @@ const Party: NextPage<
       language: language,
     });
   };
-  const vadMicro = useRef<SVGSVGElement | null>(null);
-  const { vad } = useVoiceDetector();
+
   useEffect(() => {
-    if (game === "RUNNING") {
+    if (game === "RUNNING" && view === "GUESS") {
       listenContinuously();
-
-      const onVoiceStart = () => {
-        if (!vadMicro.current) return;
-        vadMicro.current.style.display = "block";
-      };
-
-      const onVoiceStop = () => {
-        if (!vadMicro.current) return;
-        vadMicro.current.style.display = "none";
-      };
-
-      const onUpdate = (val: number) => {
-        if (!vadMicro.current) return;
-        const percent = val * 100;
-        let variation = Math.round((percent * 10) / 100) * 100;
-        variation = variation === 0 ? 50 : variation > 900 ? 900 : variation;
-        vadMicro.current.style.color = raw("teal", variation as any);
-        vadMicro.current.style.clipPath = `inset(${percent}% 0 0 0)`;
-      };
-
-      vad({
-        onVoiceStart,
-        onVoiceStop,
-        onUpdate,
-      });
     }
 
     return () => {
       SpeechRecognition.stopListening();
-      vad({
-        onVoiceStart: noop,
-        onVoiceStop: noop,
-        onUpdate: noop,
-      });
     };
-  }, [game]);
+  }, [game, view]);
+
+  useEffect(() => {
+    if (view === "GUESS") {
+      guess(finalTranscript);
+    }
+  }, [finalTranscript]);
 
   const activation = () => {
     if (typeof window === "undefined") {
@@ -387,11 +360,6 @@ const Party: NextPage<
         : false,
     }));
   }, [party, members, joineds]);
-
-  const join = () => {
-    send("join", { joined: !isJoined });
-    setIsJoined((j) => !j);
-  };
 
   return (
     <div className="flex flex-1 items-center justify-center gap-4 p-4">
@@ -478,18 +446,6 @@ const Party: NextPage<
                 className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
               />
             </form>
-
-            <div
-              data-view={view}
-              className="relative rounded-lg border border-gray-800 p-4 data-[view=SCORE]:border-gray-900"
-            >
-              <MicroIcon
-                ref={vadMicro}
-                className="absolute  h-48 w-48 transition-all duration-75"
-                style={{ clipPath: "inset(100% 0 0 0)" }}
-              />
-              <MicroIcon className="h-48 w-48" />
-            </div>
             <div className="fixed bottom-0 w-full p-2 pb-0">
               <div className="scrollbar-hide flex h-48 w-full flex-col gap-2 overflow-y-auto rounded border border-gray-800">
                 <div className="flex-1">
