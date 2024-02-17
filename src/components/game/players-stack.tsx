@@ -126,13 +126,13 @@ const Item = ({ subscriber, user, close, active, onBan }: ItemProps) => {
         }
       }}
     >
-      <button
+      <span
         className={`${
           active ? "opacity-75" : ""
         } group flex w-full items-center rounded-md p-4 text-sm ring-2 ring-white ring-opacity-5`}
       >
         Exclure {user.name}
-      </button>
+      </span>
     </ConfirmationModal>
   );
 };
