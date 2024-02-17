@@ -290,7 +290,7 @@ const PlaylistEdit = () => {
           <input
             onChange={(e) => onSearch(e.target.value)}
             id="playlist-name"
-            className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+            className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
           />
         </div>
         <div className="p-4">
@@ -400,7 +400,7 @@ const PlaylistEdit = () => {
                   id={f0rm.fields.name().name()}
                   name={f0rm.fields.name().name()}
                   data-error={!!f0rm.errors.name().errors()?.length}
-                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 data-[error=true]:border-red-500"
+                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 data-[error=true]:border-red-500"
                 />
               </div>
               <div>
@@ -413,7 +413,7 @@ const PlaylistEdit = () => {
                 <input
                   id={f0rm.fields.description().name()}
                   name={f0rm.fields.description().name()}
-                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                  className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
             </form>

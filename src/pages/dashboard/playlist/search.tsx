@@ -51,7 +51,7 @@ const PlaylistSearch: NextPageWithAuth & NextPageWithTitle = () => {
             ref={searchRef}
             onChange={(e) => onSearch(e.target.value)}
             id="playlist-name"
-            className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+            className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
           />
         </div>
         <div className="flex flex-wrap gap-4 px-28">

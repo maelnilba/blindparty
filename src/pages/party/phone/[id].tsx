@@ -3,7 +3,6 @@ import { Modal } from "@components/elements/modal";
 import { AuthGuard } from "@components/layout/auth";
 import { TRACK_TIMER_MS } from "@components/party/constants";
 import { PlayerStatusTile } from "@components/party/player-tile";
-import { useMicroPermission } from "@hooks/helpers/useMicroPermission";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
@@ -23,7 +22,14 @@ import { useEffect, useMemo, useState } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import { z } from "zod";
 import { exclude } from "..";
+import { useF0rm } from "modules/f0rm";
+import { useSubmit } from "@hooks/form/useSubmit";
+
+const guessSchema = z.object({
+  guess: z.string().min(1),
+});
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -179,7 +185,6 @@ const Party: NextPage<
   const [isJoined, setIsJoined] = useState(false);
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
-  const [guesses, setGuesses] = useState<string[]>([]);
 
   const { send, bind, members, unbind_all, me } = prpc.game.useConnect(
     party.id,
@@ -240,13 +245,11 @@ const Party: NextPage<
       });
 
       bind("round", async () => {
-        setGuesses([]);
         await sleep(TRACK_TIMER_MS);
         setView("GUESS");
       });
 
       bind("guess", () => {
-        setGuesses([]);
         setView("SCORE");
       });
 
@@ -278,7 +281,6 @@ const Party: NextPage<
   );
 
   const guess = (word: string) => {
-    setGuesses((g) => [...g, word]);
     send("guess", { guess: word.trim().toLocaleLowerCase() });
   };
 
@@ -287,29 +289,19 @@ const Party: NextPage<
     setIsJoined((j) => !j);
   };
 
-  const micro = useMicroPermission();
-  const { finalTranscript, resetTranscript } = useSpeechRecognition();
-
-  const listenContinuously = async () => {
-    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-      return null;
-    }
-
-    if (!SpeechRecognition.browserSupportsSpeechRecognition()) {
-      console.warn(
-        "Your browser does not support speech recognition software! Try Chrome desktop, maybe?"
-      );
-      return;
-    }
-    await SpeechRecognition.startListening({
-      continuous: true,
-      language: language,
-    });
-  };
+  const { finalTranscript, isMicrophoneAvailable } = useSpeechRecognition();
 
   useEffect(() => {
     if (game === "RUNNING" && view === "GUESS") {
-      listenContinuously();
+      if (!SpeechRecognition.browserSupportsSpeechRecognition())
+        console.warn(
+          "Your browser does not support speech recognition software! Try Chrome desktop, maybe?"
+        );
+      else
+        SpeechRecognition.startListening({
+          continuous: true,
+          language: language,
+        });
     }
 
     return () => {
@@ -361,13 +353,20 @@ const Party: NextPage<
     }));
   }, [party, members, joineds]);
 
+  const { submitPreventDefault } = useSubmit<typeof guessSchema>(async (e) => {
+    if (!e.success) return;
+    guess(e.data.guess);
+  });
+
+  const f0rm = useF0rm(guessSchema, submitPreventDefault);
+
   return (
     <div className="flex flex-1 items-center justify-center gap-4 p-4">
       {game === "PENDING" && (
         <>
           <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
             <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-              {!micro || micro !== "granted" ? (
+              {!isMicrophoneAvailable ? (
                 <Modal title="Activer votre micro" className="w-full">
                   <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                     Rejoindre la partie
@@ -426,45 +425,18 @@ const Party: NextPage<
       {game === "RUNNING" && (
         <>
           <div className="flex flex-1 flex-col items-center justify-center gap-4 pb-20">
-            <form
-              onSubmit={(e) => {
-                e.preventDefault();
-                const target = (e.target as HTMLFormElement).elements.namedItem(
-                  "guess"
-                ) as HTMLInputElement;
-                if (target.value) {
-                  guess(target.value);
-                  target.value = "";
-                }
-              }}
-            >
+            <form onSubmit={f0rm.form.submit}>
               <input
                 disabled={view === "SCORE"}
                 type="text"
-                name="guess"
+                name={f0rm.fields.guess().name()}
                 placeholder="Michael Jackson"
-                className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
+                className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
               />
             </form>
             <div className="fixed bottom-0 w-full p-2 pb-0">
               <div className="scrollbar-hide flex h-48 w-full flex-col gap-2 overflow-y-auto rounded border border-gray-800">
-                <div className="flex-1">
-                  {guesses
-                    .filter((g) => Boolean(g))
-                    .reverse()
-                    .map((guess, idx) => (
-                      <div
-                        key={idx}
-                        className="flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5"
-                      >
-                        <div className="inline-block w-3/4">
-                          <span className="block overflow-hidden truncate text-ellipsis">
-                            {guess}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
+                <div className="flex-1">//</div>
               </div>
             </div>
           </div>

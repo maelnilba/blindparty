@@ -64,7 +64,7 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
                 <input
                   onChange={(e) => onSearch(e.target.value)}
                   id="search"
-                  className="block w-full rounded-lg border border-gray-800 bg-transparent p-2.5 text-sm text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
+                  className="block w-full rounded-lg border border-gray-800 bg-transparent p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                 />
               </div>
               <div className="flex-1">
