@@ -185,6 +185,7 @@ const Party: NextPage<
   const [isJoined, setIsJoined] = useState(false);
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
+  const [voiceDetection, setVoiceDetection] = useState(1);
 
   const { send, bind, members, unbind_all, me } = prpc.game.useConnect(
     party.id,
@@ -280,16 +281,17 @@ const Party: NextPage<
     [game, isJoined]
   );
 
-  const guess = (word: string) => {
-    send("guess", { guess: word.trim().toLocaleLowerCase() });
-  };
-
   const join = () => {
     send("join", { joined: !isJoined });
     setIsJoined((j) => !j);
   };
 
-  const { finalTranscript, isMicrophoneAvailable } = useSpeechRecognition();
+  const {
+    finalTranscript,
+    interimTranscript,
+    isMicrophoneAvailable,
+    resetTranscript,
+  } = useSpeechRecognition();
 
   useEffect(() => {
     if (game === "RUNNING" && view === "GUESS") {
@@ -311,7 +313,8 @@ const Party: NextPage<
 
   useEffect(() => {
     if (view === "GUESS") {
-      guess(finalTranscript);
+      send("guess", { guess: finalTranscript.trim().toLocaleLowerCase() });
+      resetTranscript();
     }
   }, [finalTranscript]);
 
@@ -355,7 +358,7 @@ const Party: NextPage<
 
   const { submitPreventDefault } = useSubmit<typeof guessSchema>(async (e) => {
     if (!e.success) return;
-    guess(e.data.guess);
+    send("guess", { guess: e.data.guess.trim().toLocaleLowerCase() });
   });
 
   const f0rm = useF0rm(guessSchema, submitPreventDefault);
@@ -425,20 +428,28 @@ const Party: NextPage<
       {game === "RUNNING" && (
         <>
           <div className="flex flex-1 flex-col items-center justify-center gap-4 pb-20">
-            <form onSubmit={f0rm.form.submit}>
-              <input
-                disabled={view === "SCORE"}
-                type="text"
-                name={f0rm.fields.guess().name()}
-                placeholder="Michael Jackson"
-                className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
-              />
-            </form>
-            <div className="fixed bottom-0 w-full p-2 pb-0">
-              <div className="scrollbar-hide flex h-48 w-full flex-col gap-2 overflow-y-auto rounded border border-gray-800">
-                <div className="flex-1">//</div>
-              </div>
-            </div>
+            {voiceDetection && isMicrophoneAvailable ? (
+              <span>
+                {finalTranscript ? (
+                  <span>{finalTranscript}</span>
+                ) : (
+                  <span>
+                    {interimTranscript}
+                    <span className="animate-pulse">...</span>
+                  </span>
+                )}
+              </span>
+            ) : (
+              <form onSubmit={f0rm.form.submit}>
+                <input
+                  disabled={view === "SCORE"}
+                  type="text"
+                  name={f0rm.fields.guess().name()}
+                  placeholder="Michael Jackson"
+                  className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
+                />
+              </form>
+            )}
           </div>
         </>
       )}
