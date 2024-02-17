@@ -23,6 +23,7 @@ import { NextPageWithLayout, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { Fragment, useRef, useState } from "react";
 import { z } from "zod";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -220,6 +221,8 @@ const PlaylistCreate = () => {
 
   const f0rm = useF0rm(createSchema, submitPreventDefault);
 
+  const [autoAnimateRef] = useAutoAnimate();
+
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2">
       <div className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto px-4 pb-24">
@@ -385,7 +388,7 @@ const PlaylistCreate = () => {
             </button>
           </div>
         </Modal>
-        <div className="flex flex-1 flex-col gap-2 p-4">
+        <div className="flex flex-1 flex-col gap-2 p-4" ref={autoAnimateRef}>
           {!tracksMap.size && (
             <ErrorMessages errors={f0rm.errors.tracks().errors()} />
           )}

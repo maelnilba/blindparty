@@ -13,6 +13,7 @@ import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { z } from "zod";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const createSchema = z
   .object({
@@ -130,6 +131,9 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
 
   const f0rm = useF0rm(createSchema, submitPreventDefault);
 
+  const [autoAnimatePlaylistRef] = useAutoAnimate();
+  const [autoAnimateFriendRef] = useAutoAnimate();
+
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 p-4">
       <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800">
@@ -205,7 +209,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
           <div className="">
             <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto">
               <Tab.Group defaultIndex={0}>
-                <Tab.List className="absolute top-0 flex w-full gap-2 bg-black/10 px-6 py-2 backdrop-blur-sm">
+                <Tab.List className="absolute top-0 z-10 flex w-full gap-2 bg-black/10 px-6 py-2 backdrop-blur-sm">
                   {({ selectedIndex }) => (
                     <div className="flex flex-1 justify-evenly gap-2 rounded-full ring-2 ring-white ring-opacity-5">
                       <input
@@ -239,7 +243,11 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                   )}
                 </Tab.List>
                 <Tab.Panels className="overflow-auto pt-12">
-                  <Tab.Panel className="flex h-20 w-full flex-wrap gap-2 px-6 pt-2">
+                  <Tab.Panel
+                    static
+                    className="hidden h-20 w-full flex-wrap gap-2 px-6 pt-2 data-[headlessui-state=selected]:flex"
+                    ref={autoAnimateFriendRef}
+                  >
                     <div className="-my-2 flex h-fit w-full flex-col">
                       <ErrorMessages errors={f0rm.errors.friends().errors()} />
                     </div>
@@ -272,7 +280,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
             </div>
             <div className="scrollbar-hide relative flex flex-1 flex-col overflow-y-auto">
               <Tab.Group defaultIndex={0}>
-                <Tab.List className="absolute top-0 flex w-full gap-2 bg-black/10 px-6 py-2 backdrop-blur-sm">
+                <Tab.List className="absolute top-0 z-10 flex w-full gap-2 bg-black/10 px-6 py-2 backdrop-blur-sm">
                   {({ selectedIndex }) => (
                     <div className="flex flex-1 justify-evenly gap-2 rounded-full ring-2 ring-white ring-opacity-5">
                       <input
@@ -306,7 +314,11 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
                   )}
                 </Tab.List>
                 <Tab.Panels className="overflow-auto pt-12">
-                  <Tab.Panel className="flex h-44 w-full flex-col justify-start px-4 pt-2">
+                  <Tab.Panel
+                    static
+                    className="hidden h-44 w-full flex-col justify-start px-4 pt-2 data-[headlessui-state=selected]:flex"
+                    ref={autoAnimatePlaylistRef}
+                  >
                     <ErrorMessages errors={f0rm.errors.playlists().errors()} />
                     {[...selectedsPlaylist.values()].map((playlist, index) => (
                       <div key={playlist.id} className="cursor-pointer">

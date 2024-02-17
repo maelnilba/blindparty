@@ -23,6 +23,8 @@ import { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 import { useF0rm } from "modules/f0rm";
 import { ExclamationIcon } from "@components/icons/exclamation";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import { ErrorMessages } from "@components/elements/error";
 
 const createSchema = z.object({
   name: z.string().min(1),
@@ -214,6 +216,8 @@ const PlaylistCreate = () => {
 
   const f0rm = useF0rm(createSchema, submitPreventDefault);
 
+  const [autoAnimateRef] = useAutoAnimate();
+
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 overflow-y-hidden">
       <div className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto p-4 pb-24 pt-20">
@@ -368,20 +372,10 @@ const PlaylistCreate = () => {
             </button>
           </div>
         </Modal>
-        <div className="flex flex-1 flex-col gap-2 p-4">
-          {!tracksMap.size &&
-            f0rm.errors
-              .tracks()
-              .errors()
-              ?.map((error, index) => (
-                <div
-                  key={index}
-                  className="mx-auto flex select-none flex-row gap-2 text-center text-red-500"
-                >
-                  <ExclamationIcon className="h-4 w-4" />
-                  <span className="text-xs font-normal">{error.message}</span>
-                </div>
-              ))}
+        <div className="flex flex-1 flex-col gap-2 p-4" ref={autoAnimateRef}>
+          {!tracksMap.size && (
+            <ErrorMessages errors={f0rm.errors.tracks().errors()} />
+          )}
           {[...tracksMap].map(([_, track], index) => (
             <Fragment key={track.id}>
               <input

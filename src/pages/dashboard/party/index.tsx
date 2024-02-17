@@ -1,5 +1,6 @@
 import { AuthGuardUser } from "@components/layout/auth";
 import { PartyCard } from "@components/party/party-card";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { api } from "@utils/api";
 import { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
@@ -22,8 +23,10 @@ const Party: NextPageWithAuth & NextPageWithTitle = () => {
     },
   });
 
+  const [autoAnimateRef] = useAutoAnimate();
+
   return (
-    <div className="flex flex-wrap gap-4 p-4 px-28">
+    <div className="flex flex-wrap gap-4 p-4 px-28" ref={autoAnimateRef}>
       <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">
         <>
           <Link

@@ -13,6 +13,7 @@
     "dev:time": "ts-node devtime/index.ts run"
   },
   "dependencies": {
+    "@formkit/auto-animate": "^0.8.1",
     "@headlessui/react": "^1.7.18",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@prisma/client": "^4.13.0",

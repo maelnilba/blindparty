@@ -7,6 +7,7 @@ import { api, RouterOutputs } from "@utils/api";
 import { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const providersCanTrackApi: ProvidersCanTrackApi = [
   "spotify",
@@ -30,20 +31,10 @@ const Playlists: NextPageWithAuth & NextPageWithTitle = () => {
     },
   });
 
-  const deletePlaylist = (
-    playlist: RouterOutputs["playlist"]["get_all"][number]
-  ) => {
-    erase({ id: playlist.id });
-  };
-
-  const disconnectPlaylist = (
-    playlist: RouterOutputs["playlist"]["get_all"][number]
-  ) => {
-    disconnect({ id: playlist.id });
-  };
+  const [autoAnimateRef] = useAutoAnimate();
 
   return (
-    <div className="flex flex-wrap gap-4 p-4 px-28">
+    <div className="flex flex-wrap gap-4 p-4 px-28" ref={autoAnimateRef}>
       <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">
         <>
           {canTrackApi ? (
@@ -83,8 +74,8 @@ const Playlists: NextPageWithAuth & NextPageWithTitle = () => {
         <PlaylistCard
           key={playlist.id}
           playlist={playlist}
-          onDelete={deletePlaylist}
-          onDisconnect={disconnectPlaylist}
+          onDelete={(playlist) => erase({ id: playlist.id })}
+          onDisconnect={(playlist) => disconnect({ id: playlist.id })}
         />
       ))}
     </div>

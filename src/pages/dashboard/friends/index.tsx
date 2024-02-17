@@ -13,6 +13,7 @@ import { useDebounce } from "@hooks/helpers/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { useSession } from "next-auth/react";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const Friends: NextPageWithAuth & NextPageWithTitle = () => {
   const { data: session } = useSession();
@@ -48,6 +49,9 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
     onSuccess: () => refetch_friends(),
   });
 
+  const [autoAnimateFriendsRef] = useAutoAnimate();
+  const [autoAnimateInvitationsRef] = useAutoAnimate();
+
   return (
     <div className="scrollbar-hide flex flex-1 gap-4 p-4">
       <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800">
@@ -79,7 +83,7 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
             </div>
           </Modal>
         </div>
-        <div className="flex-1 p-2">
+        <div className="flex-1 p-2" ref={autoAnimateFriendsRef}>
           {friends?.map((friend) => (
             <FriendBanner
               key={friend.id}
@@ -95,7 +99,7 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
             Mes invitations
           </div>
         </div>
-        <div className="flex-1 p-2">
+        <div className="flex-1 p-2" ref={autoAnimateInvitationsRef}>
           {session?.user && session.user.id && (
             <>
               {invitations?.map((invitation) => (

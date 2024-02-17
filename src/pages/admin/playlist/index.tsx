@@ -1,5 +1,6 @@
 import { AuthGuardAdmin } from "@components/layout/auth";
 import { PlaylistCard } from "@components/playlist/playlist-card";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { api, RouterOutputs } from "@utils/api";
 import { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
@@ -11,13 +12,11 @@ const Playlists: NextPageWithAuth & NextPageWithTitle = () => {
       refetch();
     },
   });
-  const deletePlaylist = (
-    playlist: RouterOutputs["admin"]["playlist"]["get_all"][number]
-  ) => {
-    erase({ id: playlist.id });
-  };
+
+  const [autoAnimateRef] = useAutoAnimate();
+
   return (
-    <div className="flex flex-wrap gap-4 p-4 px-28">
+    <div className="flex flex-wrap gap-4 p-4 px-28" ref={autoAnimateRef}>
       <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">
         <Link
           href="/admin/playlist/create"
@@ -30,7 +29,7 @@ const Playlists: NextPageWithAuth & NextPageWithTitle = () => {
         <PlaylistCard
           key={playlist.id}
           playlist={playlist}
-          onDelete={deletePlaylist}
+          onDelete={(playlist) => erase({ id: playlist.id })}
         />
       ))}
     </div>

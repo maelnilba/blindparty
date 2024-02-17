@@ -433,9 +433,9 @@ export const playlistRouter = createTRPCRouter({
     }),
 
   get_public: protectedProcedure
-    .input(z.object({ field: z.string() }).optional())
-    .mutation(async ({ ctx, input }) => {
-      return input?.field
+    .input(z.object({ field: z.string() }))
+    .query(async ({ ctx, input }) => {
+      return input.field
         ? (
             await ctx.prisma.playlist.findMany({
               where: {

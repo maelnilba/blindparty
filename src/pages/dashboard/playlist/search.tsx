@@ -1,44 +1,31 @@
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
 import { TrackBanner } from "@components/playlist/track-banner";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import type { NextPageWithAuth } from "next";
 import { NextPageWithTitle } from "next";
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useState } from "react";
 
 const PlaylistSearch: NextPageWithAuth & NextPageWithTitle = () => {
-  const searchRef = useRef<HTMLInputElement | null>(null);
-  const { data: playlists, mutate: search } =
-    api.playlist.get_public.useMutation();
+  const [search, setSearch] = useState("");
+  const { data: playlists, refetch } = api.playlist.get_public.useQuery({
+    field: search,
+  });
 
   const { mutate: connect } = api.playlist.connect_playlist.useMutation({
     onSuccess: () => {
-      if (searchRef.current) {
-        searchRef.current.value
-          ? search({ field: searchRef.current.value })
-          : search();
-      }
+      refetch();
     },
   });
-  useEffect(() => {
-    search();
-  }, []);
 
   const onSearch = useDebounce((field: string) => {
-    field
-      ? search({
-          field: field,
-        })
-      : search();
+    setSearch(field);
   });
 
-  const addPlaylist = (
-    playlist: RouterOutputs["playlist"]["get_public"][number]
-  ) => {
-    connect({ id: playlist.id });
-  };
+  const [autoAnimateRef] = useAutoAnimate();
 
   return (
     <div className="flex flex-row gap-2">
@@ -48,18 +35,17 @@ const PlaylistSearch: NextPageWithAuth & NextPageWithTitle = () => {
             Rechercher une playlist
           </label>
           <input
-            ref={searchRef}
             onChange={(e) => onSearch(e.target.value)}
             id="playlist-name"
             className="block w-full rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
           />
         </div>
-        <div className="flex flex-wrap gap-4 px-28">
+        <div className="flex flex-wrap gap-4 px-28" ref={autoAnimateRef}>
           {playlists?.map((playlist) => (
             <PlaylistCard
               key={playlist.id}
               playlist={playlist}
-              onAdd={addPlaylist}
+              onAdd={(playlist) => connect({ id: playlist.id })}
             />
           ))}
         </div>
