@@ -97,6 +97,7 @@ export const Tooltip = (props: TooltipProps) => {
           onMouseLeave={() => onHover(open, "onMouseLeave")}
         >
           <Popover.Button
+            // @ts-ignore
             ref={buttonRef}
             onClick={() => handleClick(open)}
             style={{ ...bProps?.style, outline: "none" }}
@@ -113,7 +114,7 @@ export const Tooltip = (props: TooltipProps) => {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel static className="z-100 relative">
+            <Popover.Panel static className="relative z-100">
               {content}
             </Popover.Panel>
           </Transition>
