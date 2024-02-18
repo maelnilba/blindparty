@@ -389,22 +389,24 @@ const Party: NextPage<
                   <Modal.Trigger className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                     Rejoindre la partie
                   </Modal.Trigger>
-                  <div className="flex flex-col gap-2">
-                    <p>
-                      Pour que votre télèphone joue le rôle de recepteur, la
-                      permission d'accèder à votre microphone est requis
-                    </p>
-                    <p>
-                      Si l'activation ne fonctionne pas, verifier les
-                      paramètrages de votre télèphone
-                    </p>
-                    <button
-                      onClick={activation}
-                      className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-                    >
-                      Activer
-                    </button>
-                  </div>
+                  <Modal.Content>
+                    <div className="flex flex-col gap-2">
+                      <p>
+                        Pour que votre télèphone joue le rôle de recepteur, la
+                        permission d'accèder à votre microphone est requis
+                      </p>
+                      <p>
+                        Si l'activation ne fonctionne pas, verifier les
+                        paramètrages de votre télèphone
+                      </p>
+                      <Modal.Close
+                        onClick={activation}
+                        className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                      >
+                        Activer
+                      </Modal.Close>
+                    </div>
+                  </Modal.Content>
                 </Modal.Root>
               ) : (
                 <button

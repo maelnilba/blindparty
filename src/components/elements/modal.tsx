@@ -118,8 +118,23 @@ Modal.Trigger = ({ children, onClick, ...props }: ComponentProps<"button">) => {
   return (
     <button
       onClick={(e) => {
-        open();
         onClick?.(e);
+        open();
+      }}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+Modal.Close = ({ children, onClick, ...props }: ComponentProps<"button">) => {
+  const { close } = useModal();
+  return (
+    <button
+      onClick={(e) => {
+        onClick?.(e);
+        close();
       }}
       {...props}
     >

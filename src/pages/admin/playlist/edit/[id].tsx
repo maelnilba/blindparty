@@ -85,20 +85,13 @@ const PlaylistEdit = () => {
 
   const modal = useRef<ModalRef>(null);
   const currentRemoveTrack = useRef<Track>();
-  const openModal = () => {
-    if (modal.current) modal.current.open();
-  };
-  const closeModal = () => {
-    if (modal.current) modal.current.close();
-    currentRemoveTrack.current = undefined;
-  };
 
   const handleRemoveTrack = useCountCallback(
     { at: 15, reset: 60000 },
     removeTrack,
     (track) => {
       currentRemoveTrack.current = track;
-      openModal();
+      if (modal.current) modal.current.open();
     },
     [tracks]
   );
@@ -425,27 +418,23 @@ const PlaylistEdit = () => {
           <Modal.Content>
             <p>Souhaitez vous retirer toutes les tracks de la playlist ?</p>
             <div className="mt-4 flex flex-row justify-end gap-2">
-              <button
+              <Modal.Close
                 type="button"
                 className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
                 onClick={() => {
                   if (currentRemoveTrack.current)
                     removeTrack(currentRemoveTrack.current);
-                  closeModal();
                 }}
               >
                 Retirer
-              </button>
-              <button
+              </Modal.Close>
+              <Modal.Close
                 type="button"
                 className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-                onClick={() => {
-                  resetTracks();
-                  closeModal();
-                }}
+                onClick={resetTracks}
               >
                 Retirer tout
-              </button>
+              </Modal.Close>
             </div>
           </Modal.Content>
         </Modal.Root>
