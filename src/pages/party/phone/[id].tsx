@@ -382,10 +382,10 @@ const Party: NextPage<
           <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
             <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
               {!isMicrophoneAvailable ? (
-                <Modal title="Activer votre micro" className="w-full">
-                  <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+                <Modal.Root title="Activer votre micro" className="w-full">
+                  <Modal.Button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                     Rejoindre la partie
-                  </button>
+                  </Modal.Button>
                   <div className="flex flex-col gap-2">
                     <p>
                       Pour que votre télèphone joue le rôle de recepteur, la
@@ -402,7 +402,7 @@ const Party: NextPage<
                       Activer
                     </button>
                   </div>
-                </Modal>
+                </Modal.Root>
               ) : (
                 <button
                   onClick={join}

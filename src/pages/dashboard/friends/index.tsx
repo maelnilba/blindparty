@@ -56,32 +56,34 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
     <div className="scrollbar-hide flex flex-1 gap-4 p-4">
       <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
-          <Modal>
-            <button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+          <Modal.Root>
+            <Modal.Button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
               Rechercher des amis
-            </button>
-            <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
-              <label htmlFor="search" className="font-semibold">
-                Rechercher un utilisateur
-              </label>
-              <div className="sticky top-0 flex flex-col gap-2 font-semibold backdrop-blur-sm">
-                <input
-                  onChange={(e) => onSearch(e.target.value)}
-                  id="search"
-                  className="block w-full rounded-lg border border-gray-800 bg-transparent p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
-                />
-              </div>
-              <div className="flex-1">
-                {users?.map((user) => (
-                  <UserBanner
-                    key={user.id}
-                    user={user}
-                    onAdd={sendInvitation}
+            </Modal.Button>
+            <Modal.Content>
+              <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
+                <label htmlFor="search" className="font-semibold">
+                  Rechercher un utilisateur
+                </label>
+                <div className="sticky top-0 flex flex-col gap-2 font-semibold backdrop-blur-sm">
+                  <input
+                    onChange={(e) => onSearch(e.target.value)}
+                    id="search"
+                    className="block w-full rounded-lg border border-gray-800 bg-transparent p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500"
                   />
-                ))}
+                </div>
+                <div className="flex-1">
+                  {users?.map((user) => (
+                    <UserBanner
+                      key={user.id}
+                      user={user}
+                      onAdd={sendInvitation}
+                    />
+                  ))}
+                </div>
               </div>
-            </div>
-          </Modal>
+            </Modal.Content>
+          </Modal.Root>
         </div>
         <div className="flex-1 p-2" ref={autoAnimateFriendsRef}>
           {friends?.map((friend) => (

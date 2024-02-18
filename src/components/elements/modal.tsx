@@ -2,14 +2,18 @@ import { Dialog, Transition } from "@headlessui/react";
 import { noop } from "helpers/noop";
 import {
   Children,
+  ComponentProps,
   Fragment,
   ReactNode,
+  createContext,
   forwardRef,
   isValidElement,
+  useContext,
   useImperativeHandle,
   useState,
 } from "react";
-import type { Element } from "./types";
+
+export const Modal = () => {};
 
 type ModalProps = {
   defaultOpen?: boolean;
@@ -29,25 +33,24 @@ export type ModalRef = {
   close: () => void;
 };
 
-export const Modal = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
+const Context = createContext<ModalRef>({ open() {}, close() {} });
+
+Modal.Root = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
   const { defaultOpen = false, title, closeOnOutside = true } = props;
   let [isOpen, setIsOpen] = useState(defaultOpen);
 
-  const [button, content] = Children.toArray(props.children).reduce<
-    [Element | null | undefined, Element[]]
-  >(
-    (prev, child) => {
-      if (isValidElement(child)) {
-        if (child.type === "button") {
-          prev[0] = child;
-        } else {
-          prev[1].push(child);
-        }
-      }
-      return prev;
-    },
-    [null, []]
-  );
+  const button = Children.map(props.children, (child) =>
+    isValidElement(child) && child.type === Modal.Button ? child : null
+  )
+    ?.filter(Boolean)
+    .at(0);
+
+  const content = Children.map(props.children, (child) =>
+    isValidElement(child) && child.type === Modal.Content ? child : null
+  )
+    ?.filter(Boolean)
+    .at(0);
+
   function closeModal() {
     setIsOpen(false);
   }
@@ -66,19 +69,8 @@ export const Modal = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
   );
 
   return (
-    <>
-      {button && (
-        <div
-          onClickCapture={(e) => {
-            e.stopPropagation();
-            openModal();
-          }}
-          className={props.className}
-        >
-          {button}
-        </div>
-      )}
-
+    <Context.Provider value={{ open: openModal, close: closeModal }}>
+      {button}
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog
           as="div"
@@ -117,7 +109,7 @@ export const Modal = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
                   >
                     <span className="block truncate text-ellipsis">
                       {title}
-                    </span>{" "}
+                    </span>
                   </Dialog.Title>
                   {content}
                 </Dialog.Panel>
@@ -126,6 +118,34 @@ export const Modal = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
           </div>
         </Dialog>
       </Transition>
-    </>
+    </Context.Provider>
   );
 });
+
+Modal.Button = ({ children, onClick, ...props }: ComponentProps<"button">) => {
+  const { open } = useModal();
+  return (
+    <button
+      onClick={(e) => {
+        open();
+        onClick?.(e);
+      }}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
+
+Modal.Content = ({ children }: { children: ReactNode }) => {
+  return <>{children}</>;
+};
+
+export function useModal() {
+  const context = useContext(Context);
+
+  if (context === undefined) {
+    throw new Error(`useModal must be used within a Modal.Root.`);
+  }
+  return context;
+}

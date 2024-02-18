@@ -401,37 +401,34 @@ const PlaylistEdit = () => {
             </form>
           </div>
         </div>
-        <Modal
-          ref={modal}
-          title="Retirer tout"
-          className="w-full"
-          closeOnOutside={false}
-        >
-          <p>Souhaitez vous retirer toutes les tracks de la playlist ?</p>
-          <div className="mt-4 flex flex-row justify-end gap-2">
-            <button
-              type="button"
-              className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-              onClick={() => {
-                if (currentRemoveTrack.current)
-                  removeTrack(currentRemoveTrack.current);
-                closeModal();
-              }}
-            >
-              Retirer
-            </button>
-            <button
-              type="button"
-              className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-              onClick={() => {
-                resetTracks();
-                closeModal();
-              }}
-            >
-              Retirer tout
-            </button>
-          </div>
-        </Modal>
+        <Modal.Root ref={modal} title="Retirer tout" closeOnOutside={false}>
+          <Modal.Content>
+            <p>Souhaitez vous retirer toutes les tracks de la playlist ?</p>
+            <div className="mt-4 flex flex-row justify-end gap-2">
+              <button
+                type="button"
+                className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                onClick={() => {
+                  if (currentRemoveTrack.current)
+                    removeTrack(currentRemoveTrack.current);
+                  closeModal();
+                }}
+              >
+                Retirer
+              </button>
+              <button
+                type="button"
+                className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                onClick={() => {
+                  resetTracks();
+                  closeModal();
+                }}
+              >
+                Retirer tout
+              </button>
+            </div>
+          </Modal.Content>
+        </Modal.Root>
         <div className="flex flex-1 flex-col gap-2 p-4" ref={autoAnimateRef}>
           {!tracksMap.size && (
             <ErrorMessages errors={f0rm.errors.tracks().errors()} />
