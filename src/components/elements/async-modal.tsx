@@ -34,22 +34,16 @@ AsyncModal.Root = forwardRef<AsyncModalRef, AsyncModalProps>(
     let [isOpen, setIsOpen] = useState(false);
 
     const button = Children.map(props.children, (child) =>
-      isValidElement(child) && child.type === AsyncModal.Trigger ? child : null
-    )
-      ?.filter(Boolean)
-      .at(0);
+      isValidElement(child) && child.type === AsyncModal.Trigger ? child : false
+    );
 
     const content = Children.map(props.children, (child) =>
-      isValidElement(child) && child.type === AsyncModal.Content ? child : null
-    )
-      ?.filter(Boolean)
-      .at(0);
+      isValidElement(child) && child.type === AsyncModal.Content ? child : false
+    );
 
     const title = Children.map(props.children, (child) =>
-      isValidElement(child) && child.type === AsyncModal.Title ? child : null
-    )
-      ?.filter(Boolean)
-      .at(0);
+      isValidElement(child) && child.type === AsyncModal.Title ? child : false
+    );
 
     function closeModal() {
       setIsOpen(false);

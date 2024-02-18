@@ -27,17 +27,13 @@ Drawer.Root = ({
   ...props
 }: DrawerProps) => {
   const [open, setOpen] = useState<boolean>(Boolean(defaultOpen));
-  const button = Children.map(children, (child) => {
-    if (isValidElement(child) && child.type === Drawer.Button) return child;
-  })
-    ?.filter(Boolean)
-    .at(0);
+  const button = Children.map(children, (child) =>
+    isValidElement(child) && child.type === Drawer.Button ? child : false
+  );
 
-  const content = Children.map(children, (child) => {
-    if (isValidElement(child) && child.type === Drawer.Content) return child;
-  })
-    ?.filter(Boolean)
-    .at(0);
+  const content = Children.map(children, (child) =>
+    isValidElement(child) && child.type === Drawer.Content ? child : false
+  );
 
   return (
     <Context.Provider value={{ setOpen }}>

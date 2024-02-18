@@ -34,22 +34,16 @@ Modal.Root = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
   let [isOpen, setIsOpen] = useState(defaultOpen);
 
   const button = Children.map(props.children, (child) =>
-    isValidElement(child) && child.type === Modal.Trigger ? child : null
-  )
-    ?.filter(Boolean)
-    .at(0);
+    isValidElement(child) && child.type === Modal.Trigger ? child : false
+  );
 
   const content = Children.map(props.children, (child) =>
-    isValidElement(child) && child.type === Modal.Content ? child : null
-  )
-    ?.filter(Boolean)
-    .at(0);
+    isValidElement(child) && child.type === Modal.Content ? child : false
+  );
 
   const title = Children.map(props.children, (child) =>
-    isValidElement(child) && child.type === Modal.Title ? child : null
-  )
-    ?.filter(Boolean)
-    .at(0);
+    isValidElement(child) && child.type === Modal.Title ? child : false
+  );
 
   function closeModal() {
     setIsOpen(false);
