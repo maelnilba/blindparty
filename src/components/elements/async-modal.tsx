@@ -9,6 +9,7 @@ import {
   forwardRef,
   isValidElement,
   useContext,
+  useImperativeHandle,
   useState,
 } from "react";
 
@@ -16,14 +17,8 @@ export const AsyncModal = () => {};
 
 type AsyncModalProps = {
   children: ReactNode;
-  title?: string;
   beforeOpen: (...args: any) => Promise<any>;
   closeOnOutside?: boolean;
-  options?: Options;
-};
-
-type Options = {
-  titleCenter?: boolean;
 };
 
 export type AsyncModalRef = {
@@ -35,11 +30,11 @@ const Context = createContext<AsyncModalRef>({ open() {}, close() {} });
 
 AsyncModal.Root = forwardRef<AsyncModalRef, AsyncModalProps>(
   (props, forwardRef) => {
-    const { title, closeOnOutside = true } = props;
+    const { closeOnOutside = true } = props;
     let [isOpen, setIsOpen] = useState(false);
 
     const button = Children.map(props.children, (child) =>
-      isValidElement(child) && child.type === AsyncModal.Button ? child : null
+      isValidElement(child) && child.type === AsyncModal.Trigger ? child : null
     )
       ?.filter(Boolean)
       .at(0);
@@ -49,6 +44,13 @@ AsyncModal.Root = forwardRef<AsyncModalRef, AsyncModalProps>(
     )
       ?.filter(Boolean)
       .at(0);
+
+    const title = Children.map(props.children, (child) =>
+      isValidElement(child) && child.type === AsyncModal.Title ? child : null
+    )
+      ?.filter(Boolean)
+      .at(0);
+
     function closeModal() {
       setIsOpen(false);
     }
@@ -56,6 +58,15 @@ AsyncModal.Root = forwardRef<AsyncModalRef, AsyncModalProps>(
     function openModal() {
       props.beforeOpen().then(() => setIsOpen(true));
     }
+
+    useImperativeHandle(
+      forwardRef,
+      () => ({
+        open: openModal,
+        close: closeModal,
+      }),
+      []
+    );
 
     return (
       <Context.Provider value={{ open: openModal, close: closeModal }}>
@@ -90,16 +101,7 @@ AsyncModal.Root = forwardRef<AsyncModalRef, AsyncModalProps>(
                   leaveTo="opacity-0 scale-95 translate-y-4"
                 >
                   <Dialog.Panel className="transform overflow-hidden rounded-2xl border border-gray-800 bg-white/5 p-6 text-left align-middle shadow-xl ring-1 ring-white/5 backdrop-blur-sm transition-all">
-                    <Dialog.Title
-                      as="h3"
-                      className={`mb-2 inline-block w-full max-w-sm text-lg font-medium leading-6 ${
-                        props.options?.titleCenter && "text-center"
-                      }`}
-                    >
-                      <span className="block truncate text-ellipsis">
-                        {title}
-                      </span>
-                    </Dialog.Title>
+                    {title}
                     {content}
                   </Dialog.Panel>
                 </Transition.Child>
@@ -112,7 +114,7 @@ AsyncModal.Root = forwardRef<AsyncModalRef, AsyncModalProps>(
   }
 );
 
-AsyncModal.Button = ({
+AsyncModal.Trigger = ({
   children,
   onClick,
   ...props
@@ -133,6 +135,17 @@ AsyncModal.Button = ({
 
 AsyncModal.Content = ({ children }: { children: ReactNode }) => {
   return <>{children}</>;
+};
+
+AsyncModal.Title = ({
+  children,
+  ...props
+}: ComponentProps<typeof Dialog.Title> & { children: ReactNode }) => {
+  return (
+    <Dialog.Title {...props}>
+      <span className="block truncate text-ellipsis">{children}</span>
+    </Dialog.Title>
+  );
 };
 
 export function useAsyncModal() {

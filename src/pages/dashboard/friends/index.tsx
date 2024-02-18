@@ -57,9 +57,9 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
       <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <Modal.Root>
-            <Modal.Button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+            <Modal.Trigger className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
               Rechercher des amis
-            </Modal.Button>
+            </Modal.Trigger>
             <Modal.Content>
               <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
                 <label htmlFor="search" className="font-semibold">

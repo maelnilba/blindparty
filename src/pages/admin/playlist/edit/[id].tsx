@@ -418,7 +418,10 @@ const PlaylistEdit = () => {
             </form>
           </div>
         </div>
-        <Modal.Root ref={modal} title="Retirer tout" closeOnOutside={false}>
+        <Modal.Root ref={modal} closeOnOutside={false}>
+          <Modal.Title className="mb-2 inline-block w-full max-w-sm text-lg font-medium leading-6">
+            Retirer tout
+          </Modal.Title>
           <Modal.Content>
             <p>Souhaitez vous retirer toutes les tracks de la playlist ?</p>
             <div className="mt-4 flex flex-row justify-end gap-2">

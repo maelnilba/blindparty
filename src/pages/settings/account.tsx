@@ -60,45 +60,47 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
     <div className="flex flex-wrap gap-4 p-4 px-28">
       <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 backdrop-blur-sm">
-          <Modal.Root
-            title="Liste des providers"
-            options={{ titleCenter: true }}
-          >
-            <Modal.Button className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+          <Modal.Root>
+            <Modal.Title className="mb-2 inline-block w-full max-w-sm text-center text-lg font-medium leading-6">
+              Liste des providers
+            </Modal.Title>
+            <Modal.Trigger className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
               Lié un compte
-            </Modal.Button>
-            <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
-              <div className="flex-1 p-2">
-                {allProviders && accounts?.providers && (
-                  <div className="flex flex-col gap-2">
-                    {allProviders
-                      .filter(
-                        (provider) =>
-                          !accounts.providers.includes(
-                            ensureProvider(provider.name.toLocaleLowerCase())
-                          )
-                      )
-                      .map((provider) => (
-                        <ProviderBanner
-                          key={provider.id}
-                          provider={ensureProvider(
-                            provider.name.toLocaleLowerCase()
-                          )}
-                        >
-                          <PlusIcon
-                            onClick={() => {
-                              signIn(provider.id, {
-                                // callbackUrl: "http://localhost:3000/dashboard",
-                              });
-                            }}
-                            className="h-6 w-6 cursor-pointer group-hover:scale-125"
-                          />
-                        </ProviderBanner>
-                      ))}
-                  </div>
-                )}
+            </Modal.Trigger>
+            <Modal.Content>
+              <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
+                <div className="flex-1 p-2">
+                  {allProviders && accounts?.providers && (
+                    <div className="flex flex-col gap-2">
+                      {allProviders
+                        .filter(
+                          (provider) =>
+                            !accounts.providers.includes(
+                              ensureProvider(provider.name.toLocaleLowerCase())
+                            )
+                        )
+                        .map((provider) => (
+                          <ProviderBanner
+                            key={provider.id}
+                            provider={ensureProvider(
+                              provider.name.toLocaleLowerCase()
+                            )}
+                          >
+                            <PlusIcon
+                              onClick={() => {
+                                signIn(provider.id, {
+                                  // callbackUrl: "http://localhost:3000/dashboard",
+                                });
+                              }}
+                              className="h-6 w-6 cursor-pointer group-hover:scale-125"
+                            />
+                          </ProviderBanner>
+                        ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            </Modal.Content>
           </Modal.Root>
         </div>
         <div className="flex flex-1 flex-col gap-2 p-2">

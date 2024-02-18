@@ -18,14 +18,8 @@ export const Modal = () => {};
 type ModalProps = {
   defaultOpen?: boolean;
   children: ReactNode;
-  title?: string;
   className?: string;
   closeOnOutside?: boolean;
-  options?: Options;
-};
-
-type Options = {
-  titleCenter?: boolean;
 };
 
 export type ModalRef = {
@@ -36,17 +30,23 @@ export type ModalRef = {
 const Context = createContext<ModalRef>({ open() {}, close() {} });
 
 Modal.Root = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
-  const { defaultOpen = false, title, closeOnOutside = true } = props;
+  const { defaultOpen = false, closeOnOutside = true } = props;
   let [isOpen, setIsOpen] = useState(defaultOpen);
 
   const button = Children.map(props.children, (child) =>
-    isValidElement(child) && child.type === Modal.Button ? child : null
+    isValidElement(child) && child.type === Modal.Trigger ? child : null
   )
     ?.filter(Boolean)
     .at(0);
 
   const content = Children.map(props.children, (child) =>
     isValidElement(child) && child.type === Modal.Content ? child : null
+  )
+    ?.filter(Boolean)
+    .at(0);
+
+  const title = Children.map(props.children, (child) =>
+    isValidElement(child) && child.type === Modal.Title ? child : null
   )
     ?.filter(Boolean)
     .at(0);
@@ -101,16 +101,7 @@ Modal.Root = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
                 leaveTo="opacity-0 scale-95 translate-y-4"
               >
                 <Dialog.Panel className="transform overflow-hidden rounded-2xl border border-gray-800 bg-white/5 p-6 text-left align-middle shadow-xl ring-1 ring-white/5 backdrop-blur-sm transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className={`mb-2 inline-block w-full max-w-sm text-lg font-medium leading-6 ${
-                      props.options?.titleCenter && "text-center"
-                    }`}
-                  >
-                    <span className="block truncate text-ellipsis">
-                      {title}
-                    </span>
-                  </Dialog.Title>
+                  {title}
                   {content}
                 </Dialog.Panel>
               </Transition.Child>
@@ -122,7 +113,7 @@ Modal.Root = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
   );
 });
 
-Modal.Button = ({ children, onClick, ...props }: ComponentProps<"button">) => {
+Modal.Trigger = ({ children, onClick, ...props }: ComponentProps<"button">) => {
   const { open } = useModal();
   return (
     <button
@@ -139,6 +130,17 @@ Modal.Button = ({ children, onClick, ...props }: ComponentProps<"button">) => {
 
 Modal.Content = ({ children }: { children: ReactNode }) => {
   return <>{children}</>;
+};
+
+Modal.Title = ({
+  children,
+  ...props
+}: ComponentProps<typeof Dialog.Title> & { children: ReactNode }) => {
+  return (
+    <Dialog.Title {...props}>
+      <span className="block truncate text-ellipsis">{children}</span>
+    </Dialog.Title>
+  );
 };
 
 export function useModal() {

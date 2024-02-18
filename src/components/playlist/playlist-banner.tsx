@@ -47,14 +47,13 @@ export const PlaylistBanner = ({
       </div>
 
       {canShow && (
-        <AsyncModal.Root
-          beforeOpen={refetch}
-          title={full_playlist?.name}
-          options={{ titleCenter: true }}
-        >
-          <AsyncModal.Button type="button">
+        <AsyncModal.Root beforeOpen={refetch}>
+          <AsyncModal.Trigger type="button">
             <ExpandIcon className="h-6 w-6 hover:scale-125" />
-          </AsyncModal.Button>
+          </AsyncModal.Trigger>
+          <AsyncModal.Title className="mb-2 inline-block w-full max-w-sm text-center text-lg font-medium leading-6">
+            {full_playlist?.name}
+          </AsyncModal.Title>
           <AsyncModal.Content>
             <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
               <div className="flex flex-1 flex-col gap-2">
