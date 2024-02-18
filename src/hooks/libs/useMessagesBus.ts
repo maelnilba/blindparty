@@ -1,6 +1,6 @@
 import { getBaseUrl } from "helpers/base-url";
 import { useEffect, useRef, useState } from "react";
-import { z, ZodSchema } from "zod";
+import { ZodSchema, z } from "zod";
 
 export function useMessagesBus<
   TMessages extends { [event: string]: ZodSchema }

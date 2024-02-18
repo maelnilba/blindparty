@@ -1,6 +1,6 @@
 import { getQueries } from "helpers/query-validator";
-import { useRouter } from "next/router";
 import ErrorPage from "next/error";
+import { useRouter } from "next/router";
 import {
   Children,
   ComponentProps,

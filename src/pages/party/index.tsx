@@ -1,4 +1,4 @@
-import { AuthGuard, AuthGuardUser } from "@components/layout/auth";
+import { AuthGuard } from "@components/layout/auth";
 import { PartyBanner } from "@components/party/party-banner";
 import { getServerAuthSession } from "@server/auth";
 import { api } from "@utils/api";

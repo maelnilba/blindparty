@@ -1,3 +1,5 @@
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
+import { Modal } from "@components/elements/modal";
 import { FriendBanner } from "@components/friend/friend-banner";
 import { useInvitation } from "@components/friend/useInvitation";
 import { EnvelopeIcon } from "@components/icons/envelope";
@@ -7,13 +9,11 @@ import { UserPlusIcon } from "@components/icons/user-plus";
 import { XMarkIcon } from "@components/icons/x-mark";
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
-import { ConfirmationModal } from "@components/elements/confirmation-modal";
-import { Modal } from "@components/elements/modal";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { api, RouterOutputs } from "@utils/api";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { useSession } from "next-auth/react";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const Friends: NextPageWithAuth & NextPageWithTitle = () => {
   const { data: session } = useSession();

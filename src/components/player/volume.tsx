@@ -1,7 +1,7 @@
 import { Slider, SliderProps } from "@components/elements/slider";
 import { SpeakerIcon } from "@components/icons/speaker";
-import { useClient } from "@hooks/next/useClient";
 import { usePrevious } from "@hooks/helpers/usePrevious";
+import { useClient } from "@hooks/next/useClient";
 import { percent } from "helpers/math";
 import { Noop } from "helpers/noop";
 import { MutableRefObject } from "react";

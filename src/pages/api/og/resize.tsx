@@ -1,7 +1,7 @@
 import { ImageResponse } from "@vercel/og";
+import { createQueryValidator } from "helpers/query-validator";
 import type { NextRequest } from "next/server";
 import { z } from "zod";
-import { createQueryValidator } from "helpers/query-validator";
 
 export const config = {
   runtime: "edge",

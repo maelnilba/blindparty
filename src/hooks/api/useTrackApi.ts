@@ -1,9 +1,9 @@
 import { useStateAsync } from "@hooks/itsfine/useStateAsync";
-import { TrackApi } from "modules/trackapi";
 import type { Provider } from "@server/api/routers/user/tokens";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@utils/api";
-import { useEffect, useRef } from "react";
+import { TrackApi } from "modules/trackapi";
+import { useEffect } from "react";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 

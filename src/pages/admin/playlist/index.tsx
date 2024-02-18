@@ -1,7 +1,7 @@
 import { AuthGuardAdmin } from "@components/layout/auth";
 import { PlaylistCard } from "@components/playlist/playlist-card";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
-import { api, RouterOutputs } from "@utils/api";
+import { api } from "@utils/api";
 import { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
 

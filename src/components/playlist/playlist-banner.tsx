@@ -1,6 +1,6 @@
+import { AsyncModal } from "@components/elements/async-modal";
 import { ExpandIcon } from "@components/icons/expand";
 import { Picture } from "@components/images/picture";
-import { AsyncModal } from "@components/elements/async-modal";
 import { TrackBanner } from "@components/playlist/track-banner";
 import { api, RouterOutputs } from "@utils/api";
 

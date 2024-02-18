@@ -18,6 +18,7 @@ import {
 } from "@components/party/constants";
 import { PlayerStatusTile } from "@components/party/player-tile";
 import { Volume } from "@components/player/volume";
+import { useSet } from "@hooks/helpers/useSet";
 import { useMessagesBus } from "@hooks/libs/useMessagesBus";
 import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
 import { useWindowLocation } from "@hooks/next/useWindowLocation";
@@ -42,7 +43,6 @@ import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
-import { useSet } from "@hooks/helpers/useSet";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);

@@ -21,11 +21,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   };
 }
 const Home: NextPage = () => {
-  return (
-    <div>
-    
-    </div>
-  );
+  return <div></div>;
 };
 
 export default Home;

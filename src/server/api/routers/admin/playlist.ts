@@ -1,9 +1,9 @@
+import { SEPARATOR } from "@server/api/root";
 import { protectedAdminProcedure } from "@server/api/trpc";
 import { TRPCError } from "@trpc/server";
+import { noop } from "helpers/noop";
 import { z } from "zod";
 import { createTRPCRouter } from "../../trpc";
-import { noop } from "helpers/noop";
-import { SEPARATOR } from "@server/api/root";
 
 export const pictureLink = (key: string | undefined) =>
   key

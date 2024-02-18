@@ -1,8 +1,8 @@
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { Picture } from "@components/images/picture";
 import { RouterOutputs } from "@utils/api";
-import { TrackBanner } from "./track-banner";
 import Link from "next/link";
-import { ConfirmationModal } from "@components/elements/confirmation-modal";
+import { TrackBanner } from "./track-banner";
 
 type PlaylistCardProps = {
   playlist: RouterOutputs["admin"]["playlist"]["get_all"][number];
