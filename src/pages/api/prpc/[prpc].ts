@@ -18,6 +18,13 @@ const webhooks = createNextWehbookApiHandler<typeof prpc>({
   },
   presence: async (data, ctx) => {
     if (data.name === "member_removed") {
+      await ctx.prisma.party.updateMany({
+        where: { id: data.channel.id, host: { id: data.user_id } },
+        data: {
+          status: "ENDED",
+        },
+      });
+
       await ctx.prisma.party.update({
         where: {
           id: data.channel.id,

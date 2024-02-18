@@ -292,7 +292,7 @@ export const gameRouter = createTRPCRouter({
       const nameSimilarity = stringSimilarity(input.guess, party.track.name);
       const artistSimilarity = stringSimilarity(
         input.guess,
-        party.track.artists[0]!
+        party.track.artists
       );
       const albumSimilarity = stringSimilarity(input.guess, party.track.album);
 

@@ -42,6 +42,7 @@ import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { z } from "zod";
 import { exclude } from "..";
+import { useSet } from "@hooks/helpers/useSet";
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const id = getQuery(context.query.id);
@@ -179,7 +180,11 @@ const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ party, isHost }) => {
   const router = useRouter();
-  const [joineds, setJoineds] = useState<Set<string>>(new Set());
+  const {
+    set: joineds,
+    add: addJoineds,
+    remove: removeJoineds,
+  } = useSet<string>();
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
 
@@ -260,25 +265,14 @@ const Party: NextPage<
 
       bind("pusher:member_removed", (member) => {
         if ((game === "PENDING" || game === "RUNNING") && !member.info.isHost) {
-          setJoineds((joineds) => {
-            if (joineds.has(member.info.id)) {
-              joineds.delete(member.info.id);
-            }
-            return new Set(joineds);
-          });
+          removeJoineds(member.info.id);
           send("leave", { id: member.info.id });
         }
       });
 
       bind("join", ({ joined, user }) => {
-        setJoineds((joineds) => {
-          if (joined) {
-            joineds.add(user.info.id);
-          } else {
-            joineds.delete(user.info.id);
-          }
-          return new Set(joineds);
-        });
+        if (joined) addJoineds(user.info.id);
+        else removeJoineds(user.info.id);
       });
 
       let ok = true; // avoid calling round multiple time

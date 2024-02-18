@@ -5,8 +5,10 @@ type MapObject = {
   id: string | number;
 };
 
-export function useMap<T extends MapObject>() {
-  const [map, setMap] = useState<Map<MapObject["id"], T>>(new Map());
+export function useMap<T extends MapObject>(
+  initialValue: Map<T["id"], T> = new Map()
+) {
+  const [map, setMap] = useState<Map<T["id"], T>>(initialValue);
 
   const adds = (items: T[]) => {
     setMap((m) => {

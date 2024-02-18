@@ -18,7 +18,7 @@ import type {
 } from "next";
 import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useReducer, useState } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -26,6 +26,7 @@ import { z } from "zod";
 import { exclude } from "..";
 import { useF0rm } from "modules/f0rm";
 import { useSubmit } from "@hooks/form/useSubmit";
+import { useSet } from "@hooks/helpers/useSet";
 
 const guessSchema = z.object({
   guess: z.string().min(1),
@@ -181,11 +182,18 @@ const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ party, language }) => {
   const router = useRouter();
-  const [joineds, setJoineds] = useState<Set<string>>(new Set());
+  const {
+    set: joineds,
+    add: addJoineds,
+    remove: removeJoineds,
+  } = useSet<string>();
   const [isJoined, setIsJoined] = useState(false);
   const [game, setGame] = useState<PartyStatus>(party.status);
   const [view, setView] = useState<PartyViewStatus>(party.view);
-  const [voiceDetection, setVoiceDetection] = useState(1);
+  const [voiceDetection, toggleVoiceDetection] = useReducer(
+    (state) => !state,
+    true
+  );
 
   const { send, bind, members, unbind_all, me } = prpc.game.useConnect(
     party.id,
@@ -213,23 +221,12 @@ const Party: NextPage<
       });
 
       bind("leave", ({ id }) => {
-        setJoineds((joineds) => {
-          if (joineds.has(id)) {
-            joineds.delete(id);
-          }
-          return new Set(joineds);
-        });
+        removeJoineds(id);
       });
 
       bind("join", ({ joined, user }) => {
-        setJoineds((joineds) => {
-          if (joined) {
-            joineds.add(user.info.id);
-          } else {
-            joineds.delete(user.info.id);
-          }
-          return new Set(joineds);
-        });
+        if (joined) addJoineds(user.info.id);
+        else removeJoineds(user.info.id);
       });
 
       bind("start", ({ running }) => {
@@ -364,9 +361,9 @@ const Party: NextPage<
   const f0rm = useF0rm(guessSchema, submitPreventDefault);
 
   return (
-    <div className="flex flex-1 items-center justify-center gap-4 p-4">
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4">
       {game === "PENDING" && (
-        <>
+        <div className="">
           <div className="scrollbar-hide relative flex h-[40rem] w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
             <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
               {!isMicrophoneAvailable ? (
@@ -423,11 +420,11 @@ const Party: NextPage<
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
       {game === "RUNNING" && (
-        <>
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 pb-20">
+        <div className="flex w-full flex-1 flex-col items-center justify-center gap-4 pb-20">
+          <div className="flex w-full flex-1 flex-col items-center justify-center">
             {voiceDetection && isMicrophoneAvailable ? (
               <span>
                 {finalTranscript ? (
@@ -435,23 +432,51 @@ const Party: NextPage<
                 ) : (
                   <span>
                     {interimTranscript}
-                    <span className="animate-pulse">...</span>
+                    <span
+                      data-disabled={view === "SCORE"}
+                      className="animate-pulse data-[disabled=true]:animate-none"
+                    >
+                      ...
+                    </span>
                   </span>
                 )}
               </span>
             ) : (
-              <form onSubmit={f0rm.form.submit}>
+              <form
+                onSubmit={async (e) => {
+                  if (view !== "GUESS") return;
+                  await f0rm.form.submit(e);
+                  const input = (
+                    e.target as HTMLFormElement
+                  ).elements.namedItem(
+                    f0rm.fields.guess().name()
+                  ) as HTMLInputElement;
+
+                  input.value = "";
+                  input.blur();
+                }}
+              >
                 <input
                   disabled={view === "SCORE"}
                   type="text"
                   name={f0rm.fields.guess().name()}
-                  placeholder="Michael Jackson"
                   className="block w-56 rounded-lg border border-gray-800 bg-black p-2.5 text-white focus:border-gray-500 focus:outline-none focus:ring-gray-500 disabled:border-gray-900"
                 />
               </form>
             )}
           </div>
-        </>
+          <div className="item flex flex-col justify-end gap-2">
+            <span className="text-center text-sm font-normal">
+              {voiceDetection ? "Détection vocal" : "Saisie manuelle"}
+            </span>
+            <button
+              onClick={() => toggleVoiceDetection()}
+              className="w-full rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            >
+              Changer de mode
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
