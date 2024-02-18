@@ -2,7 +2,7 @@ import { Divider } from "@components/elements/divider";
 import { Modal } from "@components/elements/modal";
 import { AuthGuard } from "@components/layout/auth";
 import { TRACK_TIMER_MS } from "@components/party/constants";
-import { PlayerStatusTile } from "@components/party/player-tile";
+import { PlayerStatusTile, PlayerTile } from "@components/party/player-tile";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
@@ -27,6 +27,9 @@ import { exclude } from "..";
 import { useF0rm } from "modules/f0rm";
 import { useSubmit } from "@hooks/form/useSubmit";
 import { useSet } from "@hooks/helpers/useSet";
+import { formatPosition } from "@components/party/helpers";
+import { Confetti } from "@components/party/confetti";
+import { signOut, useSession } from "next-auth/react";
 
 const guessSchema = z.object({
   guess: z.string().min(1),
@@ -182,6 +185,8 @@ const Party: NextPage<
   InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ party, language }) => {
   const router = useRouter();
+  const { data: session } = useSession();
+
   const {
     set: joineds,
     add: addJoineds,
@@ -194,6 +199,8 @@ const Party: NextPage<
     (state) => !state,
     true
   );
+
+  const [position, setPosition] = useState<number | undefined>();
 
   const { send, bind, members, unbind_all, me } = prpc.game.useConnect(
     party.id,
@@ -261,7 +268,7 @@ const Party: NextPage<
       });
 
       bind("ban", ({ id }) => {
-        if (id === me?.id) {
+        if (id === me?.info.id) {
           router.push({
             pathname: "/party",
             query: {
@@ -269,6 +276,14 @@ const Party: NextPage<
             },
           });
         }
+      });
+
+      bind("over", ({ scores }) => {
+        setView("NONE");
+        setGame("ENDED");
+        setPosition(
+          scores.findIndex((player) => player.user.id === me?.info.id) + 1
+        );
       });
 
       return () => {
@@ -476,6 +491,36 @@ const Party: NextPage<
               Changer de mode
             </button>
           </div>
+        </div>
+      )}
+      {game === "ENDED" && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-2">
+          {me && position && (
+            <>
+              {position === 1 && <Confetti />}
+              <div className="flex flex-1 flex-col items-center justify-center gap-2">
+                <div className="flex flex-1 flex-col items-center justify-center">
+                  <PlayerTile player={me!.info} className="h-40 w-40" />
+                  <span className="text-lg font-bold">
+                    {formatPosition(position)}
+                  </span>
+                </div>
+                <div className="flex flex-1 flex-col justify-center">
+                  <button
+                    onClick={() => {
+                      if (!session || !session.user) return;
+                      if (session.user.role === "ANON")
+                        signOut({ callbackUrl: "/" });
+                      else router.push("/dashboard");
+                    }}
+                    className="w-full place-self-end justify-self-end rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                  >
+                    Quitter
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

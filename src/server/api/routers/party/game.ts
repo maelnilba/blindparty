@@ -106,9 +106,9 @@ export const gameRouter = createTRPCRouter({
       })
     )
     .trigger(async ({ ctx, input }) => {
-      const [id, user] = Object.entries<{ id: string }>(
-        input.prpc.members
-      ).find(([_, user]) => user.id === input.id) ?? [undefined, undefined];
+      const [_, user] = Object.entries<{ id: string }>(input.prpc.members).find(
+        ([_, user]) => user.id === input.id
+      ) ?? [undefined, undefined];
 
       if (!user) throw new TRPCError({ code: "NOT_FOUND" });
 
@@ -143,6 +143,26 @@ export const gameRouter = createTRPCRouter({
         endedAt: new Date().toISOString(),
       },
     });
+
+    const scores = await ctx.prisma.party.findFirstOrThrow({
+      where: { id: input.prpc.channel_id },
+      select: {
+        players: {
+          include: {
+            user: { select: { id: true, name: true, image: true } },
+          },
+        },
+      },
+    });
+
+    return await ctx.pusher.trigger({
+      scores: scores.players
+        .map((player) => ({
+          user: player.user,
+          points: player.points,
+        }))
+        .sort((a, b) => b.points - a.points),
+    });
   }),
   next: prpc.game.trigger(async ({ ctx, input }) => {
     const track = await ctx.prisma.party.findFirst({
@@ -168,7 +188,7 @@ export const gameRouter = createTRPCRouter({
 
     const trackname = [
       track.track.name,
-      track.track.artists[0],
+      track.track.artists.split(SEPARATOR.PRISMA)[0],
       track.track.album,
     ]
       .filter((v) => Boolean(v))
@@ -214,6 +234,11 @@ export const gameRouter = createTRPCRouter({
               id: true,
             },
           },
+          players: {
+            include: {
+              user: { select: { id: true, name: true, image: true } },
+            },
+          },
         },
       });
 
@@ -225,7 +250,17 @@ export const gameRouter = createTRPCRouter({
           data: { status: "ENDED" },
         });
 
-        await ctx.pusher.trigger({}, "over");
+        await ctx.pusher.trigger(
+          {
+            scores: party.players
+              .map((player) => ({
+                user: player.user,
+                points: player.points,
+              }))
+              .sort((a, b) => b.points - a.points),
+          },
+          "over"
+        );
         throw new TRPCError({ code: "CONFLICT" });
       }
 
@@ -292,7 +327,7 @@ export const gameRouter = createTRPCRouter({
       const nameSimilarity = stringSimilarity(input.guess, party.track.name);
       const artistSimilarity = stringSimilarity(
         input.guess,
-        party.track.artists
+        party.track.artists.split(SEPARATOR.PRISMA)[0]!
       );
       const albumSimilarity = stringSimilarity(input.guess, party.track.album);
 
@@ -349,7 +384,11 @@ export const gameRouter = createTRPCRouter({
 
       return await ctx.pusher.trigger({
         players: points.players,
-        name: [party.track.name, party.track.artists[0], party.track.album]
+        name: [
+          party.track.name,
+          party.track.artists.split(SEPARATOR.PRISMA)[0],
+          party.track.album,
+        ]
           .filter((v) => Boolean(v))
           .join(" - "),
         winner: points.players.find((p) => p.user.id === ctx.session.user.id),

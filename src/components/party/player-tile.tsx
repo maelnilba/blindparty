@@ -1,17 +1,24 @@
 import { Picture } from "@components/images/picture";
 import { Player } from "pages/party/phone/[id]";
+import { ComponentProps } from "react";
 
 type PlayerTileProps = {
   player: Player;
-};
-export const PlayerTile = ({ player }: PlayerTileProps) => {
+} & ComponentProps<"img">;
+export const PlayerTile = ({
+  player,
+  alt,
+  src,
+  className,
+  ...props
+}: PlayerTileProps) => {
   return (
     <div title={player.name ?? ""}>
       <Picture identifier={player.image} className="shrink-0">
         <img
           alt={`playlist picture of ${player.name}`}
           src={player.image!}
-          className="aspect-square h-12 w-12 rounded border-gray-800 object-cover"
+          className={`aspect-square h-12 w-12 rounded border-gray-800 object-cover ${className}`}
         />
       </Picture>
     </div>
