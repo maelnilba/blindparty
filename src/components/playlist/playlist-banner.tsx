@@ -47,22 +47,24 @@ export const PlaylistBanner = ({
       </div>
 
       {canShow && (
-        <AsyncModal
+        <AsyncModal.Root
           beforeOpen={refetch}
           title={full_playlist?.name}
           options={{ titleCenter: true }}
         >
-          <button type="button">
+          <AsyncModal.Button type="button">
             <ExpandIcon className="h-6 w-6 hover:scale-125" />
-          </button>
-          <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
-            <div className="flex flex-1 flex-col gap-2">
-              {full_playlist?.tracks?.map((track) => (
-                <TrackBanner key={track.id} track={track} />
-              ))}
+          </AsyncModal.Button>
+          <AsyncModal.Content>
+            <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
+              <div className="flex flex-1 flex-col gap-2">
+                {full_playlist?.tracks?.map((track) => (
+                  <TrackBanner key={track.id} track={track} />
+                ))}
+              </div>
             </div>
-          </div>
-        </AsyncModal>
+          </AsyncModal.Content>
+        </AsyncModal.Root>
       )}
     </div>
   );
