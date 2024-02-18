@@ -1,13 +1,13 @@
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
-import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { TrackBanner } from "@components/playlist/track-banner";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { type ProvidersCanTrackApi } from "@server/api/routers/user";
 import { api, RouterOutputs } from "@utils/api";
 import { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const providersCanTrackApi: ProvidersCanTrackApi = [
   "spotify",

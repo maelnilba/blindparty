@@ -1,8 +1,12 @@
 import { Divider } from "@components/elements/divider";
 import { Modal } from "@components/elements/modal";
 import { AuthGuard } from "@components/layout/auth";
+import { Confetti } from "@components/party/confetti";
 import { TRACK_TIMER_MS } from "@components/party/constants";
+import { formatPosition } from "@components/party/helpers";
 import { PlayerStatusTile, PlayerTile } from "@components/party/player-tile";
+import { useSubmit } from "@hooks/form/useSubmit";
+import { useSet } from "@hooks/helpers/useSet";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
@@ -10,12 +14,14 @@ import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
 import { getAcceptLanguage, getLanguage } from "helpers/accept-language";
 import { sleep } from "helpers/sleep";
+import { useF0rm } from "modules/f0rm";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
   NextPage,
   NextPageWithAuth,
 } from "next";
+import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { userAgentFromString } from "next/server";
 import { useEffect, useMemo, useReducer, useState } from "react";
@@ -24,12 +30,6 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 import { z } from "zod";
 import { exclude } from "..";
-import { useF0rm } from "modules/f0rm";
-import { useSubmit } from "@hooks/form/useSubmit";
-import { useSet } from "@hooks/helpers/useSet";
-import { formatPosition } from "@components/party/helpers";
-import { Confetti } from "@components/party/confetti";
-import { signOut, useSession } from "next-auth/react";
 
 const guessSchema = z.object({
   guess: z.string().min(1),

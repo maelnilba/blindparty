@@ -1,6 +1,6 @@
+import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { UserMinusIcon } from "@components/icons/user-minus";
 import { Picture } from "@components/images/picture";
-import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { RouterOutputs } from "@utils/api";
 
 export type Friend = RouterOutputs["friend"]["get_all"][number];

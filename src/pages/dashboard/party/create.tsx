@@ -4,16 +4,16 @@ import { Friend, FriendBanner } from "@components/friend/friend-banner";
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
 import { Playlist, PlaylistBanner } from "@components/playlist/playlist-banner";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Tab } from "@headlessui/react";
-import { useMap } from "@hooks/helpers/useMap";
 import { useSubmit } from "@hooks/form/useSubmit";
+import { useMap } from "@hooks/helpers/useMap";
 import { api } from "@utils/api";
 import { useF0rm } from "modules/f0rm";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
 import { z } from "zod";
-import { useAutoAnimate } from "@formkit/auto-animate/react";
 
 const createSchema = z
   .object({

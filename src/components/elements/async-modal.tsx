@@ -1,7 +1,7 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Children, Fragment, isValidElement, ReactNode, useState } from "react";
-import type { Element } from "./types";
 import { noop } from "helpers/noop";
+import { Children, Fragment, ReactNode, isValidElement, useState } from "react";
+import type { Element } from "./types";
 
 type AsyncModalProps = {
   children: ReactNode;

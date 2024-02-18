@@ -1,10 +1,10 @@
-import type { ClientSafeProvider } from "next-auth/react";
 import type { Socials } from "@server/types";
+import type { ClientSafeProvider } from "next-auth/react";
 import { Icon } from "../icon";
+import { DeezerIcon } from "./deezer";
 import { DiscordIcon } from "./discord";
 import { GoogleIcon } from "./google";
 import { SpotifyIcon } from "./spotify";
-import { DeezerIcon } from "./deezer";
 
 const providerIcons: Record<Socials, (props: Icon) => JSX.Element> = {
   discord: (props) => (

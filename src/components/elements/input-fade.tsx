@@ -49,7 +49,7 @@ export const InputFade = ({ children, ...props }: InputProps) => {
     >
       <input
         ref={ipRef}
-        className="pointer-events-auto absolute top-0 left-0 right-0 mx-auto h-8 w-full rounded-lg bg-transparent px-4 outline-none"
+        className="pointer-events-auto absolute left-0 right-0 top-0 mx-auto h-8 w-full rounded-lg bg-transparent px-4 outline-none"
         {...props}
       />
       <span className={`${active ? "opacity-0" : ""} transition-opacity`}>

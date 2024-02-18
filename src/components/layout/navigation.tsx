@@ -1,6 +1,5 @@
 import { Picture } from "@components/images/picture";
 import { Menu, Transition } from "@headlessui/react";
-import { useWindowConfirmation } from "@hooks/next/useWindowConfirmation";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 

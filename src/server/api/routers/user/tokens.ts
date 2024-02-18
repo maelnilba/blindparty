@@ -1,7 +1,7 @@
 import { type Account as PrismaAccount } from "@prisma/client";
-import { createTRPCRouter, protectedProcedure } from "../../trpc";
 import { TRPCError } from "@trpc/server";
 import { z } from "zod";
+import { createTRPCRouter, protectedProcedure } from "../../trpc";
 
 const providers = ["spotify", "deezer"] as const;
 export type Provider = (typeof providers)[number];

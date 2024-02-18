@@ -1,6 +1,6 @@
+import { TRPCError } from "@trpc/server";
 import { type Account } from "next-auth";
 import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { TRPCError } from "@trpc/server";
 
 export const deezerRouter = createTRPCRouter({
   token: protectedProcedure.query(async ({ ctx }) => {

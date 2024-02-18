@@ -1,7 +1,7 @@
-import { Noop } from "helpers/noop";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
 import { getQuery, getUA } from "@utils/next-router";
+import { Noop } from "helpers/noop";
 import {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,

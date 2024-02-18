@@ -1,7 +1,7 @@
-import "regenerator-runtime/runtime"; // for react-speech-recognition
 import { FaviconLoader } from "@components/elements/favicon-loader";
 import { Auth } from "@components/layout/auth";
 import { Layout } from "@components/layout/layout";
+import { Title } from "@components/layout/title";
 import type {
   NextPageWithAuth,
   NextPageWithLayout,
@@ -10,9 +10,9 @@ import type {
 import { type Session } from "next-auth";
 import { SessionProvider } from "next-auth/react";
 import { type AppProps, type AppType } from "next/app";
+import "regenerator-runtime/runtime"; // for react-speech-recognition
 import "../styles/globals.css";
 import { api } from "../utils/api";
-import { Title } from "@components/layout/title";
 
 type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout & NextPageWithAuth & NextPageWithTitle;
