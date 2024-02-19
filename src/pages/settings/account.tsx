@@ -31,8 +31,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
 
   const { mutateAsync: edit } = api.user.edit.useMutation({
     onSuccess: async () => {
-      const x = await update();
-      console.log(x);
+      await update();
     },
   });
 

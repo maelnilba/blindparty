@@ -110,7 +110,7 @@ const Navigation = ({ through = false }: NavigationProps) => {
         <div className="flex-1"></div>
         <div>
           <button
-            className="rounded-full bg-white px-10 py-3 font-semibold text-black no-underline transition-transform hover:scale-105"
+            className="rounded-full bg-white px-10 py-3 font-semibold text-black no-underline transition-transform hover:scale-105 max-sm:px-3 max-sm:py-1.5 max-sm:text-xs"
             onClick={() => void signIn()}
           >
             Se connecter
