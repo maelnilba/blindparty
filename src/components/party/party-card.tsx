@@ -20,7 +20,7 @@ export const PartyCard = ({ party, onAction }: PartyCardProps) => {
     locale: locale,
   });
   return (
-    <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 ">
+    <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 max-sm:h-64 ">
       <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">
         <p className="flex flex-1 flex-col items-center">
           {party.status === "PENDING" && <span>{party.max_round} rounds</span>}

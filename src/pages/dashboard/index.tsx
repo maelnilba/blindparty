@@ -11,7 +11,7 @@ const DashBoard: NextPageWithAuth & NextPageWithTitle = () => {
   const { data: friends } = api.friend.get_all.useQuery();
   const { data: partys } = api.party.get_all_invite.useQuery();
   return (
-    <div className="scrollbar-hide flex flex-1 gap-4 p-4">
+    <div className="scrollbar-hide flex flex-1 gap-4 p-4 max-sm:flex-col">
       <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
         <div className="sticky top-0 mb-2 flex flex-col items-center justify-end gap-2 bg-black/10 p-6 pb-10 font-semibold backdrop-blur-sm">
           <Link
@@ -27,7 +27,7 @@ const DashBoard: NextPageWithAuth & NextPageWithTitle = () => {
           ))}
         </div>
       </div>
-      <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800 ">
+      <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800 max-sm:hidden ">
         <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <Link
             href="/dashboard/playlist"

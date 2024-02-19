@@ -53,7 +53,7 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
   const [autoAnimateInvitationsRef] = useAutoAnimate();
 
   return (
-    <div className="scrollbar-hide flex flex-1 gap-4 p-4">
+    <div className="scrollbar-hide flex flex-1 gap-4 p-4 max-sm:flex-col">
       <div className="scrollbar-hide relative flex max-h-contain flex-1 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 font-semibold backdrop-blur-sm">
           <Modal.Root>
@@ -61,7 +61,7 @@ const Friends: NextPageWithAuth & NextPageWithTitle = () => {
               Rechercher des amis
             </Modal.Trigger>
             <Modal.Content>
-              <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
+              <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto max-sm:w-80">
                 <label htmlFor="search" className="font-semibold">
                   Rechercher un utilisateur
                 </label>

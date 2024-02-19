@@ -57,7 +57,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
   const f0rm = useF0rm(editSchema, submitPreventDefault);
 
   return (
-    <div className="flex flex-wrap gap-4 p-4 px-28">
+    <div className="flex flex-wrap gap-4 p-4 sm:px-28">
       <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800">
         <div className="sticky top-0 flex flex-row items-center justify-center gap-2 bg-black/10 p-6 backdrop-blur-sm">
           <Modal.Root>
@@ -68,7 +68,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
               Lié un compte
             </Modal.Trigger>
             <Modal.Content>
-              <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto">
+              <div className="scrollbar-hide relative flex h-96 w-96 flex-col gap-2 overflow-y-auto max-sm:w-80">
                 <div className="flex-1 p-2">
                   {allProviders && accounts?.providers && (
                     <div className="flex flex-col gap-2">

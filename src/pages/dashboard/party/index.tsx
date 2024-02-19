@@ -26,16 +26,14 @@ const Party: NextPageWithAuth & NextPageWithTitle = () => {
   const [autoAnimateRef] = useAutoAnimate();
 
   return (
-    <div className="flex flex-wrap gap-4 p-4 px-28" ref={autoAnimateRef}>
-      <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800">
-        <>
-          <Link
-            href="/dashboard/party/create"
-            className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-          >
-            Créer une partie
-          </Link>
-        </>
+    <div className="flex flex-wrap gap-4 p-4 sm:px-28" ref={autoAnimateRef}>
+      <div className="flex h-96 w-96 flex-col items-center justify-center gap-4 rounded border border-gray-800 max-sm:hidden">
+        <Link
+          href="/dashboard/party/create"
+          className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+        >
+          Créer une partie
+        </Link>
       </div>
       {party?.map((party) => (
         <PartyCard
