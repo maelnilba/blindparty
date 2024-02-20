@@ -6,6 +6,7 @@ import {
   ZodNullable,
   ZodObject,
   ZodOptional,
+  ZodPromise,
   ZodRecord,
   z,
   type ZodError,
@@ -45,7 +46,8 @@ export function out<TSchema extends ZodSchema>(schema: TSchema, effect = true) {
   if (
     schema instanceof ZodOptional ||
     schema instanceof ZodNullable ||
-    schema instanceof ZodBranded
+    schema instanceof ZodBranded ||
+    schema instanceof ZodPromise
   )
     return schema.unwrap();
 
@@ -69,7 +71,8 @@ export function outable<TSchema extends ZodSchema>(
     schema instanceof ZodOptional ||
     schema instanceof ZodBranded ||
     schema instanceof ZodNullable ||
-    schema instanceof ZodDefault
+    schema instanceof ZodDefault ||
+    schema instanceof ZodPromise
   );
 }
 

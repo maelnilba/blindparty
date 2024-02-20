@@ -47,7 +47,7 @@
     "uuid": "^9.0.1",
     "vaul": "^0.9.0",
     "voice-activity-detection": "^0.0.5",
-    "zod": "^3.20.2",
+    "zod": "^3.22.4",
     "zustand": "^4.3.6"
   },
   "devDependencies": {
