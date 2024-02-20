@@ -17,9 +17,9 @@ import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
 import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
+import { useForm } from "@marienilba/react-zod-form";
 import { api } from "@utils/api";
 import { Noop } from "helpers/noop";
-import { useF0rm } from "modules/f0rm";
 import { NextPageWithAuth, NextPageWithLayout, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { Fragment, useRef, useState } from "react";
@@ -206,7 +206,7 @@ const PlaylistCreate = () => {
     }
   });
 
-  const f0rm = useF0rm(createSchema, submitPreventDefault);
+  const f0rm = useForm(createSchema, submitPreventDefault);
 
   const [autoAnimateRef] = useAutoAnimate();
 
