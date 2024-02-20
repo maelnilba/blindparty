@@ -45,22 +45,28 @@ const Playlists: NextPageWithAuth & NextPageWithTitle = () => {
               Créer une playlist
             </Link>
           ) : (
-            <ConfirmationModal
-              message={`La création de playlist est disponible uniquement au utilisateur ayant lié leur compte ${providersCanTrackApi
-                .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-                .join(" ou ")}`}
-              actions={["Lié un compte"]}
-              onSuccess={() => {
-                router.push("/settings/account");
-              }}
-            >
-              <button
+            <ConfirmationModal.Root>
+              <ConfirmationModal.Trigger
                 disabled={isLoading}
                 className="w-80 rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline"
               >
                 Créer une playlist
-              </button>
-            </ConfirmationModal>
+              </ConfirmationModal.Trigger>
+              <ConfirmationModal.Message>
+                `La création de playlist est disponible uniquement au
+                utilisateur ayant lié leur compte
+                {providersCanTrackApi
+                  .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+                  .join(" ou ")}
+                `
+              </ConfirmationModal.Message>
+              <ConfirmationModal.Action
+                className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                onClick={() => router.push("/settings/account")}
+              >
+                Lié un compte
+              </ConfirmationModal.Action>
+            </ConfirmationModal.Root>
           )}
         </>
         <Link
@@ -125,19 +131,24 @@ const PlaylistCard = ({
             >
               Découvrir
             </Link>
-            <ConfirmationModal
-              title={`Retirer la playlist`}
-              message={`Êtes vous certain de vouloir retirer la playlist ${playlist.name} de vos playlist ?`}
-              actions={["Retirer"]}
-              className="flex-1"
-              onSuccess={() => {
-                onDisconnect(playlist);
-              }}
-            >
-              <button className="w-full rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+            <ConfirmationModal.Root>
+              <ConfirmationModal.Trigger className="w-full rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                 Retirer
-              </button>
-            </ConfirmationModal>
+              </ConfirmationModal.Trigger>
+              <ConfirmationModal.Title>
+                Retirer la playlist
+              </ConfirmationModal.Title>
+              <ConfirmationModal.Message>
+                Êtes vous certain de vouloir retirer la playlist {playlist.name}{" "}
+                de vos playlist ?
+              </ConfirmationModal.Message>
+              <ConfirmationModal.Action
+                className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                onClick={() => onDisconnect(playlist)}
+              >
+                Retirer
+              </ConfirmationModal.Action>
+            </ConfirmationModal.Root>
           </>
         ) : (
           <>
@@ -148,18 +159,25 @@ const PlaylistCard = ({
               Modifier
             </Link>
 
-            <ConfirmationModal
-              title={`Supprimer la playlist`}
-              message={`Êtes vous certain de vouloir supprimer votre playlist ${playlist.name} ? Cette action est irreversible, votre playlist sera effacée.`}
-              actions={["Supprimer"]}
-              onSuccess={() => {
-                onDelete(playlist);
-              }}
-            >
-              <button className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+            <ConfirmationModal.Root>
+              <ConfirmationModal.Trigger className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                 Supprimer
-              </button>
-            </ConfirmationModal>
+              </ConfirmationModal.Trigger>
+              <ConfirmationModal.Title>
+                Supprimer la playlist
+              </ConfirmationModal.Title>
+              <ConfirmationModal.Message>
+                Êtes vous certain de vouloir supprimer votre playlist{" "}
+                {playlist.name} ? Cette action est irreversible, votre playlist
+                sera effacée.
+              </ConfirmationModal.Message>
+              <ConfirmationModal.Action
+                className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                onClick={() => onDelete(playlist)}
+              >
+                Supprimer
+              </ConfirmationModal.Action>
+            </ConfirmationModal.Root>
           </>
         )}
       </div>

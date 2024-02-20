@@ -24,16 +24,23 @@ export const FriendBanner = ({ friend, onRemove }: FriendBannerProps) => {
         </span>
       </div>
       {onRemove && (
-        <ConfirmationModal
-          title={`Retirer ${friend.name}`}
-          message={`Êtes vous certain de vouloir retirer ${friend.name} de vos amis ?`}
-          actions={["Retirer"]}
-          onSuccess={() => {
-            onRemove(friend);
-          }}
-        >
-          <UserMinusIcon className="h-6 w-6 cursor-pointer group-hover:scale-125" />
-        </ConfirmationModal>
+        <ConfirmationModal.Root>
+          <ConfirmationModal.Trigger>
+            <UserMinusIcon className="h-6 w-6 cursor-pointer group-hover:scale-125" />
+          </ConfirmationModal.Trigger>
+          <ConfirmationModal.Title className="text-lg font-medium leading-6">
+            Retirer {friend.name}
+          </ConfirmationModal.Title>
+          <ConfirmationModal.Message>
+            Êtes vous certain de vouloir retirer {friend.name} de vos amis ?
+          </ConfirmationModal.Message>
+          <ConfirmationModal.Action
+            className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+            onClick={() => onRemove(friend)}
+          >
+            Supprimer
+          </ConfirmationModal.Action>
+        </ConfirmationModal.Root>
       )}
     </div>
   );

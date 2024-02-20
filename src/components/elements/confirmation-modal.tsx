@@ -1,20 +1,22 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { noop } from "helpers/noop";
 import {
+  Children,
   Fragment,
-  ReactElement,
+  ReactNode,
   forwardRef,
+  isValidElement,
+  useContext,
   useImperativeHandle,
   useState,
 } from "react";
+import { Context, Modal } from "./modal";
+
+export const ConfirmationModal = () => {};
 
 type ConfirmationModalProps = {
   defaultOpen?: boolean;
-  children?: ReactElement;
-  title?: string;
-  message?: string;
-  actions?: [string, string] | [string];
-  onSuccess: () => void;
+  children: ReactNode;
   className?: string;
   closeOnOutside?: boolean;
 };
@@ -24,17 +26,34 @@ export type ModalRef = {
   close: () => void;
 };
 
-export const ConfirmationModal = forwardRef<ModalRef, ConfirmationModalProps>(
+ConfirmationModal.Root = forwardRef<ModalRef, ConfirmationModalProps>(
   (props, forwardRef) => {
-    const {
-      defaultOpen = false,
-      title,
-      message,
-      actions,
-      onSuccess,
-      closeOnOutside = true,
-    } = props;
+    const { defaultOpen = false, closeOnOutside = true } = props;
     let [isOpen, setIsOpen] = useState(defaultOpen);
+
+    const button = Children.map(props.children, (child) =>
+      isValidElement(child) && child.type === ConfirmationModal.Trigger
+        ? child
+        : false
+    );
+
+    const title = Children.map(props.children, (child) =>
+      isValidElement(child) && child.type === ConfirmationModal.Title
+        ? child
+        : false
+    );
+
+    const message = Children.map(props.children, (child) =>
+      isValidElement(child) && child.type === ConfirmationModal.Message
+        ? child
+        : false
+    );
+
+    const actions = Children.map(props.children, (child) =>
+      isValidElement(child) && child.type === ConfirmationModal.Action
+        ? child
+        : false
+    );
 
     function closeModal() {
       setIsOpen(false);
@@ -54,19 +73,8 @@ export const ConfirmationModal = forwardRef<ModalRef, ConfirmationModalProps>(
     );
 
     return (
-      <>
-        {props.children && (
-          <div
-            onClickCapture={(e) => {
-              e.stopPropagation();
-              openModal();
-            }}
-            className={props.className}
-          >
-            {props.children}
-          </div>
-        )}
-
+      <Context.Provider value={{ open: openModal, close: closeModal }}>
+        {button}
         <Transition appear show={isOpen} as={Fragment}>
           <Dialog
             as="div"
@@ -97,29 +105,12 @@ export const ConfirmationModal = forwardRef<ModalRef, ConfirmationModalProps>(
                   leaveTo="opacity-0 scale-95 translate-y-4"
                 >
                   <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl border border-gray-800 bg-white/5 p-6 text-left align-middle shadow-xl ring-1 ring-white/5 backdrop-blur-sm transition-all">
-                    <Dialog.Title
-                      as="h3"
-                      className="text-lg font-medium leading-6"
-                    >
-                      {title}
-                    </Dialog.Title>
+                    {title}
                     <div className="mt-2">
                       <p className="text-sm text-gray-100">{message}</p>
                     </div>
                     <div className="mt-4 flex flex-row justify-end gap-4">
-                      {actions?.map((action, index, self) => (
-                        <button
-                          key={index}
-                          type="button"
-                          className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
-                          onClick={() => {
-                            closeModal();
-                            if (index === self.length - 1) onSuccess();
-                          }}
-                        >
-                          {action || "OK"}
-                        </button>
-                      ))}
+                      {actions}
                     </div>
                   </Dialog.Panel>
                 </Transition.Child>
@@ -127,7 +118,28 @@ export const ConfirmationModal = forwardRef<ModalRef, ConfirmationModalProps>(
             </div>
           </Dialog>
         </Transition>
-      </>
+      </Context.Provider>
     );
   }
 );
+
+ConfirmationModal.Trigger = Modal.Trigger;
+
+ConfirmationModal.Close = Modal.Close;
+
+ConfirmationModal.Action = Modal.Close;
+
+ConfirmationModal.Content = Modal.Content;
+
+ConfirmationModal.Message = Modal.Content;
+
+ConfirmationModal.Title = Modal.Title;
+
+export function useModal() {
+  const context = useContext(Context);
+
+  if (context === undefined) {
+    throw new Error(`useModal must be used within a Modal.Root.`);
+  }
+  return context;
+}

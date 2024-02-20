@@ -100,16 +100,24 @@ export const PartyCard = ({ party, onAction }: PartyCardProps) => {
             >
               Rejoindre
             </Link>
-            <ConfirmationModal
-              title={`Supprimer la partie`}
-              message={`Êtes vous certain de vouloir supprimer la partie ? Cette action est irreversible.`}
-              actions={["Supprimer"]}
-              onSuccess={() => onAction?.({ id: party.id })}
-            >
-              <button className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+            <ConfirmationModal.Root>
+              <ConfirmationModal.Trigger className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                 Supprimer
-              </button>
-            </ConfirmationModal>
+              </ConfirmationModal.Trigger>
+              <ConfirmationModal.Title>
+                Supprimer la partie
+              </ConfirmationModal.Title>
+              <ConfirmationModal.Message>
+                Êtes vous certain de vouloir supprimer la partie ? Cette action
+                est irreversible.
+              </ConfirmationModal.Message>
+              <ConfirmationModal.Action
+                className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                onClick={() => onAction?.({ id: party.id })}
+              >
+                Supprimer
+              </ConfirmationModal.Action>
+            </ConfirmationModal.Root>
           </>
         )}
         {party.status === "CANCELED" && (
@@ -120,16 +128,24 @@ export const PartyCard = ({ party, onAction }: PartyCardProps) => {
             >
               Rejouer
             </button>
-            <ConfirmationModal
-              title={`Supprimer la partie`}
-              message={`Êtes vous certain de vouloir supprimer la partie ? Cette action est irreversible.`}
-              actions={["Supprimer"]}
-              onSuccess={() => onAction?.({ id: party.id })}
-            >
-              <button className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+            <ConfirmationModal.Root>
+              <ConfirmationModal.Trigger className="rounded-full bg-pink-200 px-6 py-1 text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                 Supprimer
-              </button>
-            </ConfirmationModal>
+              </ConfirmationModal.Trigger>
+              <ConfirmationModal.Title>
+                Supprimer la partie
+              </ConfirmationModal.Title>
+              <ConfirmationModal.Message>
+                Êtes vous certain de vouloir supprimer la partie ? Cette action
+                est irreversible.
+              </ConfirmationModal.Message>
+              <ConfirmationModal.Action
+                className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                onClick={() => onAction?.({ id: party.id })}
+              >
+                Supprimer
+              </ConfirmationModal.Action>
+            </ConfirmationModal.Root>
           </>
         )}
       </div>

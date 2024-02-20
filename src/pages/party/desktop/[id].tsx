@@ -475,17 +475,26 @@ const Party: NextPage<
               {isHost ? (
                 <div className="flex w-full justify-center">
                   {missed ? (
-                    <ConfirmationModal
-                      title="Commencer la partie"
-                      message="Certains amis invités n'ont pas encore rejoint la partie, êtes vous sur de vouloir commencer la partie ? Une fois une partie lancée, il n'est plus possible de la rejoindre."
-                      actions={["Commencer"]}
-                      className="flex w-full items-center justify-center"
-                      onSuccess={start}
-                    >
-                      <button className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+                    <ConfirmationModal.Root>
+                      <ConfirmationModal.Trigger className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
                         Commencer la partie
-                      </button>
-                    </ConfirmationModal>
+                      </ConfirmationModal.Trigger>
+                      <ConfirmationModal.Title>
+                        Commencer la partie
+                      </ConfirmationModal.Title>
+                      <ConfirmationModal.Message>
+                        Certains amis invités n'ont pas encore rejoint la
+                        partie, êtes vous sur de vouloir commencer la partie ?
+                        Une fois une partie lancée, il n'est plus possible de la
+                        rejoindre.
+                      </ConfirmationModal.Message>
+                      <ConfirmationModal.Action
+                        className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+                        onClick={start}
+                      >
+                        Commencer
+                      </ConfirmationModal.Action>
+                    </ConfirmationModal.Root>
                   ) : (
                     <button
                       onClick={start}

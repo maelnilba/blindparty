@@ -115,24 +115,25 @@ const Item = ({ subscriber, user, close, active, onBan }: ItemProps) => {
   }, []);
 
   return (
-    <ConfirmationModal
-      title={`Exclure ${user.name}`}
-      message={`Êtes vous certain de vouloir exclure ${user.name} de la partie ? Une fois exclu, il n'est plus possible de rejoindre la partie en cours`}
-      actions={["Exclure"]}
-      className="flex w-full items-center justify-center"
-      onSuccess={() => {
-        if (onBan) {
-          onBan(user.id);
-        }
-      }}
-    >
-      <span
+    <ConfirmationModal.Root>
+      <ConfirmationModal.Trigger
         className={`${
           active ? "opacity-75" : ""
         } group flex w-full items-center rounded-md p-4 text-sm ring-2 ring-white ring-opacity-5`}
       >
         Exclure {user.name}
-      </span>
-    </ConfirmationModal>
+      </ConfirmationModal.Trigger>
+      <ConfirmationModal.Title>Exclure {user.name}</ConfirmationModal.Title>
+      <ConfirmationModal.Message>
+        Êtes vous certain de vouloir exclure {user.name} de la partie ? Une fois
+        exclu, il n'est plus possible de rejoindre la partie en cours
+      </ConfirmationModal.Message>
+      <ConfirmationModal.Action
+        className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+        onClick={() => onBan?.(user.id)}
+      >
+        Exclure
+      </ConfirmationModal.Action>
+    </ConfirmationModal.Root>
   );
 };

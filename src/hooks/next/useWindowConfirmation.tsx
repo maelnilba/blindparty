@@ -47,16 +47,22 @@ export function useWindowConfirmation(
   }, [isSubscribe, active]);
 
   return (
-    <ConfirmationModal
-      ref={modal}
-      title="Quitter la page"
-      message={warning}
-      onSuccess={() => {
-        if (!path.current) return;
-        success.current = true;
-        router.push(path.current.url, undefined, path.current.options);
-      }}
-      actions={["Annuler", "Quitter"]}
-    ></ConfirmationModal>
+    <ConfirmationModal.Root ref={modal}>
+      <ConfirmationModal.Title>Quitter la page</ConfirmationModal.Title>
+      <ConfirmationModal.Message>{warning}</ConfirmationModal.Message>
+      <ConfirmationModal.Action className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105">
+        Annuler
+      </ConfirmationModal.Action>
+      <ConfirmationModal.Action
+        className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+        onClick={() => {
+          if (!path.current) return;
+          success.current = true;
+          router.push(path.current.url, undefined, path.current.options);
+        }}
+      >
+        Quitter
+      </ConfirmationModal.Action>
+    </ConfirmationModal.Root>
   );
 }

@@ -27,7 +27,7 @@ export type ModalRef = {
   close: () => void;
 };
 
-const Context = createContext<ModalRef>({ open() {}, close() {} });
+export const Context = createContext<ModalRef>({ open() {}, close() {} });
 
 Modal.Root = forwardRef<ModalRef, ModalProps>((props, forwardRef) => {
   const { defaultOpen = false, closeOnOutside = true } = props;

@@ -210,14 +210,23 @@ const InvitationBanner = ({
             onClick={() => onReject(invitation)}
             className="h-6 w-6 cursor-pointer hover:scale-125"
           />
-          <ConfirmationModal
-            title="Bloquer l'utilisateur"
-            message={`Êtes vous sur de vouloir bloqué ${friendUser.name} ?`}
-            actions={["Bloquer"]}
-            onSuccess={() => onBlock(invitation)}
-          >
-            <LockClosedIcon className="h-6 w-6 cursor-pointer hover:scale-125" />
-          </ConfirmationModal>
+          <ConfirmationModal.Root>
+            <ConfirmationModal.Trigger>
+              <LockClosedIcon className="h-6 w-6 cursor-pointer hover:scale-125" />
+            </ConfirmationModal.Trigger>
+            <ConfirmationModal.Title>
+              Bloquer l'utilisateur
+            </ConfirmationModal.Title>
+            <ConfirmationModal.Message>
+              Êtes vous sur de vouloir bloqué {friendUser.name} ?
+            </ConfirmationModal.Message>
+            <ConfirmationModal.Action
+              className="rounded-full bg-white px-6 py-1 text-center text-lg font-semibold text-black no-underline transition-transform hover:scale-105"
+              onClick={() => onBlock(invitation)}
+            >
+              Bloquer
+            </ConfirmationModal.Action>
+          </ConfirmationModal.Root>
         </div>
       )}
     </div>
