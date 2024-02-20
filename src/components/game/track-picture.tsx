@@ -1,7 +1,6 @@
 import { RouterOutputs } from "@utils/api";
 import { getBaseUrl } from "helpers/base-url";
 import { createQueryValidator } from "helpers/query-validator";
-import Image from "next/image";
 import { ComponentProps } from "react";
 import { z } from "zod";
 type TrackPictureProps = RouterOutputs["party"]["game"]["round"];
@@ -23,8 +22,7 @@ export const TrackBluredPicture = ({ track }: TrackPictureProps) => {
   const apiUrl = `${getBaseUrl()}/api/og/blur${url}`;
 
   return (
-    <Image
-      loader={() => apiUrl}
+    <img
       onError={(e) => {
         (e.target as HTMLImageElement).style.display = "none";
       }}
