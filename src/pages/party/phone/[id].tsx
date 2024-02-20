@@ -99,7 +99,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         select: {
           id: true,
           name: true,
-          preview_url: true,
+          previewUrl: true,
           album: true,
           images: true,
           artists: true,
@@ -127,7 +127,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  if (party.access_mode === "PRIVATE") {
+  if (party.accessMode === "PRIVATE") {
     if (
       !party.inviteds.map((invited) => invited.id).includes(session.user.id)
     ) {
@@ -342,7 +342,7 @@ const Party: NextPage<
     { player: Player; joined: boolean; connected: boolean }[]
   >(() => {
     const players =
-      party.access_mode === "PRIVATE"
+      party.accessMode === "PRIVATE"
         ? party.inviteds
         : (members ? Object.values(members) : [])
             .filter((m) => !m.isHost)
@@ -425,7 +425,7 @@ const Party: NextPage<
               <div>{/* <PlaylistCard playlist={party.playlist} /> */}</div>
               <Divider />
               <div className="text-center text-lg font-semibold">
-                <p>{party.max_round} rounds</p>
+                <p>{party.maxRound} rounds</p>
               </div>
               <Divider />
               <div className="flex flex-wrap gap-2">

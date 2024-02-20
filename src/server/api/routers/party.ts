@@ -18,7 +18,7 @@ export const partyRouter = createTRPCRouter({
       z.object({
         playlists_id: z.array(z.string().cuid()).min(1),
         inviteds: z.array(z.string().cuid()),
-        max_round: z.number().min(1),
+        maxRoud: z.number().min(1),
         private: z.boolean().default(true),
       })
     )
@@ -51,11 +51,9 @@ export const partyRouter = createTRPCRouter({
             tracks: {
               connect: tracks,
             },
-            access_mode: input.private ? "PRIVATE" : "PUBLIC",
-            max_round:
-              input.max_round <= tracks.length
-                ? input.max_round
-                : tracks.length,
+            accessMode: input.private ? "PRIVATE" : "PUBLIC",
+            maxRound:
+              input.maxRoud <= tracks.length ? input.maxRoud : tracks.length,
             host: {
               connect: {
                 id: ctx.session.user.id,
@@ -103,8 +101,8 @@ export const partyRouter = createTRPCRouter({
         createdAt: true,
         status: true,
         round: true,
-        max_round: true,
-        access_mode: true,
+        maxRound: true,
+        accessMode: true,
         host: {
           select: {
             id: true,
@@ -116,7 +114,7 @@ export const partyRouter = createTRPCRouter({
           select: {
             id: true,
             name: true,
-            preview_url: true,
+            previewUrl: true,
             album: true,
             images: true,
             artists: true,
@@ -248,7 +246,7 @@ export const partyRouter = createTRPCRouter({
             tracks: {
               connect: copy.tracks.map((t) => ({ id: t.id })),
             },
-            max_round: copy.max_round,
+            maxRound: copy.maxRound,
             host: {
               connect: {
                 id: ctx.session.user.id,

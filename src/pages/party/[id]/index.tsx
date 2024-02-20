@@ -50,7 +50,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  if ((!session || !session.user) && party.access_mode == "PUBLIC") {
+  if ((!session || !session.user) && party.accessMode == "PUBLIC") {
     return {
       redirect: {
         destination: "/party/" + party.id + "/join",
@@ -66,7 +66,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  if (party.access_mode === "PRIVATE") {
+  if (party.accessMode === "PRIVATE") {
     if (
       !party.inviteds.map((invited) => invited.id).includes(session.user.id) ||
       (party.status !== "PENDING" &&

@@ -231,7 +231,7 @@ class Converter {
               .map(({ track: item, added_at }) => ({
                 id: item!.id,
                 name: item!.name,
-                preview_url: item!.preview_url,
+                previewUrl: item!.preview_url,
                 album: {
                   name: item!.album.name,
                   images: item!.album.images.map((image) => ({
@@ -244,7 +244,7 @@ class Converter {
           : playlistTracks.data.map((item) => ({
               id: String(item.id),
               name: item.title,
-              preview_url: item.preview,
+              previewUrl: item.preview,
               album: {
                 name: item.album.title,
                 images: [

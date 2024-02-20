@@ -225,12 +225,12 @@ export const gameRouter = createTRPCRouter({
         },
         select: {
           id: true,
-          max_round: true,
+          maxRound: true,
           round: true,
           tracks: {
             select: {
               images: true,
-              preview_url: true,
+              previewUrl: true,
               id: true,
             },
           },
@@ -244,7 +244,7 @@ export const gameRouter = createTRPCRouter({
 
       if (!party) throw new TRPCError({ code: "UNAUTHORIZED" });
 
-      if (party.round > party.max_round) {
+      if (party.round > party.maxRound) {
         await ctx.prisma.party.update({
           where: { id: party.id },
           data: { status: "ENDED" },

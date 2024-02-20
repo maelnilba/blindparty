@@ -23,10 +23,10 @@ export const PartyCard = ({ party, onAction }: PartyCardProps) => {
     <div className="scrollbar-hide relative flex h-96 w-96 flex-col overflow-y-auto rounded border border-gray-800 max-sm:h-64 ">
       <div className="sticky top-0 flex flex-row items-center justify-end gap-2 bg-black/10 px-2 py-2 font-semibold backdrop-blur-sm">
         <p className="flex flex-1 flex-col items-center">
-          {party.status === "PENDING" && <span>{party.max_round} rounds</span>}
+          {party.status === "PENDING" && <span>{party.maxRound} rounds</span>}
           {party.status === "RUNNING" && (
             <span>
-              {Math.min(party.round, party.max_round)}/{party.max_round} rounds
+              {Math.min(party.round, party.maxRound)}/{party.maxRound} rounds
             </span>
           )}
           <span>{party._count.tracks} tracks</span>
@@ -35,12 +35,12 @@ export const PartyCard = ({ party, onAction }: PartyCardProps) => {
           {party.status === "PENDING" ||
             (party.status === "RUNNING" && (
               <>
-                {party.access_mode === "PRIVATE" && (
+                {party.accessMode === "PRIVATE" && (
                   <span>
                     {party.members.count}/{party._count.inviteds} joueurs
                   </span>
                 )}
-                {party.access_mode === "PUBLIC" && (
+                {party.accessMode === "PUBLIC" && (
                   <span>{party.members.count} joueurs</span>
                 )}
               </>

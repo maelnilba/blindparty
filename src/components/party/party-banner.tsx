@@ -25,12 +25,12 @@ export const PartyBanner = ({ party }: PartyBannerProps) => {
         />
       </Picture>
       <div className="flex w-3/4 flex-col">
-        {party.access_mode === "PRIVATE" && (
+        {party.accessMode === "PRIVATE" && (
           <p>
             {party.members.count}/{party._count.inviteds} joueurs
           </p>
         )}
-        {party.access_mode === "PUBLIC" && <p>{party.members.count} joueurs</p>}
+        {party.accessMode === "PUBLIC" && <p>{party.members.count} joueurs</p>}
         <p className="overflow-hidden truncate text-ellipsis text-xs font-normal">
           Crée par {party.host.name}
         </p>

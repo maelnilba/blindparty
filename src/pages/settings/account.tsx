@@ -41,14 +41,14 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
       if (!e.success) return;
       if (!user) throw new Error("Should have user");
 
-      let s3key = user?.s3key ?? getS3key(user.image);
+      let s3Key = user?.s3Key ?? getS3key(user.image);
       if (imageUpload.current && imageUpload.current.local) {
-        await imageUpload.current.upload(s3key);
+        await imageUpload.current.upload(s3Key);
       }
 
       await edit({
         name: e.data.name,
-        s3key: imageUpload.current ? imageUpload.current.key : undefined,
+        s3Key: imageUpload.current ? imageUpload.current.key : undefined,
       });
     }
   );

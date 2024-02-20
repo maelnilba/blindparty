@@ -53,7 +53,7 @@ export const s3Router = createTRPCRouter({
                 id: ctx.session.user.id,
               },
             },
-            s3key: input.key,
+            s3Key: input.key,
           },
         });
         if (!playlist) throw new TRPCError({ code: "PRECONDITION_FAILED" });
@@ -61,7 +61,7 @@ export const s3Router = createTRPCRouter({
         const user = await ctx.prisma.user.findFirst({
           where: {
             id: ctx.session.user.id,
-            s3key: input.key,
+            s3Key: input.key,
           },
         });
 

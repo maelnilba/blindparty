@@ -119,7 +119,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
       if (e.data.access && !friends.size) return;
 
       await create({
-        max_round: e.data.round,
+        maxRoud: e.data.round,
         private: e.data.access,
         playlists_id: playlist
           ? [playlist.id]

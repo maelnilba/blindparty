@@ -95,7 +95,7 @@ const useGetPlaylistTracks = () => {
     ["track-api", "playlist-tracks", id],
     async () => {
       return (await trackApi.getPlaylistTracks(id!)).filter((track) =>
-        Boolean(track?.preview_url)
+        Boolean(track?.previewUrl)
       );
     },
     {

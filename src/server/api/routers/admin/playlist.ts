@@ -14,7 +14,7 @@ const trackSchema = z.array(
   z.object({
     id: z.string(),
     name: z.string(),
-    preview_url: z.string().url().nullable(),
+    previewUrl: z.string().url().nullable(),
     album: z.object({
       name: z.string(),
       images: z.array(
@@ -35,7 +35,7 @@ export const trackMapped = (
   tracks: {
     id: string;
     name: string;
-    preview_url: string | null;
+    previewUrl: string | null;
     album: string;
     images: string;
     artists: string;
@@ -60,20 +60,20 @@ export const playlistRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         description: z.string().optional(),
-        s3key: z.string().optional(),
+        s3Key: z.string().optional(),
         generated: z.boolean(),
         tracks: trackSchema.min(1),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const picture = pictureLink(input.s3key);
+      const picture = pictureLink(input.s3Key);
 
       return await ctx.prisma.playlist.create({
         data: {
           name: input.name,
           description: input.description,
           picture: picture,
-          s3key: input.s3key,
+          s3Key: input.s3Key,
           generated: input.generated,
           public: true,
           tracks: {
@@ -84,7 +84,7 @@ export const playlistRouter = createTRPCRouter({
               create: {
                 id: track.id,
                 name: track.name,
-                preview_url: track.preview_url ?? undefined,
+                previewUrl: track.previewUrl ?? undefined,
                 album: track.album.name,
                 artists: track.artists
                   .map((artist) => artist.name)
@@ -104,14 +104,14 @@ export const playlistRouter = createTRPCRouter({
         id: z.string().cuid(),
         name: z.string(),
         description: z.string().optional(),
-        s3key: z.string().optional(),
+        s3Key: z.string().optional(),
         generated: z.boolean(),
         tracks: trackSchema,
         removed_tracks: z.array(z.string()),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const picture = pictureLink(input.s3key);
+      const picture = pictureLink(input.s3Key);
 
       return await ctx.prisma.playlist.update({
         where: {
@@ -121,7 +121,7 @@ export const playlistRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           picture: picture,
-          s3key: input.s3key,
+          s3Key: input.s3Key,
           generated: input.generated,
           tracks: {
             disconnect: input.removed_tracks.map((track_id) => ({
@@ -134,7 +134,7 @@ export const playlistRouter = createTRPCRouter({
               create: {
                 id: track.id,
                 name: track.name,
-                preview_url: track.preview_url ?? undefined,
+                previewUrl: track.previewUrl ?? undefined,
                 album: track.album.name,
                 artists: track.artists
                   .map((artist) => artist.name)
@@ -153,19 +153,19 @@ export const playlistRouter = createTRPCRouter({
       z.object({
         name: z.string(),
         description: z.string().optional(),
-        s3key: z.string().optional(),
+        s3Key: z.string().optional(),
         generated: z.boolean(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const picture = pictureLink(input.s3key);
+      const picture = pictureLink(input.s3Key);
 
       return await ctx.prisma.playlist.create({
         data: {
           name: input.name,
           description: input.description,
           picture: picture,
-          s3key: input.s3key,
+          s3Key: input.s3Key,
           generated: input.generated,
           public: true,
         },
@@ -177,12 +177,12 @@ export const playlistRouter = createTRPCRouter({
         id: z.string().cuid(),
         name: z.string(),
         description: z.string().optional(),
-        s3key: z.string().optional(),
+        s3Key: z.string().optional(),
         generated: z.boolean(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const picture = pictureLink(input.s3key);
+      const picture = pictureLink(input.s3Key);
 
       return await ctx.prisma.playlist.update({
         where: {
@@ -192,7 +192,7 @@ export const playlistRouter = createTRPCRouter({
           name: input.name,
           description: input.description,
           picture: picture,
-          s3key: input.s3key,
+          s3Key: input.s3Key,
           generated: input.generated,
         },
       });
@@ -241,7 +241,7 @@ export const playlistRouter = createTRPCRouter({
               create: {
                 id: track.id,
                 name: track.name,
-                preview_url: track.preview_url ?? undefined,
+                previewUrl: track.previewUrl ?? undefined,
                 album: track.album.name,
                 artists: track.artists
                   .map((artist) => artist.name)
@@ -271,11 +271,11 @@ export const playlistRouter = createTRPCRouter({
         },
       });
 
-      if (playlist.s3key)
+      if (playlist.s3Key)
         ctx.s3.deleteObject(
           {
             Bucket: process.env.AWS_S3_BUCKET_NAME!,
-            Key: playlist.s3key,
+            Key: playlist.s3Key,
           },
           noop
         );
@@ -298,7 +298,7 @@ export const playlistRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
-              preview_url: true,
+              previewUrl: true,
               album: true,
               images: true,
               artists: true,
@@ -324,7 +324,7 @@ export const playlistRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
-              preview_url: true,
+              previewUrl: true,
               album: true,
               images: true,
               artists: true,

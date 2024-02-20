@@ -85,10 +85,10 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
               } rounded border-gray-800`}
             >
               <TrackBluredPicture track={track} />
-              {track?.preview_url && (
+              {track?.previewUrl && (
                 <>
                   <audio ref={audio} className="invisible opacity-0">
-                    <source src={track.preview_url} />
+                    <source src={track.previewUrl} />
                   </audio>
                 </>
               )}

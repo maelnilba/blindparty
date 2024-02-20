@@ -229,14 +229,14 @@ export const TrackPlayer = ({
             </div>
           </div>
           <div className="col-span-6 flex flex-col items-center justify-center gap-2">
-            {track?.preview_url && (
+            {track?.previewUrl && (
               <>
                 <audio
                   key={track.id}
                   ref={audio}
                   className="invisible h-0 opacity-0"
                 >
-                  <source src={track.preview_url} />
+                  <source src={track.previewUrl} />
                 </audio>
               </>
             )}

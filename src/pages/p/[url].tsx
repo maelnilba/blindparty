@@ -28,7 +28,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       party: {
         select: {
           id: true,
-          access_mode: true,
+          accessMode: true,
         },
       },
     },
@@ -43,7 +43,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  if ((!session || !session.user) && link.party.access_mode === "PUBLIC") {
+  if ((!session || !session.user) && link.party.accessMode === "PUBLIC") {
     return {
       redirect: {
         destination: "/party/" + link.party.id + "/join",

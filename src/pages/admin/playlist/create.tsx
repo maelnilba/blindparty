@@ -155,7 +155,7 @@ const PlaylistCreate = () => {
       const tracks = [...tracksMap].map(([_, track]) => ({
         id: track.id,
         name: track.name,
-        preview_url: track.preview_url!,
+        previewUrl: track.previewUrl!,
         album: {
           name: track.album.name,
           images: track.album.images.map((image) => ({
@@ -189,7 +189,7 @@ const PlaylistCreate = () => {
         await create({
           name: e.data.name,
           description: e.data.description,
-          s3key: imageUpload.current ? imageUpload.current.key : undefined,
+          s3Key: imageUpload.current ? imageUpload.current.key : undefined,
           tracks: tracks,
           generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
         });
@@ -197,7 +197,7 @@ const PlaylistCreate = () => {
         const playlist = await create_empty({
           name: e.data.name,
           description: e.data.description,
-          s3key: imageUpload.current ? imageUpload.current.key : undefined,
+          s3Key: imageUpload.current ? imageUpload.current.key : undefined,
           generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
         });
 

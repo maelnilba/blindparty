@@ -153,7 +153,7 @@ const PlaylistEdit = () => {
     search({ field: field });
   });
 
-  const s3key = useRef<string>();
+  const s3Key = useRef<string>();
   const form = useRef<HTMLFormElement>(null);
   const { data: playlist } = api.admin.playlist.get_playlist.useQuery(
     { id: id! },
@@ -177,7 +177,7 @@ const PlaylistEdit = () => {
             f0rm.fields.description().name()
           ) as any
         ).value = playlist.description;
-        s3key.current = playlist.s3key ?? undefined;
+        s3Key.current = playlist.s3Key ?? undefined;
         addTracks(playlist.tracks);
       },
     }
@@ -198,7 +198,7 @@ const PlaylistEdit = () => {
         .map(([_, track]) => ({
           id: track.id,
           name: track.name,
-          preview_url: track.preview_url!,
+          previewUrl: track.previewUrl!,
           album: {
             name: track.album.name,
             images: track.album.images.map((image) => ({
@@ -229,11 +229,11 @@ const PlaylistEdit = () => {
         !imageUpload.current.local
       ) {
         const img = await fetchMergeAlbum(mockAlbumsPicture);
-        await imageUpload.current.set(img, true, s3key.current);
+        await imageUpload.current.set(img, true, s3Key.current);
       }
 
       if (imageUpload.current && imageUpload.current.local) {
-        await imageUpload.current.upload(s3key.current);
+        await imageUpload.current.upload(s3Key.current);
       }
 
       if (tracks.length <= 20) {
@@ -241,7 +241,7 @@ const PlaylistEdit = () => {
           id: id,
           name: e.data.name,
           description: e.data.description,
-          s3key: imageUpload.current ? imageUpload.current.key : undefined,
+          s3Key: imageUpload.current ? imageUpload.current.key : undefined,
           tracks: tracks,
           removed_tracks: removed_tracks,
           generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
@@ -251,7 +251,7 @@ const PlaylistEdit = () => {
           id: playlist.id,
           name: e.data.name,
           description: e.data.description,
-          s3key: imageUpload.current ? imageUpload.current.key : undefined,
+          s3Key: imageUpload.current ? imageUpload.current.key : undefined,
           generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
         });
 

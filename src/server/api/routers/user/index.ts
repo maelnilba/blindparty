@@ -60,7 +60,7 @@ export const userRouter = createTRPCRouter({
       select: {
         name: true,
         image: true,
-        s3key: true,
+        s3Key: true,
       },
     });
   }),
@@ -68,11 +68,11 @@ export const userRouter = createTRPCRouter({
     .input(
       z.object({
         name: z.string().min(1),
-        s3key: z.string().optional(),
+        s3Key: z.string().optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const picture = pictureLink(input.s3key);
+      const picture = pictureLink(input.s3Key);
 
       return await ctx.prisma.user.update({
         where: {
@@ -80,7 +80,7 @@ export const userRouter = createTRPCRouter({
         },
         data: {
           name: input.name,
-          s3key: input.s3key,
+          s3Key: input.s3Key,
           image: picture,
         },
       });

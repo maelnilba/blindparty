@@ -36,13 +36,13 @@ export const friendRouter = createTRPCRouter({
           {
             AND: [
               {
-                user_invite: {
+                invited: {
                   id: ctx.session.user.id,
                 },
               },
               {
                 NOT: {
-                  user_sent: {
+                  sender: {
                     id: ctx.session.user.id,
                   },
                 },
@@ -57,13 +57,13 @@ export const friendRouter = createTRPCRouter({
           {
             AND: [
               {
-                user_sent: {
+                sender: {
                   id: ctx.session.user.id,
                 },
               },
               {
                 NOT: {
-                  user_invite: {
+                  invited: {
                     id: ctx.session.user.id,
                   },
                 },
@@ -81,14 +81,14 @@ export const friendRouter = createTRPCRouter({
         id: true,
         status: true,
         createdAt: true,
-        user_invite: {
+        sender: {
           select: {
             id: true,
             name: true,
             image: true,
           },
         },
-        user_sent: {
+        invited: {
           select: {
             id: true,
             name: true,
@@ -110,8 +110,8 @@ export const friendRouter = createTRPCRouter({
           status: "PENDING",
         },
         include: {
-          user_invite: true,
-          user_sent: true,
+          invited: true,
+          sender: true,
         },
       });
 
@@ -121,18 +121,18 @@ export const friendRouter = createTRPCRouter({
 
       await ctx.prisma.user.update({
         where: {
-          id: invitation.user_sent.id,
+          id: invitation.sender.id,
         },
         data: {
           friends: {
             connectOrCreate: {
               create: {
-                friendId: invitation.user_invite.id,
-                name: invitation.user_invite.name,
-                image: invitation.user_invite.image,
+                friendId: invitation.invited.id,
+                name: invitation.invited.name,
+                image: invitation.invited.image,
               },
               where: {
-                friendId: invitation.user_invite.id,
+                friendId: invitation.invited.id,
               },
             },
           },
@@ -141,18 +141,18 @@ export const friendRouter = createTRPCRouter({
 
       await ctx.prisma.user.update({
         where: {
-          id: invitation.user_invite.id,
+          id: invitation.invited.id,
         },
         data: {
           friends: {
             connectOrCreate: {
               create: {
-                friendId: invitation.user_sent.id,
-                name: invitation.user_sent.name,
-                image: invitation.user_sent.image,
+                friendId: invitation.sender.id,
+                name: invitation.sender.name,
+                image: invitation.sender.image,
               },
               where: {
-                friendId: invitation.user_sent.id,
+                friendId: invitation.sender.id,
               },
             },
           },
@@ -257,8 +257,8 @@ export const friendRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       return ctx.prisma.friendInvitation.create({
         data: {
-          userSentId: ctx.session.user.id,
-          userInviteId: input.id,
+          senderId: ctx.session.user.id,
+          invitedId: input.id,
         },
       });
     }),

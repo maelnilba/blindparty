@@ -24,7 +24,7 @@ declare module TrackApi {
     }[];
     id: string;
     name: string;
-    preview_url: string | null;
+    previewUrl: string | null;
     /**
      * Unix timestamp
      */

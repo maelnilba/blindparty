@@ -181,8 +181,8 @@ const InvitationBanner = ({
   onBlock,
   onReject,
 }: InvitationBannerProps) => {
-  const invited = invitation.user_sent.id === sessionUserId ? false : true;
-  const friendUser = invited ? invitation.user_sent : invitation.user_invite;
+  const invited = invitation.sender.id === sessionUserId ? false : true;
+  const friendUser = invited ? invitation.sender : invitation.invited;
   return (
     <div className="group flex items-center justify-center gap-4 p-2 font-bold ring-2 ring-white ring-opacity-5">
       <Picture identifier={friendUser.image} className="shrink-0">

@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider        = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
@@ -62,23 +62,23 @@ model VerificationToken {
 //
 
 model User {
-    id                 String             @id @default(cuid())
-    name               String?
-    email              String?            @unique
-    emailVerified      DateTime?
-    image              String?
-    s3key              String?
-    platform           String?
-    accounts           Account[]
-    sessions           Session[]
-    playlists          Playlist[]
-    role               Role               @default(USER)
-    friends            Friend[]
-    invitations_sent   FriendInvitation[] @relation("sent")
-    invitations_invite FriendInvitation[] @relation("invite")
-    hosts              Party[]            @relation("host")
-    players            Player[]
-    party              Party[]
+    id                String             @id @default(cuid())
+    name              String?
+    email             String?            @unique
+    emailVerified     DateTime?
+    image             String?
+    s3Key             String?
+    platform          String?
+    accounts          Account[]
+    sessions          Session[]
+    playlists         Playlist[]
+    role              Role               @default(USER)
+    friends           Friend[]
+    invitationsSent   FriendInvitation[] @relation("sent")
+    invitationsInvite FriendInvitation[] @relation("invite")
+    hosts             Party[]            @relation("host")
+    players           Player[]
+    party             Party[]
 }
 
 enum Role {
@@ -102,17 +102,17 @@ model Friend {
 }
 
 model FriendInvitation {
-    id           String           @id @default(cuid())
-    user_sent    User             @relation(name: "sent", fields: [userSentId], references: [id])
-    user_invite  User             @relation(name: "invite", fields: [userInviteId], references: [id])
-    userSentId   String
-    userInviteId String
-    createdAt    DateTime         @default(now())
-    updatedAt    DateTime         @updatedAt
-    status       InvitationStatus @default(PENDING)
+    id        String           @id @default(cuid())
+    sender    User             @relation(name: "sent", fields: [senderId], references: [id])
+    invited   User             @relation(name: "invite", fields: [invitedId], references: [id])
+    senderId  String
+    invitedId String
+    createdAt DateTime         @default(now())
+    updatedAt DateTime         @updatedAt
+    status    InvitationStatus @default(PENDING)
 
-    @@unique([userSentId, userInviteId])
-    @@index([userInviteId])
+    @@unique([senderId, invitedId])
+    @@index([invitedId])
 }
 
 enum InvitationStatus {
@@ -130,7 +130,7 @@ model Playlist {
     name        String
     description String?  @db.Text
     picture     String?
-    s3key       String?
+    s3Key       String?
     generated   Boolean  @default(false)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
@@ -144,7 +144,7 @@ model Track {
     id             String     @id
     name           String     @db.VarChar(500)
     picture        String?
-    preview_url    String?
+    previewUrl     String?
     album          String     @db.VarChar(500)
     artists        String     @db.Text
     images         String     @db.Text
@@ -168,23 +168,23 @@ model Player {
 }
 
 model Party {
-    id        String          @id @default(cuid())
-    createdAt DateTime        @default(now())
-    updatedAt DateTime        @updatedAt
-    endedAt   DateTime?
-    tracks    Track[]
-    inviteds  User[]
-    players   Player[]
-    host      User            @relation(name: "host", fields: [hostId], references: [id])
-    hostId    String
-    status    PartyStatus     @default(PENDING)
-    view      PartyViewStatus @default(NONE)
-    access_mode PartyAccessMode @default(PRIVATE)
-    max_round Int
-    round     Int             @default(1)
-    track     Track?          @relation(name: "current", fields: [trackId], references: [id])
-    trackId   String?
-    link      PartyLink?
+    id         String          @id @default(cuid())
+    createdAt  DateTime        @default(now())
+    updatedAt  DateTime        @updatedAt
+    endedAt    DateTime?
+    tracks     Track[]
+    inviteds   User[]
+    players    Player[]
+    host       User            @relation(name: "host", fields: [hostId], references: [id])
+    hostId     String
+    status     PartyStatus     @default(PENDING)
+    view       PartyViewStatus @default(NONE)
+    accessMode PartyAccessMode @default(PRIVATE)
+    maxRound   Int
+    round      Int             @default(1)
+    track      Track?          @relation(name: "current", fields: [trackId], references: [id])
+    trackId    String?
+    link       PartyLink?
 
     @@index([trackId])
     @@index([hostId])

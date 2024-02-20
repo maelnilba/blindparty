@@ -114,7 +114,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
         select: {
           id: true,
           name: true,
-          preview_url: true,
+          previewUrl: true,
           album: true,
           images: true,
           artists: true,
@@ -293,7 +293,7 @@ const Party: NextPage<
         ok = false;
         await sleep(VIEW_SCORE_MS);
         ok = true;
-        setRoundCount((c) => Math.min(c + 1, party.max_round));
+        setRoundCount((c) => Math.min(c + 1, party.maxRound));
         round([..._tracks]);
       });
 
@@ -310,7 +310,7 @@ const Party: NextPage<
         setItwas(name);
 
         await sleep(VIEW_SCORE_MS);
-        setRoundCount((c) => Math.min(c + 1, party.max_round));
+        setRoundCount((c) => Math.min(c + 1, party.maxRound));
         round([..._tracks]);
       });
 
@@ -369,7 +369,7 @@ const Party: NextPage<
     { player: Player; joined: boolean; connected: boolean }[]
   >(() => {
     const players =
-      party.access_mode === "PRIVATE"
+      party.accessMode === "PRIVATE"
         ? party.inviteds
         : (members ? Object.values(members) : [])
             .filter((m) => !m.isHost)
@@ -513,7 +513,7 @@ const Party: NextPage<
             <div className="flex flex-1 flex-col gap-6 p-2">
               <Divider />
               <div className="text-center text-lg font-semibold">
-                <p>{party.max_round} rounds</p>
+                <p>{party.maxRound} rounds</p>
               </div>
               <Divider />
               <div className="flex max-h-96 flex-wrap gap-x-2.5 gap-y-2 overflow-hidden">
@@ -545,7 +545,7 @@ const Party: NextPage<
             <div className="flex flex-col items-center gap-4 px-8 pt-32">
               <RoundTile round={roundCount} />
               <Divider />
-              <p className="text-4xl font-extrabold">{party.max_round}</p>
+              <p className="text-4xl font-extrabold">{party.maxRound}</p>
               <Volume
                 className="h-40"
                 orientation="vertical"
