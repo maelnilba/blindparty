@@ -7,7 +7,6 @@ import { formatPosition } from "@components/party/helpers";
 import { PlayerStatusTile, PlayerTile } from "@components/party/player-tile";
 import { useSubmit } from "@hooks/form/useSubmit";
 import { useSet } from "@hooks/helpers/useSet";
-import { useForm } from "@marienilba/react-zod-form";
 import type { PartyStatus, PartyViewStatus } from "@prisma/client";
 import { getServerAuthSession } from "@server/auth";
 import { prisma } from "@server/db";
@@ -15,6 +14,7 @@ import { getQuery, getUA } from "@utils/next-router";
 import { prpc } from "@utils/prpc";
 import { getAcceptLanguage, getLanguage } from "helpers/accept-language";
 import { sleep } from "helpers/sleep";
+import { useF0rm } from "modules/f0rm";
 import type {
   GetServerSidePropsContext,
   InferGetServerSidePropsType,
@@ -373,7 +373,7 @@ const Party: NextPage<
     send("guess", { guess: e.data.guess.trim().toLocaleLowerCase() });
   });
 
-  const f0rm = useForm(guessSchema, submitPreventDefault);
+  const f0rm = useF0rm(guessSchema, submitPreventDefault);
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4">

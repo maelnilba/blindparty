@@ -8,8 +8,8 @@ import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Tab } from "@headlessui/react";
 import { useSubmit } from "@hooks/form/useSubmit";
 import { useMap } from "@hooks/helpers/useMap";
-import { useForm } from "@marienilba/react-zod-form";
 import { api } from "@utils/api";
+import { useF0rm } from "modules/f0rm";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { useRef, useState } from "react";
@@ -129,7 +129,7 @@ const PartyCreate: NextPageWithAuth & NextPageWithTitle = () => {
     }
   );
 
-  const f0rm = useForm(createSchema, submitPreventDefault);
+  const f0rm = useF0rm(createSchema, submitPreventDefault);
 
   const [autoAnimatePlaylistRef] = useAutoAnimate();
   const [autoAnimateFriendRef] = useAutoAnimate();
