@@ -1,8 +1,8 @@
-import { prpc } from "@server/api/prpc";
 import {
   createNextApiHandler,
   createNextWehbookApiHandler,
-} from "modules/prpc/server";
+} from "@marienilba/prpc";
+import { prpc } from "@server/api/prpc";
 import { env } from "../../../env/server.mjs";
 
 const webhooks = createNextWehbookApiHandler<typeof prpc>({

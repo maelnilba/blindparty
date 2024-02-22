@@ -1,4 +1,4 @@
-import { createPRPCNext } from "modules/prpc/client";
+import { createPRPCNext } from "@marienilba/prpc";
 import { PRPCRouter } from "server/api/prpc";
 import { AppRouter } from "../server/api/root";
 import { api } from "./api";

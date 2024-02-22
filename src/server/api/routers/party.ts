@@ -1,5 +1,5 @@
+import { setChannelName } from "@marienilba/prpc";
 import { TRPCError } from "@trpc/server";
-import { setChannelName } from "modules/prpc/shared/utils";
 import { customAlphabet } from "nanoid";
 import { z } from "zod";
 import { pusherClient as pusher } from "../prpc";
