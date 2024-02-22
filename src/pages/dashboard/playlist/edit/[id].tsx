@@ -18,10 +18,10 @@ import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
 import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
+import { useForm } from "@marienilba/react-zod-form";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
 import { Noop } from "helpers/noop";
-import { useF0rm } from "modules/f0rm";
 import type { NextPageWithLayout, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
 import { Fragment, useRef, useState } from "react";
@@ -263,7 +263,7 @@ const PlaylistEdit = () => {
       }
     }
   );
-  const f0rm = useF0rm(editSchema, submitPreventDefault);
+  const f0rm = useForm(editSchema, submitPreventDefault);
 
   const [autoAnimateRef] = useAutoAnimate();
 

@@ -6,10 +6,10 @@ import { SignIn } from "@components/icons/sign-in";
 import { SocialIcon, ensureProvider } from "@components/icons/socials";
 import { AuthGuardUser } from "@components/layout/auth";
 import { useSubmit } from "@hooks/form/useSubmit";
+import { useForm } from "@marienilba/react-zod-form";
 import { useQuery } from "@tanstack/react-query";
 import { RouterOutputs, api } from "@utils/api";
 import { getNextAuthProviders } from "@utils/next-auth";
-import { useF0rm } from "modules/f0rm";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { signIn, useSession } from "next-auth/react";
 import { ReactNode, useRef } from "react";
@@ -53,7 +53,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
     }
   );
 
-  const f0rm = useF0rm(editSchema, submitPreventDefault);
+  const f0rm = useForm(editSchema, submitPreventDefault);
 
   return (
     <div className="flex flex-wrap gap-4 p-4 sm:px-28">
