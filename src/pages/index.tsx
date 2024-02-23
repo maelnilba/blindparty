@@ -8,6 +8,7 @@ import { TextGenerated } from "@components/landing/text-generated";
 import { GetLayoutWithoutNavigation } from "@components/layout/layout";
 import { getServerAuthSession } from "@server/auth";
 import type { GetServerSidePropsContext, NextPageWithLayout } from "next";
+import { signIn } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
@@ -94,13 +95,13 @@ const Home: NextPageWithLayout = () => {
                 With Spotify
               </span>
             </h2>
-            <Link
-              href="/sign-in"
+            <button
+              onClick={() => signIn("spotify")}
               className="flex items-center justify-between gap-2 text-nowrap rounded-full border border-gray-800 bg-black py-2 pl-2 pr-6 text-lg font-semibold text-white no-underline ring-1 ring-white/5 transition-transform hover:scale-105"
             >
               <SpotifyIcon className="h-14 w-14" />
               Se connecter
-            </Link>
+            </button>
           </div>
         </div>
         <div className="relative z-10 w-full py-20">
