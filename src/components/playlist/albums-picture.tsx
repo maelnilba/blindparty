@@ -1,4 +1,5 @@
 import { createQueryValidator } from "helpers/query-validator";
+import { twMerge } from "tailwind-merge";
 import { z } from "zod";
 import { create } from "zustand";
 
@@ -42,9 +43,10 @@ export const AlbumsPicture = ({
   const [B1, B2] = row2;
   return (
     <div
-      className={`${
-        className ?? ""
-      } group relative flex aspect-square shrink-0 items-center justify-center overflow-hidden rounded object-cover text-white outline outline-1 outline-gray-800`}
+      className={twMerge(
+        "group relative flex aspect-square shrink-0 items-center justify-center overflow-hidden rounded object-cover text-white outline outline-1 outline-gray-800",
+        className
+      )}
     >
       <picture>
         <img className="aspect-square" src={A1} />

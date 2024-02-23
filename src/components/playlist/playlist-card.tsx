@@ -44,7 +44,7 @@ export const PlaylistCard = ({ playlist, onDelete }: PlaylistCardProps) => {
             Supprimer
           </ConfirmationModal.Trigger>
           <ConfirmationModal.Title>
-            Supprimer la playlist{" "}
+            Supprimer la playlist
           </ConfirmationModal.Title>
           <ConfirmationModal.Message>
             Êtes vous certain de vouloir supprimer votre playlist{" "}

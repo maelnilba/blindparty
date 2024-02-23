@@ -1,9 +1,11 @@
+import clsx from "clsx";
 import {
   ComponentProps,
   createContext,
   PropsWithChildren,
   useContext,
 } from "react";
+import { twMerge } from "tailwind-merge";
 
 type Timing =
   | "ease"
@@ -85,7 +87,10 @@ Square.Dash = ({ parent, ...props }: SquareDashProps) => {
   const { active, speed, timing } = useSquare();
 
   return (
-    <div className={`h-full w-full overflow-hidden ${className}`} {...div}>
+    <div
+      className={twMerge(clsx("h-full w-full overflow-hidden", className))}
+      {...div}
+    >
       <svg
         viewBox="0 0 200 200"
         className="h-full w-full"

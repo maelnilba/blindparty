@@ -5,8 +5,8 @@ import {
 } from "@components/player/volume";
 import { useCountdown } from "@hooks/helpers/useCountdown";
 import { RouterOutputs } from "@utils/api";
+import clsx from "clsx";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
-import { TrackBluredPicture } from "./track-picture";
 
 export type TrackPlayerProps = RouterOutputs["party"]["game"]["round"] & {
   tracktimer: number;
@@ -71,18 +71,20 @@ export const TrackPlayer = forwardRef<TrackPlayerRef, TrackPlayerProps>(
           </div>
         )}
         <Square
-          className={`scrollbar-hide h-full w-full rounded-lg ${
-            state === "RUNNING" && "bg-gray-800/50"
-          }`}
+          className={clsx("scrollbar-hide h-full w-full rounded-lg", {
+            "bg-gray-800/50": state === "RUNNING",
+          })}
           active={state === "RUNNING"}
           timing="linear"
           speed={30}
         >
           <Square.Child className="h-full w-full flex-col overflow-hidden rounded p-1.5">
             <div
-              className={`relative h-full w-full overflow-hidden ${
-                state === "RUNNING" ? "border-0" : "border"
-              } rounded border-gray-800`}
+              className={clsx(
+                "relative h-full w-full overflow-hidden rounded border-gray-800",
+                { "border-0": state === "RUNNING" },
+                { bordr: state !== "RUNNING" }
+              )}
             >
               <TrackBluredPicture track={track} />
               {track?.previewUrl && (

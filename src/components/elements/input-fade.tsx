@@ -1,4 +1,5 @@
 import { useClickOutside } from "@hooks/helpers/useClickOutside";
+import clsx from "clsx";
 import { InputHTMLAttributes, ReactNode, useRef, useState } from "react";
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -43,16 +44,17 @@ export const InputFade = ({ children, ...props }: InputProps) => {
         }
       }}
       style={{ borderRadius: "16px" }}
-      className={`${
-        ipRef.current && ipRef.current.value ? "pointer-events-none" : ""
-      } relative w-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5`}
+      className={clsx(
+        "relative w-full px-6 py-1 text-center text-lg font-semibold no-underline ring-2 ring-white ring-opacity-5",
+        { "pointer-events-none": ipRef.current && ipRef.current.value }
+      )}
     >
       <input
         ref={ipRef}
         className="pointer-events-auto absolute left-0 right-0 top-0 mx-auto h-8 w-full rounded-lg bg-transparent px-4 outline-none"
         {...props}
       />
-      <span className={`${active ? "opacity-0" : ""} transition-opacity`}>
+      <span className={clsx("transition-opacity", { "opacity-0": active })}>
         {children}
       </span>
     </div>

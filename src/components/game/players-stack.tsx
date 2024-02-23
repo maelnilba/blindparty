@@ -1,6 +1,7 @@
 import { ConfirmationModal } from "@components/elements/confirmation-modal";
 import { Picture } from "@components/images/picture";
 import { Menu, Transition } from "@headlessui/react";
+import clsx from "clsx";
 import { SubscriberProxy, useSubscriber } from "helpers/observable";
 import { Player } from "pages/party/phone/[id]";
 import { useEffect } from "react";
@@ -117,9 +118,10 @@ const Item = ({ subscriber, user, close, active, onBan }: ItemProps) => {
   return (
     <ConfirmationModal.Root>
       <ConfirmationModal.Trigger
-        className={`${
-          active ? "opacity-75" : ""
-        } group flex w-full items-center rounded-md p-4 text-sm ring-2 ring-white ring-opacity-5`}
+        className={clsx(
+          "group flex w-full items-center rounded-md p-4 text-sm ring-2 ring-white ring-opacity-5",
+          { "opacity-75": active }
+        )}
       >
         Exclure {user.name}
       </ConfirmationModal.Trigger>

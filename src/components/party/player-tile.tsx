@@ -1,6 +1,7 @@
 import { Picture } from "@components/images/picture";
 import { Player } from "pages/party/phone/[id]";
 import { ComponentProps } from "react";
+import { twMerge } from "tailwind-merge";
 
 type PlayerTileProps = {
   player: Player;
@@ -18,7 +19,11 @@ export const PlayerTile = ({
         <img
           alt={`playlist picture of ${player.name}`}
           src={player.image!}
-          className={`aspect-square h-12 w-12 rounded border-gray-800 object-cover ${className}`}
+          className={twMerge(
+            "aspect-square h-12 w-12 rounded border-gray-800 object-cover",
+            className
+          )}
+          {...props}
         />
       </Picture>
     </div>

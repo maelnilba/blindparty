@@ -1,8 +1,21 @@
 import * as Slider from "@radix-ui/react-slider";
+import clsx from "clsx";
 import { motion, useMotionValue, useTransform } from "framer-motion";
-import { PointerEvent, useRef } from "react";
+import { ComponentProps, PointerEvent, useRef } from "react";
+import { twMerge } from "tailwind-merge";
 
-const App = () => {
+type TimerProps = Omit<
+  ComponentProps<typeof Slider.Root>,
+  | "orientation"
+  | "onLostPointerCapture"
+  | "onPointerMove"
+  | "onPointerLeave"
+  | "min"
+  | "max"
+  | "step"
+  | "defaultValue"
+>;
+export const Timer = ({ className, ...props }: TimerProps) => {
   const valueChange = useRef<number[]>([]);
   const valueCommit = useRef<number[]>([]);
   const percentage = useMotionValue(0);
@@ -19,11 +32,17 @@ const App = () => {
 
   return (
     <Slider.Root
-      className="group relative flex h-10 w-full items-center active:cursor-pointer"
-      defaultValue={[50]}
+      {...props}
+      className={twMerge(
+        clsx(
+          "group relative flex h-10 w-full items-center active:cursor-pointer",
+          className
+        )
+      )}
+      defaultValue={[0]}
+      min={0}
       max={100}
       step={1}
-      minStepsBetweenThumbs={2}
       orientation="horizontal"
       onValueChange={(value) => {
         valueChange.current = value;
@@ -54,5 +73,3 @@ const App = () => {
     </Slider.Root>
   );
 };
-
-export default App;
