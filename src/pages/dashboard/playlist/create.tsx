@@ -214,7 +214,7 @@ const PlaylistCreate = () => {
       <List.Root className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto p-4 pb-24 pt-20">
         {data?.map((playlist) => (
           <List.Item
-            className="outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+            className="outline-none focus:ring-1 focus:ring-white/20"
             key={playlist.id}
             onKeyUp={({ code }) =>
               code === "Enter" && getPlaylistTrack(playlist.id)
@@ -251,7 +251,7 @@ const PlaylistCreate = () => {
         <List.Root className="flex flex-col gap-2 p-4">
           {tracks?.map((track) => (
             <List.Item
-              className="outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+              className="outline-none focus:ring-1 focus:ring-white/20"
               key={track.id}
               onKeyUp={({ code }) => code === "Enter" && playTrack(track)}
             >
@@ -373,7 +373,7 @@ const PlaylistCreate = () => {
         </Modal.Root>
         <List.Root
           className="flex flex-1 flex-col gap-2 p-4"
-          // ref={autoAnimateRef}
+          ref={autoAnimateRef}
         >
           {!tracksMap.size && (
             <List.NotItem>
@@ -383,7 +383,7 @@ const PlaylistCreate = () => {
           {[...tracksMap].map(([_, track], index) => (
             <List.Item
               key={track.id}
-              className="outline-none focus-visible:ring-1 focus-visible:ring-white/20"
+              className="outline-none focus:ring-1 focus:ring-white/20"
               onKeyUp={({ code }) => code === "Enter" && playTrack(track)}
             >
               {({ selected }) => (
