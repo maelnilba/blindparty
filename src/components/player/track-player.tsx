@@ -1,10 +1,8 @@
 import { PauseIcon } from "@components/icons/pause";
 import { PlayIcon } from "@components/icons/play";
-import { SpeakerIcon } from "@components/icons/speaker";
 import { Picture } from "@components/images/picture";
 import { Track } from "@components/playlist/types";
 import { secondIntl } from "helpers/date";
-import { percent } from "helpers/math";
 import { asyncnoop, noop } from "helpers/noop";
 import {
   ComponentProps,
@@ -14,13 +12,9 @@ import {
   useState,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { Player, VolumeData, useIsPlaying } from "./audio-player";
+import { AudioPlayer, useIsPlaying } from "./audio-player";
 import { Timer } from "./music-timer";
-import {
-  VolumeRef,
-  Volume as VolumeTracker,
-  usePlayerVolumeStore,
-} from "./volume";
+import { Volume, usePlayerVolumeStore } from "./volume";
 
 type TrackPlayerContext = {
   currentTrack: Track | null;
@@ -151,20 +145,20 @@ export const TrackPlayer = ({
           <div className="col-span-3 flex items-center justify-center gap-4 px-[1.75rem]">
             <TrackInfo track={currentTrack} />
           </div>
-          <Player.Root
+          <AudioPlayer.Root
             defaultVolume={defaultVolume}
             defaultMuted={defaultMuted}
             ref={audio}
             className="invisible h-0 opacity-0"
           >
             <div className="col-span-6 flex flex-col items-center justify-center gap-2">
-              <Player.Play className="block cursor-pointer rounded-full bg-white p-2.5 transition-transform duration-75 hover:scale-105 data-[play=true]:hidden">
+              <AudioPlayer.Play className="block cursor-pointer rounded-full bg-white p-2.5 transition-transform duration-75 hover:scale-105 data-[play=true]:hidden">
                 <PlayIcon className="h-6 w-6 text-black" />
-              </Player.Play>
-              <Player.Pause className="hidden cursor-pointer rounded-full bg-white p-2.5 transition-transform duration-75 hover:scale-105 data-[play=true]:block">
+              </AudioPlayer.Play>
+              <AudioPlayer.Pause className="hidden cursor-pointer rounded-full bg-white p-2.5 transition-transform duration-75 hover:scale-105 data-[play=true]:block">
                 <PauseIcon className="h-6 w-6 text-black" />
-              </Player.Pause>
-              <Player.Time>
+              </AudioPlayer.Pause>
+              <AudioPlayer.Time>
                 {({ time, duration }) => {
                   return (
                     <div className="flex h-4 w-full items-center justify-center gap-2">
@@ -189,12 +183,13 @@ export const TrackPlayer = ({
                     </div>
                   );
                 }}
-              </Player.Time>
+              </AudioPlayer.Time>
             </div>
             <div className="col-span-3 flex items-center justify-center">
-              <Player.Volume>
+              <AudioPlayer.Volume>
                 {({ volume, setVolume, muted, setMuted }) => (
                   <Volume
+                    className="flex w-40 items-center gap-2"
                     volume={volume}
                     muted={muted}
                     setVolume={setVolume}
@@ -204,9 +199,9 @@ export const TrackPlayer = ({
                     setDefaultMuted={setDefaultMuted}
                   />
                 )}
-              </Player.Volume>
+              </AudioPlayer.Volume>
             </div>
-          </Player.Root>
+          </AudioPlayer.Root>
         </div>
       </div>
     </TrackPlayerContext.Provider>
@@ -250,60 +245,5 @@ const TrackInfo = ({ track }: TrackInfoProps) => {
         )}
       </div>
     </>
-  );
-};
-
-type VolumeProps = {
-  defaultVolume: number;
-  setDefaultVolume: (volume: number) => void;
-  setDefaultMuted: (muted: boolean) => void;
-} & VolumeData;
-export const Volume = ({
-  volume,
-  muted,
-  setVolume,
-  setMuted,
-  defaultVolume,
-  setDefaultVolume,
-  setDefaultMuted,
-}: VolumeProps) => {
-  const ref = useRef<VolumeRef>(null);
-  return (
-    <div className="flex w-40 items-center gap-2">
-      <SpeakerIcon
-        percent={muted ? 0 : percent(volume, [0, 100])}
-        className="h-6 w-6 cursor-pointer transition-all hover:scale-105"
-        onClick={() => {
-          if (ref.current && volume === 0) {
-            ref.current.changeValue([1]);
-            setVolume(1);
-            setDefaultVolume(1);
-            setMuted(false);
-            setDefaultMuted(false);
-          } else {
-            setMuted(!muted);
-            setDefaultMuted(!muted);
-          }
-        }}
-      />
-      <VolumeTracker
-        ref={ref}
-        muted={muted}
-        min={0}
-        max={1}
-        step={0.05}
-        defaultValue={[defaultVolume]}
-        onValueChange={([value]) => {
-          if (!(value === undefined)) {
-            if (muted) {
-              setMuted(false);
-              setDefaultMuted(false);
-            }
-            setVolume(value);
-            setDefaultVolume(value);
-          }
-        }}
-      />
-    </div>
   );
 };

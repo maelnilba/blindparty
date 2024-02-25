@@ -16,19 +16,19 @@ import {
   useState,
 } from "react";
 
-export const Player = () => <></>;
+export const AudioPlayer = () => <></>;
 
 const Context = createContext<{ ref: RefObject<HTMLAudioElement> }>({
   ref: null as any,
 });
 
-type PlayerRootProps = {
+type AudioPlayerRootProps = {
   children: ReactNode;
   defaultVolume?: number;
   defaultMuted?: boolean;
 } & Omit<ComponentProps<"audio">, "children">;
 
-Player.Root = forwardRef<HTMLAudioElement, PlayerRootProps>(
+AudioPlayer.Root = forwardRef<HTMLAudioElement, AudioPlayerRootProps>(
   ({ children, defaultVolume, defaultMuted, ...props }, forwardRef) => {
     const alternativeRef = useRef<HTMLAudioElement>(null);
     const [ref, setRef] = useState<RefObject<HTMLAudioElement>>({
@@ -36,9 +36,11 @@ Player.Root = forwardRef<HTMLAudioElement, PlayerRootProps>(
     });
 
     useEffect(() => {
-      const forwadedRef = useForwardedRef(forwardRef);
-      if (forwadedRef.current) setRef(forwadedRef);
       if (forwardRef === null) setRef(alternativeRef);
+      else {
+        const forwadedRef = useForwardedRef(forwardRef);
+        if (forwadedRef.current) setRef(forwadedRef);
+      }
     }, [forwardRef]);
 
     useEffect(() => {
@@ -60,7 +62,7 @@ Player.Root = forwardRef<HTMLAudioElement, PlayerRootProps>(
     return (
       <Context.Provider value={{ ref }}>
         {children}
-        <audio ref={forwardRef} {...props} />
+        <audio ref={forwardRef ?? alternativeRef} {...props} />
       </Context.Provider>
     );
   }
@@ -72,7 +74,7 @@ type ButtonProps = {
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => void;
 } & Omit<ComponentProps<"button">, "onClick">;
-Player.Button = ({ children, onClick, ...props }: ButtonProps) => {
+AudioPlayer.Button = ({ children, onClick, ...props }: ButtonProps) => {
   const { ref } = useContext(Context);
   return (
     <button
@@ -89,7 +91,7 @@ Player.Button = ({ children, onClick, ...props }: ButtonProps) => {
 };
 
 type PlayProps = {} & Omit<ComponentProps<"button">, "onClick">;
-Player.Play = ({ children, ...props }: PlayProps) => {
+AudioPlayer.Play = ({ children, ...props }: PlayProps) => {
   const { ref } = useContext(Context);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -102,7 +104,7 @@ Player.Play = ({ children, ...props }: PlayProps) => {
   });
 
   return (
-    <Player.Button
+    <AudioPlayer.Button
       onClick={(audio) => {
         audio.play();
       }}
@@ -111,12 +113,12 @@ Player.Play = ({ children, ...props }: PlayProps) => {
       {...props}
     >
       {children}
-    </Player.Button>
+    </AudioPlayer.Button>
   );
 };
 
 type PauseProps = {} & Omit<ComponentProps<"button">, "onClick">;
-Player.Pause = ({ children, ...props }: PauseProps) => {
+AudioPlayer.Pause = ({ children, ...props }: PauseProps) => {
   const { ref } = useContext(Context);
   const [isPaused, setIsPaused] = useState(true);
   useEventListener(ref, "playing", () => {
@@ -128,7 +130,7 @@ Player.Pause = ({ children, ...props }: PauseProps) => {
   });
 
   return (
-    <Player.Button
+    <AudioPlayer.Button
       onClick={(audio) => {
         audio.pause();
       }}
@@ -137,14 +139,14 @@ Player.Pause = ({ children, ...props }: PauseProps) => {
       {...props}
     >
       {children}
-    </Player.Button>
+    </AudioPlayer.Button>
   );
 };
 
 type PlayingProps = {
   children: (state: { playing: boolean }) => ReactNode;
 };
-Player.Playing = ({ children }: PlayingProps) => {
+AudioPlayer.Playing = ({ children }: PlayingProps) => {
   const { ref } = useContext(Context);
   const [isPlaying, setIsPlaying] = useState(false);
 
@@ -168,7 +170,7 @@ export type VolumeData = {
 type VolumeProps = {
   children: (volume: VolumeData) => ReactNode;
 };
-Player.Volume = ({ children }: VolumeProps) => {
+AudioPlayer.Volume = ({ children }: VolumeProps) => {
   const { ref } = useContext(Context);
 
   const volume = useEffectValue(
@@ -234,7 +236,7 @@ type Time = {
 type TimeProps = {
   children: (time: Time) => ReactNode;
 };
-Player.Time = ({ children }: TimeProps) => {
+AudioPlayer.Time = ({ children }: TimeProps) => {
   const { ref } = useContext(Context);
 
   const time = useEventListenerValue(
@@ -262,6 +264,15 @@ Player.Time = ({ children }: TimeProps) => {
 
   return <>{children({ time, duration: durationChanged || duration })}</>;
 };
+
+export function useAudioPlayer() {
+  const context = useContext(Context);
+
+  if (context === undefined)
+    throw new Error(`useAudioPlayer must be used within a AudioPlayer.Root.`);
+
+  return context;
+}
 
 export function useIsPlaying<TRef extends RefObject<HTMLAudioElement>>(
   ref: TRef

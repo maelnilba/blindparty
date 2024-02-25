@@ -1,14 +1,18 @@
+import { SpeakerIcon } from "@components/icons/speaker";
 import * as Slider from "@radix-ui/react-slider";
 import clsx from "clsx";
+import { percent } from "helpers/math";
 import {
   ComponentProps,
   forwardRef,
   useImperativeHandle,
+  useRef,
   useState,
 } from "react";
 import { twMerge } from "tailwind-merge";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
+import { VolumeData } from "./audio-player";
 
 export const usePlayerVolumeStore = create(
   persist<{
@@ -33,10 +37,10 @@ export const usePlayerVolumeStore = create(
 export type VolumeRef = {
   changeValue: (value: number[]) => void;
 };
-type VolumeProps = Omit<ComponentProps<typeof Slider.Root>, "value"> & {
+type VolumeTrackerProps = Omit<ComponentProps<typeof Slider.Root>, "value"> & {
   muted?: boolean;
 };
-export const Volume = forwardRef<VolumeRef, VolumeProps>(
+export const VolumeTracker = forwardRef<VolumeRef, VolumeTrackerProps>(
   ({ className, muted, defaultValue, onValueChange, ...props }, forwardRef) => {
     const [value, setValue] = useState<number[] | undefined>(defaultValue);
 
@@ -70,3 +74,62 @@ export const Volume = forwardRef<VolumeRef, VolumeProps>(
     );
   }
 );
+
+type VolumeProps = {
+  defaultVolume: number;
+  setDefaultVolume: (volume: number) => void;
+  setDefaultMuted: (muted: boolean) => void;
+} & VolumeData &
+  ComponentProps<typeof Slider.Root>;
+export const Volume = ({
+  volume,
+  muted,
+  setVolume,
+  setMuted,
+  defaultVolume,
+  setDefaultVolume,
+  setDefaultMuted,
+  className,
+  ...props
+}: VolumeProps) => {
+  const ref = useRef<VolumeRef>(null);
+  return (
+    <div className={className}>
+      <SpeakerIcon
+        percent={muted ? 0 : percent(volume, [0, 100])}
+        className="h-6 w-6 cursor-pointer transition-all hover:scale-105"
+        onClick={() => {
+          if (ref.current && volume === 0) {
+            ref.current.changeValue([1]);
+            setVolume(1);
+            setDefaultVolume(1);
+            setMuted(false);
+            setDefaultMuted(false);
+          } else {
+            setMuted(!muted);
+            setDefaultMuted(!muted);
+          }
+        }}
+      />
+      <VolumeTracker
+        {...props}
+        ref={ref}
+        muted={muted}
+        min={0}
+        max={1}
+        step={0.05}
+        defaultValue={[defaultVolume]}
+        onValueChange={([value]) => {
+          if (!(value === undefined)) {
+            if (muted) {
+              setMuted(false);
+              setDefaultMuted(false);
+            }
+            setVolume(value);
+            setDefaultVolume(value);
+          }
+        }}
+      />
+    </div>
+  );
+};

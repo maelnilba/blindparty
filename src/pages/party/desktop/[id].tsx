@@ -17,7 +17,8 @@ import {
   VIEW_SCORE_MS,
 } from "@components/party/constants";
 import { PlayerStatusTile } from "@components/party/player-tile";
-import { Volume } from "@components/player/volume";
+import { AudioPlayer } from "@components/player/audio-player";
+import { Volume, usePlayerVolumeStore } from "@components/player/volume";
 import { useSet } from "@hooks/helpers/useSet";
 import { useMessagesBus } from "@hooks/libs/useMessagesBus";
 import { useWindowConfirmationStore } from "@hooks/next/useWindowConfirmation";
@@ -423,6 +424,14 @@ const Party: NextPage<
     },
   });
 
+  const { defaultVolume, setDefaultVolume, defaultMuted, setDefaultMuted } =
+    usePlayerVolumeStore((state) => ({
+      defaultVolume: state.volume / 100,
+      setDefaultVolume: (volume: number) => state.setVolume(volume * 100),
+      setDefaultMuted: (muted: boolean) => state.setMuted(muted),
+      defaultMuted: state.muted,
+    }));
+
   return (
     <div className="scrollbar-hide flex flex-1 gap-4 p-4">
       {game === "PENDING" && (
@@ -541,57 +550,64 @@ const Party: NextPage<
               <WinnerTile player={winner} />
             </div>
           </div>
-          <div className="fixed right-0 top-0 flex w-max">
-            <div className="flex flex-col items-center gap-4 px-8 pt-32">
-              <RoundTile round={roundCount} />
-              <Divider />
-              <p className="text-4xl font-extrabold">{party.maxRound}</p>
-              <Volume
-                className="h-40"
-                orientation="vertical"
-                inverted
-                onValueChange={(vol, prev) => {
-                  if (audio.current) audio.current.speaker(vol, prev);
-                }}
-                onClick={(state) => {
-                  if (!audio.current) return;
-                  state ? audio.current.unmute() : audio.current.mute();
-                }}
-              />
-            </div>
-          </div>
-          {view === "GUESS" && (
-            <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
-              {track?.track && (
-                <TrackPlayer
-                  tracktimer={TRACK_TIMER_MS}
-                  key={track.track.id}
-                  ref={audio}
-                  track={track.track}
-                />
-              )}
-            </div>
-          )}
-          {view === "SCORE" && (
-            <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
-              <div className="flex flex-col items-center justify-center gap-2">
-                <p className="text-4xl font-extrabold">Le son était</p>
-                <div className="px-10 py-6">
-                  {track && track.track && (
-                    <div className="scrollbar-hide relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded border border-gray-800">
-                      <TrackPicture
-                        width={600}
-                        height={600}
-                        className="object-cover"
-                        track={track.track}
-                      />
-                    </div>
+          <AudioPlayer.Root
+            defaultVolume={defaultVolume}
+            defaultMuted={defaultMuted}
+            className="invisible opacity-0"
+          >
+            <div className="fixed right-0 top-0 flex w-max">
+              <div className="flex flex-col items-center gap-4 px-8 pt-32">
+                <RoundTile round={roundCount} />
+                <Divider />
+                <p className="text-4xl font-extrabold">{party.maxRound}</p>
+                <AudioPlayer.Volume>
+                  {(props) => (
+                    <Volume
+                      className="flex h-40 flex-col items-center justify-center gap-2"
+                      {...props}
+                      defaultVolume={defaultVolume}
+                      setDefaultVolume={setDefaultVolume}
+                      setDefaultMuted={setDefaultMuted}
+                      inverted
+                      orientation="vertical"
+                    />
                   )}
-                </div>
-                <p className="text-center">{itwas}</p>
+                </AudioPlayer.Volume>
               </div>
             </div>
-          )}
+            {view === "GUESS" && (
+              <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
+                {track?.track && (
+                  <TrackPlayer
+                    tracktimer={TRACK_TIMER_MS}
+                    key={track.track.id}
+                    ref={audio}
+                    track={track.track}
+                  />
+                )}
+              </div>
+            )}
+            {view === "SCORE" && (
+              <div className="flex aspect-square w-full max-w-xl flex-col items-center justify-center">
+                <div className="flex flex-col items-center justify-center gap-2">
+                  <p className="text-4xl font-extrabold">Le son était</p>
+                  <div className="px-10 py-6">
+                    {track && track.track && (
+                      <div className="scrollbar-hide relative flex h-full w-full flex-col items-center justify-center overflow-hidden rounded border border-gray-800">
+                        <TrackPicture
+                          width={600}
+                          height={600}
+                          className="object-cover"
+                          track={track.track}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  <p className="text-center">{itwas}</p>
+                </div>
+              </div>
+            )}
+          </AudioPlayer.Root>
         </div>
       )}
       {game === "ENDED" && (
