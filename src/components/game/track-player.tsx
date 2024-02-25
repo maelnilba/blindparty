@@ -7,6 +7,7 @@ import { useCountdown } from "@hooks/helpers/useCountdown";
 import { RouterOutputs } from "@utils/api";
 import clsx from "clsx";
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
+import { TrackBluredPicture } from "./track-picture";
 
 export type TrackPlayerProps = RouterOutputs["party"]["game"]["round"] & {
   tracktimer: number;

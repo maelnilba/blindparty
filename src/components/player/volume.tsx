@@ -1,10 +1,7 @@
-import { Slider, SliderProps } from "@components/elements/slider";
-import { SpeakerIcon } from "@components/icons/speaker";
-import { usePrevious } from "@hooks/helpers/usePrevious";
-import { useClient } from "@hooks/next/useClient";
-import { percent } from "helpers/math";
-import { Noop } from "helpers/noop";
-import { MutableRefObject } from "react";
+import * as Slider from "@radix-ui/react-slider";
+import clsx from "clsx";
+import { ComponentProps } from "react";
+import { twMerge } from "tailwind-merge";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -12,10 +9,14 @@ export const usePlayerVolumeStore = create(
   persist<{
     volume: number;
     setVolume: (volume: number) => void;
+    muted: boolean;
+    setMuted: (muted: boolean) => void;
   }>(
     (set) => ({
       volume: 0,
       setVolume: (volume) => set({ volume }),
+      muted: false,
+      setMuted: (muted) => set({ muted }),
     }),
     {
       name: "settings-player",
@@ -24,75 +25,23 @@ export const usePlayerVolumeStore = create(
   )
 );
 
-type VolumeProps = {
-  onClick: (state: boolean) => void;
-  onValueChange: (value: number, previousValue: number) => void;
-} & Omit<
-  SliderProps,
-  "onClick" | "defaultValue" | "value" | "min" | "max" | "onValueChange"
->;
-
-export const Volume = ({ onClick, onValueChange, ...props }: VolumeProps) => {
-  const volume = usePlayerVolumeStore((state) => state.volume);
-  const setVolume = usePlayerVolumeStore((state) => state.setVolume);
-  const volumewas = usePrevious(volume);
-
-  const isClient = useClient();
-
-  if (!isClient) return <Noop />;
-
+type VolumeProps = ComponentProps<typeof Slider.Root> & { muted?: boolean };
+export const Volume = ({ className, muted, ...props }: VolumeProps) => {
   return (
-    <>
-      <SpeakerIcon
-        percent={percent(volume, [0, 100])}
-        className="h-6 w-6 cursor-pointer transition-transform duration-75 hover:scale-105"
-        onClick={() => {
-          if (volume === 0) setVolume(volumewas || 1);
-          else setVolume(0);
-          onClick(volume === 0);
-        }}
-        active={!!volume}
-      />
-      <Slider
-        {...props}
-        defaultValue={[volume]}
-        value={[volume]}
-        min={0}
-        max={100}
-        onValueChange={(e) => {
-          const [value] = e;
-          if (value !== undefined) {
-            const previous = volume;
-            setVolume(value);
-            onValueChange(value, previous);
-          }
-        }}
-      />
-    </>
+    <Slider.Root
+      data-muted={muted}
+      className={twMerge(
+        clsx(
+          className,
+          "group relative flex items-center active:cursor-pointer data-[orientation='horizontal']:h-10 data-[orientation='vertical']:h-full data-[orientation='horizontal']:w-full data-[orientation='vertical']:w-10 data-[orientation='horizontal']:flex-row data-[orientation='vertical']:flex-col"
+        )
+      )}
+      {...props}
+    >
+      <Slider.Track className="relative flex-grow rounded border border-gray-800 bg-black ring-1 ring-white/20 transition-all group-data-[orientation='horizontal']:h-2.5 group-data-[orientation='vertical']:w-2.5">
+        <Slider.Range className="absolute z-20 block rounded bg-white transition-all group-hover:bg-orange-500 group-focus:bg-orange-500 group-data-[muted=true]:hidden group-data-[orientation='horizontal']:h-full group-data-[orientation='vertical']:w-full" />
+      </Slider.Track>
+      <Slider.Thumb className="block h-0 w-0" aria-label="Volume" />
+    </Slider.Root>
   );
 };
-
-export function useVolumeAudio(
-  audio: MutableRefObject<HTMLAudioElement | null> | undefined
-) {
-  const mute = () => {
-    if (!audio || !audio.current) return;
-    audio.current.muted = true;
-  };
-  const unmute = () => {
-    if (!audio || !audio.current) return;
-    audio.current.muted = false;
-  };
-  const speaker = (spk: number, prev: number) => {
-    if (!audio || !audio.current) return;
-    if (spk === 0 && !!prev) mute();
-    if (spk !== 0 && !prev) unmute();
-    audio.current.volume = spk / 100;
-  };
-
-  return {
-    mute,
-    unmute,
-    speaker,
-  };
-}

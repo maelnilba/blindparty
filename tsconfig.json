@@ -21,7 +21,6 @@
       "@hooks/*": ["hooks/*"],
       "@shared/*": ["shared/*"],
       "@utils/*": ["utils/*"],
-      "@prpc/*": ["lib/prpc/*"],
       "@server/*": ["server/*"],
       "@lib/*": ["lib/*"]
     }

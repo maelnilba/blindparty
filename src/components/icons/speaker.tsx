@@ -1,12 +1,11 @@
 import { Icon } from "./icon";
 
 export const SpeakerIcon = ({
-  active = true,
   percent = 50,
   ...props
-}: Icon & { active?: boolean; percent?: number }) => {
+}: Icon & { percent: number }) => {
   const state = percent <= 33 ? 1 : percent <= 66 ? 2 : 3;
-  if (!active) return <Inactive {...props} />;
+  if (!percent) return <Inactive {...props} />;
   return <Active state={state} {...props} />;
 };
 

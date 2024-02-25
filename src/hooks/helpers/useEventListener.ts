@@ -1,31 +1,47 @@
-import { MutableRefObject, useEffect, useRef } from "react";
+import { useEffect } from "react";
 
-export function useEventListener<T extends HTMLElement>(
-  event: keyof HTMLElementEventMap,
-  cb: (
-    ref: MutableRefObject<T>,
-    event: HTMLElementEventMap[keyof HTMLElementEventMap]
-  ) => void
-): [MutableRefObject<T | null>, () => void, () => void] {
-  const ref = useRef<T | null>(null);
-  function handleEventListener(
-    event: HTMLElementEventMap[keyof HTMLElementEventMap]
-  ) {
-    if (ref.current) {
-      cb(ref as any, event);
-    }
-  }
+import { RefObject, useState } from "react";
+
+export function useEventListenerValue<
+  TRef extends RefObject<HTMLElement>,
+  TEvent extends keyof HTMLElementEventMap,
+  TListener extends (ev: HTMLElementEventMap[TEvent]) => any,
+  TInitial extends ReturnType<TListener>
+>(
+  ref: TRef,
+  event: TEvent,
+  callback: TListener,
+  initialValue?: TInitial
+): TInitial extends never
+  ? ReturnType<TListener> | undefined
+  : ReturnType<TListener> {
+  const [state, setState] = useState<ReturnType<TListener> | undefined>(
+    initialValue
+  );
+
   useEffect(() => {
+    const listener = (ev: HTMLElementEventMap[TEvent]) => {
+      setState(callback(ev));
+    };
+    ref.current?.addEventListener(event, listener);
     return () => {
-      ref.current?.removeEventListener(event, handleEventListener);
+      ref.current?.removeEventListener(event, listener);
     };
   }, [ref]);
 
-  const cleanup = () =>
-    ref.current?.removeEventListener(event, handleEventListener);
+  // @ts-ignore
+  return state;
+}
 
-  const subscribe = () =>
-    ref.current?.addEventListener(event, handleEventListener);
-
-  return [ref, subscribe, cleanup];
+export function useEventListener<
+  TRef extends RefObject<HTMLElement>,
+  TEvent extends keyof HTMLElementEventMap,
+  TListener extends (ev: HTMLElementEventMap[TEvent]) => any
+>(ref: TRef, event: TEvent, callback: TListener) {
+  useEffect(() => {
+    ref.current?.addEventListener(event, callback);
+    return () => {
+      ref.current?.removeEventListener(event, callback);
+    };
+  }, [ref]);
 }

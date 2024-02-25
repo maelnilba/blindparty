@@ -56,6 +56,4 @@ export const Navigation = () => {
       </Transition.Child>
     </Transition>
   );
-
-  return <></>;
 };
