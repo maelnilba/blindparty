@@ -11,6 +11,7 @@ type TrackBannerProps = {
   onPlay?: (track: Track) => void;
   on?: "REMOVE" | "ADD";
   playing?: boolean;
+  selected?: boolean;
 };
 
 export const TrackBanner = ({
@@ -20,6 +21,7 @@ export const TrackBanner = ({
   onPlay,
   playing,
   on,
+  selected,
 }: TrackBannerProps) => {
   const image = track.album.images[0];
   return (
@@ -56,9 +58,11 @@ export const TrackBanner = ({
       </div>
       {(onAdd || onRemove) && !(onAdd && onRemove && on) && (
         <button
+          tabIndex={selected ? 0 : -1}
           onClick={() =>
             onAdd ? onAdd(track) : onRemove ? onRemove(track) : noop
           }
+          onKeyUp={(event) => event.stopPropagation()}
           className="w-1/4 rounded-full bg-white px-6 py-1 text-sm font-normal text-black no-underline transition-transform hover:scale-105"
         >
           {onAdd && "Ajouter"}
@@ -67,7 +71,9 @@ export const TrackBanner = ({
       )}
       {onAdd && onRemove && on && (
         <button
+          tabIndex={selected ? 0 : -1}
           onClick={() => (on === "ADD" ? onAdd(track) : onRemove(track))}
+          onKeyUp={(event) => event.stopPropagation()}
           className="w-1/4 rounded-full bg-white px-6 py-1 text-sm font-normal text-black no-underline transition-transform hover:scale-105"
         >
           {on === "ADD" && "Ajouter"}

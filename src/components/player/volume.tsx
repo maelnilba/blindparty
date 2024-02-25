@@ -52,6 +52,7 @@ export const VolumeTracker = forwardRef<VolumeRef, VolumeTrackerProps>(
 
     return (
       <Slider.Root
+        tabIndex={0}
         value={value}
         data-muted={muted}
         onValueChange={(value) => {
@@ -93,24 +94,28 @@ export const Volume = ({
   ...props
 }: VolumeProps) => {
   const ref = useRef<VolumeRef>(null);
+
+  const mute = () => {
+    if (ref.current && volume === 0) {
+      ref.current.changeValue([1]);
+      setVolume(1);
+      setDefaultVolume(1);
+      setMuted(false);
+      setDefaultMuted(false);
+    } else {
+      setMuted(!muted);
+      setDefaultMuted(!muted);
+    }
+  };
+
   return (
     <div className={className}>
-      <SpeakerIcon
-        percent={muted ? 0 : percent(volume, [0, 100])}
-        className="h-6 w-6 cursor-pointer transition-all hover:scale-105"
-        onClick={() => {
-          if (ref.current && volume === 0) {
-            ref.current.changeValue([1]);
-            setVolume(1);
-            setDefaultVolume(1);
-            setMuted(false);
-            setDefaultMuted(false);
-          } else {
-            setMuted(!muted);
-            setDefaultMuted(!muted);
-          }
-        }}
-      />
+      <button onClick={mute}>
+        <SpeakerIcon
+          percent={muted ? 0 : percent(volume, [0, 100])}
+          className="h-6 w-6 cursor-pointer transition-all hover:scale-105"
+        />
+      </button>
       <VolumeTracker
         {...props}
         ref={ref}

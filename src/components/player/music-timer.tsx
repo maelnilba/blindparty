@@ -39,6 +39,7 @@ export const Timer = ({
   return (
     <Slider.Root
       {...props}
+      tabIndex={0}
       value={active ? dragValue : value}
       defaultValue={value}
       className={twMerge(
