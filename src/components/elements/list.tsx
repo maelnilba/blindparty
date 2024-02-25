@@ -2,6 +2,7 @@ import {
   Children,
   ComponentProps,
   ComponentPropsWithoutRef,
+  ReactNode,
   createElement,
   isValidElement,
   useRef,
@@ -28,7 +29,7 @@ List.Root = ({ children }: ListProps) => {
   return (
     <ul
       ref={ref}
-      onFocusCapture={(event) => {
+      onPointerDownCapture={(event) => {
         let element = event.target as HTMLElement;
         while (element.parentNode !== null) {
           if (element.parentElement === event.currentTarget) break;
@@ -73,7 +74,14 @@ List.Root = ({ children }: ListProps) => {
   );
 };
 
-type ListItemProps = ComponentProps<"li">;
-List.Item = ({ children, ...props }: ListItemProps) => (
-  <li {...props}>{children}</li>
-);
+type ListItemProps = Omit<ComponentProps<"li">, "children" | "tabIndex"> & {
+  children: ((value: { selected: boolean }) => ReactNode) | ReactNode;
+};
+List.Item = ({ children, ...props }: ListItemProps) => {
+  const selected = (props as ComponentProps<"li">).tabIndex === 0;
+  return (
+    <li {...props} aria-selected={selected}>
+      {children instanceof Function ? children({ selected }) : children}
+    </li>
+  );
+};
