@@ -14,9 +14,13 @@ import {
   useState,
 } from "react";
 import { useHotkeys } from "react-hotkeys-hook";
-import { Player, useIsPlaying } from "./audio-player";
+import { Player, VolumeData, useIsPlaying } from "./audio-player";
 import { Timer } from "./music-timer";
-import { Volume, usePlayerVolumeStore } from "./volume";
+import {
+  VolumeRef,
+  Volume as VolumeTracker,
+  usePlayerVolumeStore,
+} from "./volume";
 
 type TrackPlayerContext = {
   currentTrack: Track | null;
@@ -122,8 +126,6 @@ export const TrackPlayer = ({
     preventDefault: true,
   });
 
-  const image = currentTrack?.album?.images?.at(0);
-
   return (
     <TrackPlayerContext.Provider
       value={{
@@ -147,34 +149,7 @@ export const TrackPlayer = ({
       >
         <div className="grid w-full grid-cols-12 border-t-2 border-gray-800 p-2">
           <div className="col-span-3 flex items-center justify-center gap-4 px-[1.75rem]">
-            <Picture
-              className="group/image relative shrink-0"
-              identifier={image?.url}
-            >
-              <img
-                alt={`track picture of ${currentTrack?.name}`}
-                src={image?.url}
-                className="h-12 w-12 rounded border-gray-800 object-cover transition-all duration-75 group-hover/item:scale-105"
-              />
-            </Picture>
-            <div className="inline-block w-3/4">
-              {currentTrack && (
-                <>
-                  <span
-                    title={currentTrack.name}
-                    className="block overflow-hidden truncate text-ellipsis font-extrabold"
-                  >
-                    {currentTrack.name}
-                  </span>
-                  <span
-                    title={currentTrack.artists.map((a) => a.name).join(", ")}
-                    className="block overflow-hidden truncate text-ellipsis"
-                  >
-                    {currentTrack.artists.map((a) => a.name).join(", ")}
-                  </span>
-                </>
-              )}
-            </div>
+            <TrackInfo track={currentTrack} />
           </div>
           <Player.Root
             defaultVolume={defaultVolume}
@@ -219,33 +194,15 @@ export const TrackPlayer = ({
             <div className="col-span-3 flex items-center justify-center">
               <Player.Volume>
                 {({ volume, setVolume, muted, setMuted }) => (
-                  <div className="flex w-40 items-center gap-2">
-                    <SpeakerIcon
-                      percent={muted ? 0 : percent(volume, [0, 100])}
-                      className="h-6 w-6 cursor-pointer transition-all hover:scale-105"
-                      onClick={() => {
-                        setMuted(!muted);
-                        setDefaultMuted(!muted);
-                      }}
-                    />
-                    <Volume
-                      muted={muted}
-                      min={0}
-                      max={1}
-                      step={0.05}
-                      defaultValue={[defaultVolume]}
-                      onValueChange={([value]) => {
-                        if (!(value === undefined)) {
-                          if (muted) {
-                            setMuted(false);
-                            setDefaultMuted(false);
-                          }
-                          setVolume(value);
-                          setDefaultVolume(value);
-                        }
-                      }}
-                    />
-                  </div>
+                  <Volume
+                    volume={volume}
+                    muted={muted}
+                    setVolume={setVolume}
+                    setMuted={setMuted}
+                    defaultVolume={defaultVolume}
+                    setDefaultVolume={setDefaultVolume}
+                    setDefaultMuted={setDefaultMuted}
+                  />
                 )}
               </Player.Volume>
             </div>
@@ -253,5 +210,100 @@ export const TrackPlayer = ({
         </div>
       </div>
     </TrackPlayerContext.Provider>
+  );
+};
+
+type TrackInfoProps = {
+  track: Track | null;
+};
+
+const TrackInfo = ({ track }: TrackInfoProps) => {
+  const image = track?.album?.images?.at(0);
+  return (
+    <>
+      <Picture
+        className="group/image relative shrink-0"
+        identifier={image?.url}
+      >
+        <img
+          alt={`track picture of ${track?.name}`}
+          src={image?.url}
+          className="h-12 w-12 rounded border-gray-800 object-cover transition-all duration-75 group-hover/item:scale-105"
+        />
+      </Picture>
+      <div className="inline-block w-3/4">
+        {track && (
+          <>
+            <span
+              title={track.name}
+              className="block overflow-hidden truncate text-ellipsis font-extrabold"
+            >
+              {track.name}
+            </span>
+            <span
+              title={track.artists.map((a) => a.name).join(", ")}
+              className="block overflow-hidden truncate text-ellipsis"
+            >
+              {track.artists.map((a) => a.name).join(", ")}
+            </span>
+          </>
+        )}
+      </div>
+    </>
+  );
+};
+
+type VolumeProps = {
+  defaultVolume: number;
+  setDefaultVolume: (volume: number) => void;
+  setDefaultMuted: (muted: boolean) => void;
+} & VolumeData;
+export const Volume = ({
+  volume,
+  muted,
+  setVolume,
+  setMuted,
+  defaultVolume,
+  setDefaultVolume,
+  setDefaultMuted,
+}: VolumeProps) => {
+  const ref = useRef<VolumeRef>(null);
+  return (
+    <div className="flex w-40 items-center gap-2">
+      <SpeakerIcon
+        percent={muted ? 0 : percent(volume, [0, 100])}
+        className="h-6 w-6 cursor-pointer transition-all hover:scale-105"
+        onClick={() => {
+          if (ref.current && volume === 0) {
+            ref.current.changeValue([1]);
+            setVolume(1);
+            setDefaultVolume(1);
+            setMuted(false);
+            setDefaultMuted(false);
+          } else {
+            setMuted(!muted);
+            setDefaultMuted(!muted);
+          }
+        }}
+      />
+      <VolumeTracker
+        ref={ref}
+        muted={muted}
+        min={0}
+        max={1}
+        step={0.05}
+        defaultValue={[defaultVolume]}
+        onValueChange={([value]) => {
+          if (!(value === undefined)) {
+            if (muted) {
+              setMuted(false);
+              setDefaultMuted(false);
+            }
+            setVolume(value);
+            setDefaultVolume(value);
+          }
+        }}
+      />
+    </div>
   );
 };

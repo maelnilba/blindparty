@@ -159,14 +159,14 @@ Player.Playing = ({ children }: PlayingProps) => {
   return <>{children({ playing: isPlaying })}</>;
 };
 
-type Volume = {
+export type VolumeData = {
   volume: number;
   muted: boolean;
   setVolume: (volume: number) => void;
   setMuted: (muted: boolean) => void;
 };
 type VolumeProps = {
-  children: (volume: Volume) => ReactNode;
+  children: (volume: VolumeData) => ReactNode;
 };
 Player.Volume = ({ children }: VolumeProps) => {
   const { ref } = useContext(Context);
