@@ -57,8 +57,6 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
 
       let s3Key = user?.s3Key ?? getS3key(user.image);
 
-      console.log(e.data, "data");
-
       if (e.data.image)
         await post(
           e.data.image.post,

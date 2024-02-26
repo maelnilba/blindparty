@@ -1,5 +1,9 @@
 import { ErrorMessages } from "@components/elements/error";
-import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
+import {
+  ImageUpload,
+  fetchPresignedPost,
+  useS3,
+} from "@components/elements/image-upload";
 import { List } from "@components/elements/list";
 import { Modal, ModalRef } from "@components/elements/modal";
 import { GetLayoutThrough } from "@components/layout/layout";
@@ -8,22 +12,21 @@ import { TrackBanner } from "@components/player/track-banner";
 import { TrackPlayer, usePlayer } from "@components/player/track-player";
 import {
   AlbumsPicture,
-  useAlbumsPictureStore,
+  useMergeAlbum,
 } from "@components/playlist/albums-picture";
 import { Track } from "@components/playlist/types";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { spotify } from "@hooks/api/useTrackApi";
 import { useSubmit } from "@hooks/form/useSubmit";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
-import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
-import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useForm } from "@marienilba/react-zod-form";
 import { api } from "@utils/api";
+import { zu } from "@utils/zod";
 import { Noop } from "helpers/noop";
 import { NextPageWithAuth, NextPageWithLayout, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { z } from "zod";
 
 const createSchema = z.object({
@@ -36,6 +39,14 @@ const createSchema = z.object({
       message: "Une playlist ne peut contenir plus de 1000 tracks.",
     })
     .default([]),
+  image: zu
+    .file({
+      name: z.string(),
+      size: z.number().max(5, { message: "The file should be lower than 5Mo" }),
+      type: z.string().startsWith("image/"),
+    })
+    .optional()
+    .transform(fetchPresignedPost({ prefix: "playlist" })),
 });
 
 const PlaylistCreate = () => {
@@ -87,46 +98,7 @@ const PlaylistCreate = () => {
     [tracks]
   );
 
-  const [mockAlbumsPicture, setMockAlbumsPicture] = useState<
-    string[] | undefined
-  >();
-  const fetchMergeAlbum = useAlbumsPictureStore((state) => state.fetch);
-  const setMergeAlbum = useDebounce(async (sources: string[]) => {
-    if (!imageUpload.current) return;
-    setMockAlbumsPicture(sources);
-  }, 100);
-
-  useAsyncEffect(async () => {
-    if (
-      tracksMap.size > 3 &&
-      imageUpload.current &&
-      !imageUpload.current.local
-    ) {
-      const images = [
-        ...[...tracksMap]
-          .map(([_, v]) => v.album.images)
-          .reduce((map, images) => {
-            const image = images[0];
-            if (image) map.set(image.url, (map.get(image.url) ?? 0) + 1);
-            return map;
-          }, new Map<string, number>()),
-      ]
-        .map(([k, v]) => ({
-          count: v,
-          image: k,
-        }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 4);
-
-      if (images.length !== 4) return;
-      const sources = images.map((img) => img.image).sort();
-      await setMergeAlbum(sources);
-    }
-
-    if (tracksMap.size < 4) {
-      setMockAlbumsPicture(undefined);
-    }
-  }, [tracksMap]);
+  const [mockAlbumsPicture, fetchMergeAlbum] = useMergeAlbum(tracksMap);
 
   const { load, play, toggle, currentTrack, playing } = usePlayer();
   const playTrack = async (track: Track) => {
@@ -142,68 +114,72 @@ const PlaylistCreate = () => {
     mutate({ id });
   };
 
-  const imageUpload = useRef<ImageUploadRef | null>(null);
+  const { post } = useS3({ prefix: "playlist" });
 
-  const { submitPreventDefault, isSubmitting } = useSubmit(async (e) => {
-    if (!e.success) return;
-    const tracks = [...tracksMap].map(([_, track]) => ({
-      id: track.id,
-      name: track.name,
-      previewUrl: track.previewUrl!,
-      album: {
-        name: track.album.name,
-        images: track.album.images.map((image) => ({
-          url: image.url,
+  const { submitPreventDefault, isSubmitting } = useSubmit<typeof createSchema>(
+    async (e) => {
+      if (!e.success) return;
+
+      const tracks = [...tracksMap].map(([_, track]) => ({
+        id: track.id,
+        name: track.name,
+        previewUrl: track.previewUrl!,
+        album: {
+          name: track.album.name,
+          images: track.album.images.map((image) => ({
+            url: image.url,
+          })),
+        },
+        artists: track.artists.map((artist) => ({
+          name: artist.name,
         })),
-      },
-      artists: track.artists.map((artist) => ({
-        name: artist.name,
-      })),
-    }));
+      }));
 
-    if (tracks.length < 1) {
-      return;
+      let key: string | never = z.NEVER;
+      if (e.data.image) {
+        await post(
+          e.data.image.post,
+          new File([e.data.image.file], e.data.image.file.name)
+        );
+        key = e.data.image.key;
+      } else if (mockAlbumsPicture) {
+        const mock = await fetchMergeAlbum(mockAlbumsPicture);
+        const presigned = (await fetchPresignedPost({
+          prefix: "playlist",
+        })(mock))!;
+        await post(
+          presigned.post,
+          new File([presigned.file], presigned.file.name)
+        );
+        key = presigned.key;
+      }
+
+      if (tracks.length <= 20) {
+        await create({
+          name: e.data.name,
+          description: e.data.description,
+          s3Key: key,
+          tracks: tracks,
+          generated: !Boolean(e.data.image),
+        });
+      } else {
+        const playlist = await create_empty({
+          name: e.data.name,
+          description: e.data.description,
+          s3Key: key,
+          generated: !Boolean(e.data.image),
+        });
+
+        await Promise.all(
+          Array.from({ length: Math.ceil(tracks.length / 20) }, (_, i) =>
+            tracks.slice(i * 20, i * 20 + 20)
+          ).map((tracks) => insert_tracks({ id: playlist.id, tracks }))
+        );
+
+        router.push("/dashboard/playlist");
+      }
     }
-
-    if (
-      imageUpload.current &&
-      mockAlbumsPicture &&
-      !imageUpload.current.changed &&
-      !imageUpload.current.local
-    ) {
-      const img = await fetchMergeAlbum(mockAlbumsPicture);
-      await imageUpload.current.set(img, true);
-    }
-
-    if (imageUpload.current && imageUpload.current.local) {
-      await imageUpload.current.upload();
-    }
-
-    if (tracks.length <= 20) {
-      await create({
-        name: e.data.name,
-        description: e.data.description,
-        s3Key: imageUpload.current ? imageUpload.current.key : undefined,
-        tracks: tracks,
-        generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
-      });
-    } else {
-      const playlist = await create_empty({
-        name: e.data.name,
-        description: e.data.description,
-        s3Key: imageUpload.current ? imageUpload.current.key : undefined,
-        generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
-      });
-
-      await Promise.all(
-        Array.from({ length: Math.ceil(tracks.length / 20) }, (_, i) =>
-          tracks.slice(i * 20, i * 20 + 20)
-        ).map((tracks) => insert_tracks({ id: playlist.id, tracks }))
-      );
-
-      router.push("/dashboard/playlist");
-    }
-  });
+  );
 
   const f0rm = useForm(createSchema, submitPreventDefault);
 
@@ -295,20 +271,33 @@ const PlaylistCreate = () => {
             </button>
           </div>
           <div className="flex flex-grow items-center justify-center gap-4">
-            <ImageUpload
-              ref={imageUpload}
-              className="flex-1"
-              prefix="playlist"
-              presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
-            >
-              {mockAlbumsPicture && (
-                <AlbumsPicture
-                  className="flex-1"
-                  row1={mockAlbumsPicture.slice(0, 2)}
-                  row2={mockAlbumsPicture.slice(2, 4)}
-                />
-              )}
-            </ImageUpload>
+            <ImageUpload.Root className="flex aspect-square flex-1 shrink-0 items-center justify-center overflow-hidden rounded border border-gray-800 object-cover text-white">
+              <ImageUpload.Input
+                form="create-playlist"
+                name={f0rm.fields.image().name()}
+                accept="image/*"
+              />
+              <ImageUpload.Picture
+                identifier={mockAlbumsPicture}
+                className="aspect-square object-contain"
+              >
+                {({ src }) =>
+                  mockAlbumsPicture && !src ? (
+                    <AlbumsPicture
+                      className="pointer-events-none flex-1"
+                      row1={mockAlbumsPicture.slice(0, 2)}
+                      row2={mockAlbumsPicture.slice(2, 4)}
+                    />
+                  ) : (
+                    <img
+                      alt="Playlist picture"
+                      src={src}
+                      className="h-full w-full"
+                    />
+                  )
+                }
+              </ImageUpload.Picture>
+            </ImageUpload.Root>
             <form
               onSubmit={f0rm.form.submit}
               id="create-playlist"

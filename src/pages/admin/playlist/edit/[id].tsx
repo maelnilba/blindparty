@@ -1,5 +1,9 @@
 import { ErrorMessages } from "@components/elements/error";
-import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
+import {
+  ImageUpload,
+  fetchPresignedPost,
+  useS3,
+} from "@components/elements/image-upload";
 import { List } from "@components/elements/list";
 import { Modal, ModalRef } from "@components/elements/modal";
 import { AuthGuardAdmin } from "@components/layout/auth";
@@ -9,7 +13,7 @@ import { TrackBanner } from "@components/player/track-banner";
 import { TrackPlayer, usePlayer } from "@components/player/track-player";
 import {
   AlbumsPicture,
-  useAlbumsPictureStore,
+  useMergeAlbum,
 } from "@components/playlist/albums-picture";
 import { Track } from "@components/playlist/types";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
@@ -18,15 +22,15 @@ import { useSubmit } from "@hooks/form/useSubmit";
 import { useCountCallback } from "@hooks/helpers/useCountCallback";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useMap } from "@hooks/helpers/useMap";
-import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useForm } from "@marienilba/react-zod-form";
 import { api } from "@utils/api";
 import { getQuery } from "@utils/next-router";
+import { zu } from "@utils/zod";
 import { Noop } from "helpers/noop";
 import type { NextPageWithAuth, NextPageWithLayout } from "next";
 import { NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { z } from "zod";
 
 const editSchema = z.object({
@@ -39,6 +43,15 @@ const editSchema = z.object({
       message: "Une playlist ne peut contenir plus de 1000 tracks.",
     })
     .default([]),
+  newTracks: z.array(zu.boolean()).min(1),
+  image: zu
+    .file({
+      name: z.string(),
+      size: z.number().max(5, { message: "The file should be lower than 5Mo" }),
+      type: z.string().startsWith("image/"),
+    })
+    .optional()
+    .transform(fetchPresignedPost({ prefix: "playlist" })),
 });
 
 const PlaylistEdit = () => {
@@ -98,46 +111,7 @@ const PlaylistEdit = () => {
     [tracks]
   );
 
-  const [mockAlbumsPicture, setMockAlbumsPicture] = useState<
-    string[] | undefined
-  >();
-  const fetchMergeAlbum = useAlbumsPictureStore((state) => state.fetch);
-  const setMergeAlbum = useDebounce(async (sources: string[]) => {
-    if (!imageUpload.current) return;
-    setMockAlbumsPicture(sources);
-  }, 100);
-
-  useAsyncEffect(async () => {
-    if (
-      tracksMap.size > 3 &&
-      imageUpload.current &&
-      !imageUpload.current.local
-    ) {
-      const images = [
-        ...[...tracksMap]
-          .map(([_, v]) => v.album.images)
-          .reduce((map, images) => {
-            const image = images[0];
-            if (image) map.set(image.url, (map.get(image.url) ?? 0) + 1);
-            return map;
-          }, new Map<string, number>()),
-      ]
-        .map(([k, v]) => ({
-          count: v,
-          image: k,
-        }))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 4);
-
-      if (images.length !== 4) return;
-      const sources = images.map((img) => img.image).sort();
-      await setMergeAlbum(sources);
-    }
-
-    if (tracksMap.size < 4) {
-      setMockAlbumsPicture(undefined);
-    }
-  }, [tracksMap]);
+  const [mockAlbumsPicture, fetchMergeAlbum] = useMergeAlbum(tracksMap);
 
   const { load, play, toggle, currentTrack, playing } = usePlayer();
   const playTrack = async (track: Track) => {
@@ -153,7 +127,6 @@ const PlaylistEdit = () => {
     search({ field: field });
   });
 
-  const s3Key = useRef<string>();
   const form = useRef<HTMLFormElement>(null);
   const { data: playlist } = api.admin.playlist.get_playlist.useQuery(
     { id: id! },
@@ -177,13 +150,13 @@ const PlaylistEdit = () => {
             f0rm.fields.description().name()
           ) as any
         ).value = playlist.description;
-        s3Key.current = playlist.s3Key ?? undefined;
         addTracks(playlist.tracks);
       },
     }
   );
 
-  const imageUpload = useRef<ImageUploadRef | null>(null);
+  const { post } = useS3({ prefix: "playlist" });
+
   const { submitPreventDefault, isSubmitting } = useSubmit<typeof editSchema>(
     async (e) => {
       if (!e.success) return;
@@ -211,29 +184,23 @@ const PlaylistEdit = () => {
         }))
         .filter((t) => !playlist.tracks.find((pt) => pt.id === t.id));
 
-      if (
-        tracks.length < 1 &&
-        removed_tracks.length < 1 &&
-        e.data.name === playlist.name &&
-        (e.data.description ?? null) === playlist.description &&
-        !imageUpload.current?.local
-      ) {
-        push("/admin/playlist");
-        return;
-      }
-
-      if (
-        imageUpload.current &&
-        mockAlbumsPicture &&
-        !imageUpload.current.changed &&
-        !imageUpload.current.local
-      ) {
-        const img = await fetchMergeAlbum(mockAlbumsPicture);
-        await imageUpload.current.set(img, true, s3Key.current);
-      }
-
-      if (imageUpload.current && imageUpload.current.local) {
-        await imageUpload.current.upload(s3Key.current);
+      let key = playlist.s3Key!;
+      if (e.data.image) {
+        await post(
+          e.data.image.post,
+          new File([e.data.image.file], e.data.image.file.name)
+        );
+        key = e.data.image.key;
+      } else if (mockAlbumsPicture && playlist.generated) {
+        const mock = await fetchMergeAlbum(mockAlbumsPicture);
+        const presigned = (await fetchPresignedPost({
+          prefix: "playlist",
+        })(mock))!;
+        await post(
+          presigned.post,
+          new File([presigned.file], presigned.file.name)
+        );
+        key = presigned.key;
       }
 
       if (tracks.length <= 20) {
@@ -241,18 +208,18 @@ const PlaylistEdit = () => {
           id: id,
           name: e.data.name,
           description: e.data.description,
-          s3Key: imageUpload.current ? imageUpload.current.key : undefined,
+          s3Key: key,
           tracks: tracks,
           removed_tracks: removed_tracks,
-          generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
+          generated: !Boolean(e.data.image) && playlist.generated,
         });
       } else {
         const edit = await edit_empty({
           id: playlist.id,
           name: e.data.name,
           description: e.data.description,
-          s3Key: imageUpload.current ? imageUpload.current.key : undefined,
-          generated: Boolean(mockAlbumsPicture && !imageUpload.current?.local),
+          s3Key: key,
+          generated: !Boolean(e.data.image) && playlist.generated,
         });
 
         await Promise.all(
@@ -375,22 +342,37 @@ const PlaylistEdit = () => {
             </button>
           </div>
           <div className="flex flex-grow items-center justify-center gap-4">
-            <ImageUpload
-              generated={playlist?.generated}
-              src={playlist?.picture}
-              ref={imageUpload}
-              className="flex-1"
-              prefix="playlist"
-              presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
-            >
-              {mockAlbumsPicture && (
-                <AlbumsPicture
-                  className="flex-1"
-                  row1={mockAlbumsPicture.slice(0, 2)}
-                  row2={mockAlbumsPicture.slice(2, 4)}
-                />
-              )}
-            </ImageUpload>
+            <ImageUpload.Root className="flex aspect-square flex-1 shrink-0 items-center justify-center overflow-hidden rounded border border-gray-800 object-cover text-white">
+              <ImageUpload.Input
+                form="edit-playlist"
+                name={f0rm.fields.image().name()}
+                accept="image/*"
+              />
+              <ImageUpload.Picture
+                identifier={
+                  playlist?.generated
+                    ? mockAlbumsPicture ?? playlist.picture
+                    : playlist?.picture
+                }
+                className="aspect-square object-contain"
+              >
+                {({ src }) =>
+                  mockAlbumsPicture && playlist?.generated && !src ? (
+                    <AlbumsPicture
+                      className="pointer-events-none flex-1"
+                      row1={mockAlbumsPicture.slice(0, 2)}
+                      row2={mockAlbumsPicture.slice(2, 4)}
+                    />
+                  ) : (
+                    <img
+                      alt="Playlist picture"
+                      src={src ?? playlist?.picture ?? undefined}
+                      className="h-full w-full"
+                    />
+                  )
+                }
+              </ImageUpload.Picture>
+            </ImageUpload.Root>
             <form
               ref={form}
               onSubmit={f0rm.form.submit}
@@ -471,6 +453,17 @@ const PlaylistEdit = () => {
             >
               {({ selected }) => (
                 <>
+                  <input
+                    form="edit-playlist"
+                    type="hidden"
+                    value={String(
+                      Boolean(
+                        playlist &&
+                          playlist.tracks.some((t) => t.id === track.id)
+                      )
+                    )}
+                    name={f0rm.fields.newTracks(index).name()}
+                  />
                   <input
                     form="edit-playlist"
                     type="hidden"

@@ -52,3 +52,51 @@ export const AlbumsPicture = ({
     </div>
   );
 };
+
+import { Track } from "@components/playlist/types";
+import { useDebounce } from "@hooks/helpers/useDebounce";
+import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
+import { useState } from "react";
+
+export function useMergeAlbum<T extends Map<Track["id"], Track>>(map: T) {
+  const [mockAlbumsPicture, setMockAlbumsPicture] = useState<
+    string[] | undefined
+  >();
+  const fetchMergeAlbum = useAlbumsPictureStore((state) => state.fetch);
+  const setMockAlbumsPictureDebounce = useDebounce(
+    async (sources: string[]) => {
+      setMockAlbumsPicture(sources);
+    },
+    100
+  );
+
+  useAsyncEffect(async () => {
+    if (map.size > 3) {
+      const images = [
+        ...[...map]
+          .map(([_, v]) => v.album.images)
+          .reduce((map, images) => {
+            const image = images[0];
+            if (image) map.set(image.url, (map.get(image.url) ?? 0) + 1);
+            return map;
+          }, new Map<string, number>()),
+      ]
+        .map(([k, v]) => ({
+          count: v,
+          image: k,
+        }))
+        .sort((a, b) => b.count - a.count)
+        .slice(0, 4);
+
+      if (images.length !== 4) return;
+      const sources = images.map((img) => img.image).sort();
+      await setMockAlbumsPictureDebounce(sources);
+    }
+
+    if (map.size < 4) {
+      setMockAlbumsPicture(undefined);
+    }
+  }, [map]);
+
+  return [mockAlbumsPicture, fetchMergeAlbum] as const;
+}

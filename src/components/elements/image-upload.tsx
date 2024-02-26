@@ -16,15 +16,15 @@ import {
 import { twMerge } from "tailwind-merge";
 
 const Context = createContext<{
-  src: string | null;
-  setSrc: (src: string | null) => void;
-}>({ src: null, setSrc: noop });
+  src: string | undefined;
+  setSrc: (src: string | undefined) => void;
+}>({ src: undefined, setSrc: noop });
 
 export const ImageUpload = () => <></>;
 
 type ImageUploadProps = ComponentProps<"div">;
 ImageUpload.Root = ({ children, className, ...props }: ImageUploadProps) => {
-  const [src, setSrc] = useState<string | null>(null);
+  const [src, setSrc] = useState<string | undefined>();
 
   const input = Children.map(children, (child) =>
     isValidElement(child) && child.type === ImageUpload.Input ? child : false
@@ -73,7 +73,7 @@ type ImageUploadPictureProps = Omit<
   "children"
 > & {
   children: (src: {
-    src: string | null;
+    src: string | undefined;
   }) => ReactElement<{ [key: string]: any; className: string }>;
 };
 ImageUpload.Picture = ({
@@ -92,7 +92,7 @@ ImageUpload.Picture = ({
 export function useS3(opts: { prefix: S3Prefix }) {
   const { mutateAsync } = api.s3.delete.useMutation();
 
-  const post = async (post: PresignedPost, file: File, key?: string) => {
+  const post = async (post: PresignedPost, file: File, key?: string | null) => {
     if (key) {
       await mutateAsync({ key: key, prefix: opts.prefix });
     }
