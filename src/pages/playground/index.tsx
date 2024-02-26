@@ -1,39 +1,48 @@
-import { List } from "@components/elements/list";
+import { useForm } from "@marienilba/react-zod-form";
+import { validator } from "@shared/validators/presigned";
+import { zu } from "@utils/zod";
+import { PresignedPost } from "aws-sdk/clients/s3";
+import { z } from "zod";
+
+const schema = z.object({
+  image: zu
+    .file({
+      name: z.string(),
+      size: z.number().max(200),
+      type: z.string().startsWith("image/"),
+    })
+    .optional()
+    .transform(async (file) => {
+      if (!file) return null;
+      const url = validator.createSearchURL({ prefix: "playlist" });
+      const res = await fetch("/api/s3/presigned" + url);
+      const data = await res.json();
+      return { ...data, file } as {
+        post: PresignedPost;
+        key: string;
+        file: Blob;
+      };
+    }),
+});
 
 const App = () => {
+  const form = useForm(schema, async (event) => {
+    event.preventDefault();
+
+    if (!event.success) return;
+    console.log(event.data);
+  });
   return (
-    <div className="h-80 p-2">
-      <List.Root>
-        {Array(50)
-          .fill(0)
-          .map((_, i) => (
-            <List.Item
-              className="flex gap-4 p-4 outline-blue-600 focus:outline"
-              key={i}
-            >
-              {({ selected }) => (
-                <>
-                  <button
-                    tabIndex={selected ? 0 : -1}
-                    className="w-full cursor-pointer rounded bg-white px-2 text-center text-black"
-                  >
-                    {i}
-                  </button>
-                  <button
-                    tabIndex={selected ? 0 : -1}
-                    className="w-full cursor-pointer rounded bg-white px-2 text-center text-black"
-                  >
-                    {i}
-                  </button>
-                </>
-              )}
-            </List.Item>
-          ))}
-      </List.Root>
-      <button tabIndex={0} className="focus:outline">
-        test focus
-      </button>
-    </div>
+    <form onSubmit={form.form.submit} className="h-80 p-2">
+      <input
+        onChange={(e) => {
+          e.target.value = "";
+        }}
+        name={form.fields.image().name()}
+        type="file"
+      />
+      <button type="submit">submit</button>
+    </form>
   );
 };
 

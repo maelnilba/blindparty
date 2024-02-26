@@ -1,173 +1,102 @@
-import { ImageIcon } from "@components/icons/image";
+import { Picture } from "@components/images/picture";
 import type { S3Prefix } from "@server/api/routers/infra/s3";
+import { validator } from "@shared/validators/presigned";
 import { api } from "@utils/api";
-import { PresignedPost } from "aws-sdk/clients/s3";
+import type { PresignedPost } from "aws-sdk/clients/s3";
+import { noop } from "helpers/noop";
 import {
-  forwardRef,
-  ReactNode,
-  useDeferredValue,
-  useImperativeHandle,
-  useRef,
+  Children,
+  ComponentProps,
+  ReactElement,
+  createContext,
+  isValidElement,
+  useContext,
   useState,
 } from "react";
-export type ImageUploadRef = {
-  set: (blob: Blob, upload: boolean, key?: string) => Promise<Response | void>;
-  remove: () => void;
-  upload: (key?: string) => Promise<Response>;
-  key: string | undefined;
-  changed: boolean;
-  local: boolean;
-};
+import { twMerge } from "tailwind-merge";
 
-type ImageUploadProps = {
-  children?: ReactNode;
-  className?: string;
-  src?: string | null;
-  generated?: boolean;
-  prefix: S3Prefix;
-  presignedOptions?: {
-    /**
-     * The expires time of the presigned url in seconds
-     */
-    expires?: number;
-    maxSize?: number;
-    autoResigne?: boolean;
-  };
-};
-export const ImageUpload = forwardRef<ImageUploadRef, ImageUploadProps>(
-  (
-    {
-      className,
-      src: _src,
-      prefix,
-      presignedOptions,
-      children,
-      generated = false,
-    },
-    ref
-  ) => {
-    const { mutateAsync } = api.s3.presigned.useMutation();
-    const { post } = useS3({ prefix });
-    const [__src, set__Src] = useState<string | null | undefined>(_src);
-    const [file, setFile] = useState<File | null>(null);
-    const [presigned, setPresigned] = useState<PresignedPost | undefined>();
-    const [key, setKey] = useState<string | undefined>();
-    const [local, setLocal] = useState(false);
-    const deferredSrc = useDeferredValue(__src);
+const Context = createContext<{
+  src: string | null;
+  setSrc: (src: string | null) => void;
+}>({ src: null, setSrc: noop });
 
-    const expiresAt = useRef(
-      new Date(Date.now() + (presignedOptions?.expires ?? 0) * 1000)
-    );
-    const isPresigned = useRef(false);
+export const ImageUpload = () => <></>;
 
-    const src = deferredSrc ? deferredSrc : _src;
+type ImageUploadProps = ComponentProps<"div">;
+ImageUpload.Root = ({ children, className, ...props }: ImageUploadProps) => {
+  const [src, setSrc] = useState<string | null>(null);
 
-    const getPresigned = async (check: boolean = true) => {
-      if (
-        check &&
-        expiresAt.current.valueOf() > Date.now() &&
-        isPresigned.current
-      ) {
-        return;
-      }
-      const { key: _key, post } = await mutateAsync({
-        expires: presignedOptions?.expires,
-        maxSize: presignedOptions?.maxSize,
-        prefix: prefix,
-      });
+  const input = Children.map(children, (child) =>
+    isValidElement(child) && child.type === ImageUpload.Input ? child : false
+  );
 
-      setPresigned(post);
-      setKey(_key);
+  const picture = Children.map(children, (child) =>
+    isValidElement(child) && child.type === ImageUpload.Picture ? child : false
+  );
 
-      expiresAt.current = new Date(
-        Date.now() + (presignedOptions?.expires ?? 0) * 1000
-      );
-      isPresigned.current = true;
-
-      return { post, _key };
-    };
-
-    const set = async (file: File, upload: boolean = false) => {
-      setFile(file);
-      const url = URL.createObjectURL(file);
-      set__Src(url);
-      return await getPresigned(!upload);
-    };
-
-    useImperativeHandle(
-      ref,
-      () => ({
-        set: async (blob: Blob, upload: boolean = false, _key?: string) => {
-          const file = new File([blob], "albums_merged");
-          const presign = await set(file, upload);
-          if (upload && presign) {
-            return await post(presign.post, file, _key);
-          }
-        },
-        remove: () => {
-          setFile(null);
-          set__Src(_src);
-          setPresigned(undefined);
-          setKey(undefined);
-          isPresigned.current = false;
-        },
-        upload: async (_key?: string) => {
-          if (!presigned || !file)
-            throw new Error("No file present or presigned url failed");
-          if (expiresAt.current.valueOf() < Date.now()) {
-            if (presignedOptions?.autoResigne) {
-              await getPresigned();
-            } else {
-              throw new Error("The presigned url has expired");
-            }
-          }
-          return await post(presigned, file, _key);
-        },
-        key: key,
-        changed: Boolean(file && key && presigned && !local),
-        local: local,
-      }),
-      [presigned, key, file, local]
-    );
-
-    return (
-      <div
-        className={`${
-          className ?? ""
-        } group relative flex aspect-square shrink-0 items-center justify-center overflow-hidden rounded border border-gray-800 object-cover text-white`}
-      >
-        <input
-          onChange={async (e) => {
-            const file = e.target.files?.[0];
-            if (!file) return;
-            set(file);
-            e.target.value = "";
-            setLocal(true);
-          }}
-          type="file"
-          accept="image/*"
-          className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-        />
-
-        {src ? (
-          <img src={src} className="aspect-square w-full object-cover" />
-        ) : (
-          <ImageIcon className="pointer-events-none h-12 w-12 group-hover:scale-105" />
-        )}
-        {children && (!generated ? !src : true) && (
-          <div className="pointer-events-none absolute">{children}</div>
-        )}
+  return (
+    <Context.Provider value={{ src, setSrc }}>
+      <div {...props} className={twMerge(className, "relative")}>
+        {input}
+        {picture}
       </div>
-    );
-  }
-);
+    </Context.Provider>
+  );
+};
 
-function useS3(opts: { prefix: S3Prefix }) {
+type ImageUploadInputProps = Omit<ComponentProps<"input">, "type">;
+ImageUpload.Input = ({
+  className,
+  onChange,
+  ...props
+}: ImageUploadInputProps) => {
+  const { setSrc } = useContext(Context);
+  return (
+    <input
+      className={twMerge(
+        "absolute inset-0 h-full w-full cursor-pointer opacity-0",
+        className
+      )}
+      type="file"
+      onChange={(event) => {
+        if (event.target.files && event.target.files.item(0))
+          setSrc(URL.createObjectURL(event.target.files.item(0)!));
+        onChange?.(event);
+      }}
+      {...props}
+    />
+  );
+};
+
+type ImageUploadPictureProps = Omit<
+  ComponentProps<typeof Picture>,
+  "children"
+> & {
+  children: (src: {
+    src: string | null;
+  }) => ReactElement<{ [key: string]: any; className: string }>;
+};
+ImageUpload.Picture = ({
+  children,
+  identifier,
+  ...props
+}: ImageUploadPictureProps) => {
+  const { src } = useContext(Context);
+  return (
+    <Picture identifier={src ?? identifier} {...props}>
+      {children({ src })}
+    </Picture>
+  );
+};
+
+export function useS3(opts: { prefix: S3Prefix }) {
   const { mutateAsync } = api.s3.delete.useMutation();
+
   const post = async (post: PresignedPost, file: File, key?: string) => {
     if (key) {
       await mutateAsync({ key: key, prefix: opts.prefix });
     }
+
     const formData = new FormData();
     Object.entries({
       ...post.fields,
@@ -186,3 +115,17 @@ function useS3(opts: { prefix: S3Prefix }) {
     post,
   };
 }
+
+export const fetchPresignedPost =
+  ({ prefix }: { prefix: S3Prefix }) =>
+  async (blob: Blob | undefined) => {
+    if (!blob) return null;
+    const url = validator.createSearchURL({ prefix });
+    const res = await fetch("/api/s3/presigned" + url);
+    const data = await res.json();
+    return { ...data, file: blob } as {
+      post: PresignedPost;
+      key: string;
+      file: Blob;
+    };
+  };

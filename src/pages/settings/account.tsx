@@ -1,5 +1,10 @@
 import { Divider } from "@components/elements/divider";
-import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
+import { ErrorMessages } from "@components/elements/error";
+import {
+  ImageUpload,
+  fetchPresignedPost,
+  useS3,
+} from "@components/elements/image-upload";
 import { Modal } from "@components/elements/modal";
 import { PlusIcon } from "@components/icons/plus";
 import { SignIn } from "@components/icons/sign-in";
@@ -10,15 +15,23 @@ import { useForm } from "@marienilba/react-zod-form";
 import { useQuery } from "@tanstack/react-query";
 import { RouterOutputs, api } from "@utils/api";
 import { getNextAuthProviders } from "@utils/next-auth";
+import { zu } from "@utils/zod";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import { signIn, useSession } from "next-auth/react";
-import { ReactNode, useRef } from "react";
+import { ReactNode } from "react";
 import { z } from "zod";
 
 const editSchema = z.object({
   name: z
     .string()
     .min(3, { message: "Un pseudo doit contenir au minimum 3 caractère." }),
+  image: zu
+    .file({
+      name: z.string(),
+      size: z.number().max(5, { message: "The file should be lower than 5Mo" }),
+    })
+    .optional()
+    .transform(fetchPresignedPost({ prefix: "user" })),
 });
 
 const Settings: NextPageWithAuth & NextPageWithTitle = () => {
@@ -35,20 +48,27 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
     },
   });
 
-  const imageUpload = useRef<ImageUploadRef | null>(null);
+  const { post } = useS3({ prefix: "user" });
+
   const { submitPreventDefault, isSubmitting } = useSubmit<typeof editSchema>(
     async (e) => {
       if (!e.success) return;
       if (!user) throw new Error("Should have user");
 
       let s3Key = user?.s3Key ?? getS3key(user.image);
-      if (imageUpload.current && imageUpload.current.local) {
-        await imageUpload.current.upload(s3Key);
-      }
+
+      console.log(e.data, "data");
+
+      if (e.data.image)
+        await post(
+          e.data.image.post,
+          new File([e.data.image.file], e.data.image.file.name),
+          s3Key
+        );
 
       await edit({
         name: e.data.name,
-        s3Key: imageUpload.current ? imageUpload.current.key : undefined,
+        s3Key: e.data.image ? e.data.image.key : undefined,
       });
     }
   );
@@ -136,13 +156,25 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
         </div>
         <div className="flex flex-1 flex-col gap-2 p-2">
           <div className="flex justify-center gap-4">
-            <ImageUpload
-              src={session?.user?.image}
-              ref={imageUpload}
-              className="flex-1"
-              prefix="user"
-              presignedOptions={{ autoResigne: true, expires: 60 * 5 }}
-            />
+            <ImageUpload.Root className="flex aspect-square flex-1 shrink-0 items-center justify-center overflow-hidden rounded border border-gray-800 object-cover text-white">
+              <ImageUpload.Input
+                form="edit-user"
+                name={f0rm.fields.image().name()}
+                accept="image/*"
+              />
+              <ImageUpload.Picture
+                identifier={session?.user?.image}
+                className="aspect-square object-contain"
+              >
+                {({ src }) => (
+                  <img
+                    alt="Profil picture"
+                    src={src ?? session!.user!.image!}
+                    className="h-full w-full"
+                  />
+                )}
+              </ImageUpload.Picture>
+            </ImageUpload.Root>
             <form
               onSubmit={f0rm.form.submit}
               id="edit-user"
@@ -165,6 +197,7 @@ const Settings: NextPageWithAuth & NextPageWithTitle = () => {
               </div>
             </form>
           </div>
+          <ErrorMessages errors={f0rm.errors.errors()} />
         </div>
       </div>
     </div>

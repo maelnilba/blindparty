@@ -1,13 +1,6 @@
-import { createQueryValidator } from "helpers/query-validator";
+import { validator } from "@shared/validators/merge";
 import { twMerge } from "tailwind-merge";
-import { z } from "zod";
 import { create } from "zustand";
-
-const validator = createQueryValidator(
-  z.object({
-    sources: z.array(z.string().url()).length(4),
-  })
-);
 
 export const useAlbumsPictureStore = create<{
   cache: Map<string, Blob>;

@@ -1,17 +1,10 @@
+import { validator } from "@shared/validators/merge";
 import { ImageResponse } from "@vercel/og";
-import { createQueryValidator } from "helpers/query-validator";
 import type { NextRequest } from "next/server";
-import { z } from "zod";
 
 export const config = {
   runtime: "edge",
 };
-
-const validator = createQueryValidator(
-  z.object({
-    sources: z.array(z.string().url()).length(4),
-  })
-);
 
 export default async function (req: NextRequest) {
   const { searchParams } = new URL(req.url);

@@ -1,4 +1,10 @@
-import { HTMLAttributes, isValidElement, ReactElement, useState } from "react";
+import {
+  HTMLAttributes,
+  isValidElement,
+  ReactElement,
+  useEffect,
+  useState,
+} from "react";
 import { Placeholder } from "./placeholder";
 
 type PictureProps = {
@@ -15,6 +21,11 @@ export const Picture = ({
 }: PictureProps) => {
   const [error, setError] = useState(false);
   const className = isValidElement(children) ? children.props.className : "";
+
+  useEffect(() => {
+    setError(false);
+  }, [children]);
+
   if (!identifier || error) {
     return <Placeholder className={className} />;
   }
