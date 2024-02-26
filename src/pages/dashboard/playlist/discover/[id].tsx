@@ -1,3 +1,4 @@
+import { List } from "@components/elements/list";
 import { ClockIcon } from "@components/icons/clock";
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
@@ -61,20 +62,25 @@ const PlaylistDiscover = ({
             </div>
           </div>
         </div>
-        <div className="p-4">
+        <List.Root className="p-4">
           {playlist.tracks.map((track) => (
-            <TrackExpandedBanner
+            <List.Item
               key={track.id}
-              track={track}
-              onPlay={playTrack}
-              playing={
-                Boolean(currentTrack) &&
-                currentTrack?.id === track.id &&
-                playing
-              }
-            />
+              className="outline-none focus:ring-1 focus:ring-white/20"
+              onKeyUp={({ code }) => code === "Enter" && playTrack(track)}
+            >
+              <TrackExpandedBanner
+                track={track}
+                onPlay={playTrack}
+                playing={
+                  Boolean(currentTrack) &&
+                  currentTrack?.id === track.id &&
+                  playing
+                }
+              />
+            </List.Item>
           ))}
-        </div>
+        </List.Root>
       </div>
     </div>
   );

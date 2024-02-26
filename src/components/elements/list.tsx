@@ -40,6 +40,8 @@ List.Root = forwardRef<HTMLUListElement, ListProps>(
         return false;
       });
 
+    if (indexFocused > items.length) setIndexFocused(0);
+
     return (
       <ul
         {...props}

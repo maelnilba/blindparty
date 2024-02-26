@@ -1,6 +1,7 @@
 import { ModalRef } from "@components/elements/confirmation-modal";
 import { ErrorMessages } from "@components/elements/error";
 import { ImageUpload, ImageUploadRef } from "@components/elements/image-upload";
+import { List } from "@components/elements/list";
 import { Modal } from "@components/elements/modal";
 import { GetLayoutThrough } from "@components/layout/layout";
 import { PlaylistBanner } from "@components/player/playlist-banner";
@@ -24,7 +25,7 @@ import { getQuery } from "@utils/next-router";
 import { Noop } from "helpers/noop";
 import type { NextPageWithLayout, NextPageWithTitle } from "next";
 import { useRouter } from "next/router";
-import { Fragment, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { z } from "zod";
 
 const editSchema = z.object({
@@ -267,15 +268,22 @@ const PlaylistEdit = () => {
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2">
-      <div className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto p-4 pb-24 pt-20">
+      <List.Root className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto p-4 pb-24 pt-20">
         {data?.map((playlist) => (
-          <PlaylistBanner
+          <List.Item
+            className="outline-none focus:ring-1 focus:ring-white/20"
             key={playlist.id}
-            playlist={playlist}
-            onClick={(id) => mutate({ id })}
-          />
+            onKeyUp={({ code }) =>
+              code === "Enter" && mutate({ id: playlist.id })
+            }
+          >
+            <PlaylistBanner
+              playlist={playlist}
+              onClick={(id) => mutate({ id })}
+            />
+          </List.Item>
         ))}
-      </div>
+      </List.Root>
       <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto px-2 pb-24 pt-0.5">
         {tracks && (
           <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">
@@ -299,23 +307,31 @@ const PlaylistEdit = () => {
             )}
           </div>
         )}
-        <div className="flex flex-col gap-2 p-4">
+        <List.Root className="flex flex-col gap-2 p-4">
           {tracks?.map((track) => (
-            <TrackBanner
+            <List.Item
+              className="outline-none focus:ring-1 focus:ring-white/20"
               key={track.id}
-              track={track}
-              onAdd={addTrack}
-              onRemove={removeTrack}
-              on={tracksMap.has(track.id) ? "REMOVE" : "ADD"}
-              onPlay={playTrack}
-              playing={
-                Boolean(currentTrack) &&
-                currentTrack?.id === track.id &&
-                playing
-              }
-            />
+              onKeyUp={({ code }) => code === "Enter" && playTrack(track)}
+            >
+              {({ selected }) => (
+                <TrackBanner
+                  track={track}
+                  onAdd={addTrack}
+                  onRemove={removeTrack}
+                  on={tracksMap.has(track.id) ? "REMOVE" : "ADD"}
+                  onPlay={playTrack}
+                  playing={
+                    Boolean(currentTrack) &&
+                    currentTrack?.id === track.id &&
+                    playing
+                  }
+                  selected={selected}
+                />
+              )}
+            </List.Item>
           ))}
-        </div>
+        </List.Root>
       </div>
       <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto px-2 pb-24 pt-0.5">
         <div className="sticky top-0 z-10 flex flex-col gap-2 bg-black/10 py-2 pt-20 backdrop-blur-sm">
@@ -419,31 +435,45 @@ const PlaylistEdit = () => {
             </div>
           </Modal.Content>
         </Modal.Root>
-        <div className="flex flex-1 flex-col gap-2 p-4" ref={autoAnimateRef}>
+        <List.Root
+          className="flex flex-1 flex-col gap-2 p-4"
+          ref={autoAnimateRef}
+        >
           {!tracksMap.size && (
-            <ErrorMessages errors={f0rm.errors.tracks().errors()} />
+            <List.NotItem>
+              <ErrorMessages errors={f0rm.errors.tracks().errors()} />
+            </List.NotItem>
           )}
           {[...tracksMap].map(([_, track], index) => (
-            <Fragment key={track.id}>
-              <input
-                form="edit-playlist"
-                type="hidden"
-                value={track.id}
-                name={f0rm.fields.tracks(index).id().name()}
-              />
-              <TrackBanner
-                track={track}
-                onRemove={handleRemoveTrack}
-                onPlay={playTrack}
-                playing={
-                  Boolean(currentTrack) &&
-                  currentTrack?.id === track.id &&
-                  playing
-                }
-              />
-            </Fragment>
+            <List.Item
+              key={track.id}
+              className="outline-none focus:ring-1 focus:ring-white/20"
+              onKeyUp={({ code }) => code === "Enter" && playTrack(track)}
+            >
+              {({ selected }) => (
+                <>
+                  <input
+                    form="edit-playlist"
+                    type="hidden"
+                    value={track.id}
+                    name={f0rm.fields.tracks(index).id().name()}
+                  />
+                  <TrackBanner
+                    track={track}
+                    onRemove={handleRemoveTrack}
+                    onPlay={playTrack}
+                    playing={
+                      Boolean(currentTrack) &&
+                      currentTrack?.id === track.id &&
+                      playing
+                    }
+                    selected={selected}
+                  />
+                </>
+              )}
+            </List.Item>
           ))}
-        </div>
+        </List.Root>
       </div>
     </div>
   );
