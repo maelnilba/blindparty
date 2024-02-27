@@ -1,26 +1,8 @@
-import {
-  ZodArray,
-  ZodBoolean,
-  ZodDate,
-  ZodEnum,
-  ZodNumber,
-  ZodString,
-  z,
-  type ZodObject,
-} from "zod";
+import { ZodTypeAny, z, type ZodObject } from "zod";
 import { getBaseUrl } from "./base-url";
 
 type QueryZodSchema = ZodObject<{
-  [x: string]:
-    | ZodString
-    | ZodNumber
-    | ZodBoolean
-    | ZodDate
-    | ZodEnum<any>
-    | ZodArray<ZodString>
-    | ZodArray<ZodNumber>
-    | ZodArray<ZodBoolean>
-    | ZodArray<ZodDate>;
+  [x: string]: ZodTypeAny;
 }>;
 
 export const createBodyValidator = <T extends ZodObject<any>>(schema: T) => {

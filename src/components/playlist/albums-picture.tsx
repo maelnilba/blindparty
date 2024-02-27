@@ -33,6 +33,22 @@ export const AlbumsPicture = ({
 }) => {
   const [A1, A2] = row1;
   const [B1, B2] = row2;
+
+  if (!A2 && !B1 && !B2) {
+    return (
+      <div
+        className={twMerge(
+          "group relative flex aspect-square shrink-0 items-center justify-center overflow-hidden rounded object-cover text-white outline outline-1 outline-gray-800",
+          className
+        )}
+      >
+        <picture>
+          <img className="aspect-square" src={A1} />
+        </picture>
+      </div>
+    );
+  }
+
   return (
     <div
       className={twMerge(
@@ -94,8 +110,17 @@ export function useMergeAlbum<T extends Map<Track["id"], Track>>(map: T) {
       await setMockAlbumsPictureDebounce(sources);
     }
 
-    if (map.size < 4) {
+    if (map.size < 1) {
       setMockAlbumsPicture(undefined);
+    } else if (map.size < 4) {
+      const image = [...map]
+        .sort()
+        .map(([_, v]) => v.album.images)
+        .at(0)!
+        .map((i) => i.url)
+        .at(0);
+
+      if (image) setMockAlbumsPicture([image]);
     }
   }, [map]);
 

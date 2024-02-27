@@ -3,6 +3,6 @@ import { z } from "zod";
 
 export const validator = createQueryValidator(
   z.object({
-    sources: z.array(z.string().url()).length(4),
+    sources: z.array(z.string().url()).length(4).or(z.string().url()),
   })
 );
