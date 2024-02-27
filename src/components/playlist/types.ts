@@ -7,3 +7,7 @@ type TrackPrisma = NonNullable<
 >;
 
 export type Playlist = TrackApi.Playlist;
+
+export type PlaylistPrisma = NonNullable<
+  RouterOutputs["playlist"]["get_playlist"]
+>;

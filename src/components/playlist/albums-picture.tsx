@@ -53,10 +53,11 @@ export const AlbumsPicture = ({
   );
 };
 
-import { Track } from "@components/playlist/types";
+import { ImageUpload } from "@components/elements/image-upload";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 import { useAsyncEffect } from "@hooks/itsfine/useAsyncEffect";
 import { useState } from "react";
+import { PlaylistPrisma, Track } from "./types";
 
 export function useMergeAlbum<T extends Map<Track["id"], Track>>(map: T) {
   const [mockAlbumsPicture, setMockAlbumsPicture] = useState<
@@ -74,6 +75,7 @@ export function useMergeAlbum<T extends Map<Track["id"], Track>>(map: T) {
     if (map.size > 3) {
       const images = [
         ...[...map]
+          .sort()
           .map(([_, v]) => v.album.images)
           .reduce((map, images) => {
             const image = images[0];
@@ -100,3 +102,50 @@ export function useMergeAlbum<T extends Map<Track["id"], Track>>(map: T) {
 
   return [mockAlbumsPicture, fetchMergeAlbum] as const;
 }
+
+type AlbumInputProps = {
+  form: string;
+  name: string;
+  playlist?: PlaylistPrisma;
+  mockAlbumsPicture?: string[];
+};
+export const AlbumInput = ({
+  form,
+  name,
+  playlist,
+  mockAlbumsPicture,
+}: AlbumInputProps) => (
+  <ImageUpload.Root className="flex aspect-square flex-1 shrink-0 items-center justify-center overflow-hidden rounded border border-gray-800 object-cover text-white">
+    <ImageUpload.Input form={form} name={name} accept="image/*" />
+    <ImageUpload.Picture
+      identifier={
+        playlist
+          ? playlist.generated
+            ? mockAlbumsPicture ?? playlist.picture
+            : playlist.picture
+          : mockAlbumsPicture
+      }
+      className="aspect-square object-contain"
+    >
+      {({ src }) =>
+        (
+          playlist
+            ? mockAlbumsPicture && playlist.generated && !src
+            : mockAlbumsPicture && !src
+        ) ? (
+          <AlbumsPicture
+            className="pointer-events-none flex-1"
+            row1={mockAlbumsPicture!.slice(0, 2)}
+            row2={mockAlbumsPicture!.slice(2, 4)}
+          />
+        ) : (
+          <img
+            alt="Playlist picture"
+            src={src ?? playlist?.picture ?? undefined}
+            className="h-full w-full"
+          />
+        )
+      }
+    </ImageUpload.Picture>
+  </ImageUpload.Root>
+);
