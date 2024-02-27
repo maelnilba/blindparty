@@ -2,10 +2,10 @@ import { ErrorMessages } from "@components/elements/error";
 import { List } from "@components/elements/list";
 import { ModalRef } from "@components/elements/modal";
 import { GetLayoutThrough } from "@components/layout/layout";
-import { PlaylistBanner } from "@components/player/playlist-banner";
 import { TrackBanner } from "@components/player/track-banner";
 import { TrackPlayer, usePlayer } from "@components/player/track-player";
 import { AlbumInput, useMergeAlbum } from "@components/playlist/albums-picture";
+import { PlaylistContainer } from "@components/playlist/playlist-container";
 import { createSchema, useCreate } from "@components/playlist/playlist-form";
 import { RemoveModal } from "@components/playlist/remove-modal";
 import { Track } from "@components/playlist/types";
@@ -58,10 +58,6 @@ const PlaylistCreate = () => {
     }
   };
 
-  const getPlaylistTrack = (id: string) => {
-    mutate({ id });
-  };
-
   const { submitPreventDefault, isSubmitting, isLoading, isSuccess } =
     useCreate({
       tracksMap,
@@ -75,20 +71,7 @@ const PlaylistCreate = () => {
 
   return (
     <div className="scrollbar-hide flex flex-1 flex-row gap-2 overflow-y-hidden">
-      <List.Root className="scrollbar-hide flex h-screen flex-1 flex-col gap-2 overflow-y-auto p-4 pb-24 pt-20">
-        {data?.map((playlist) => (
-          <List.Item
-            className="outline-none focus:ring-1 focus:ring-white/20"
-            key={playlist.id}
-            onKeyUp={({ code }) =>
-              code === "Enter" && getPlaylistTrack(playlist.id)
-            }
-          >
-            <PlaylistBanner playlist={playlist} onClick={getPlaylistTrack} />
-          </List.Item>
-        ))}
-      </List.Root>
-
+      <PlaylistContainer playlists={data} onClick={(id) => mutate({ id })} />
       <div className="scrollbar-hide relative flex h-screen flex-1 flex-col gap-2 overflow-y-auto px-2 pb-24 pt-0.5">
         {tracks && (
           <div className="sticky top-0 z-10 flex items-center justify-center gap-4 bg-black/10 py-2 pt-20 backdrop-blur-sm">

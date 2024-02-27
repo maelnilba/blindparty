@@ -31,7 +31,6 @@ export const AlbumsPicture = ({
   row2: string[];
   className?: string;
 }) => {
-  // flex-col issues
   const [A1, A2] = row1;
   const [B1, B2] = row2;
   return (

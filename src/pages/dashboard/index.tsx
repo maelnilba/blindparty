@@ -1,7 +1,7 @@
 import { FriendBanner } from "@components/friend/friend-banner";
 import { AuthGuardUser } from "@components/layout/auth";
 import { PartyBanner } from "@components/party/party-banner";
-import { PlaylistBanner } from "@components/playlist/playlist-banner";
+import { PlaylistBanner } from "@components/party/playlist-banner";
 import { api } from "@utils/api";
 import type { NextPageWithAuth, NextPageWithTitle } from "next";
 import Link from "next/link";

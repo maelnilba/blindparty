@@ -3,7 +3,7 @@ import { InputFade } from "@components/elements/input-fade";
 import { Friend, FriendBanner } from "@components/friend/friend-banner";
 import { Picture } from "@components/images/picture";
 import { AuthGuardUser } from "@components/layout/auth";
-import { Playlist, PlaylistBanner } from "@components/playlist/playlist-banner";
+import { Playlist, PlaylistBanner } from "@components/party/playlist-banner";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { Tab } from "@headlessui/react";
 import { useSubmit } from "@hooks/form/useSubmit";

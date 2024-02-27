@@ -1,5 +1,5 @@
 import { List } from "@components/elements/list";
-import { PlaylistBanner } from "@components/player/playlist-banner";
+import { PlaylistBanner } from "@components/playlist/playlist-banner";
 import { spotify } from "@hooks/api/useTrackApi";
 import { useDebounce } from "@hooks/helpers/useDebounce";
 
